@@ -1,0 +1,19 @@
+name: Pruebas Delta (datos demo)
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar Playwright
+        run: |
+          pip install playwright==1.48.0
+          python -m playwright install --with-deps chromium
+      - name: Cargar los Excels demo en Delta y verificar resultados exactos
+        run: python tests/test_demo.py

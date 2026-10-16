@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "Si usas Pingüino Delta, cítalo así:"
+title: "Pingüino Delta: calculadora de programación y rotación de medicamentos para farmacia de Atención Primaria"
+authors:
+  - family-names: "Carrasco Cisterna"
+    given-names: "Felipe"
+    affiliation: "CESFAM Limache Viejo, DESAM Limache"
+version: "2.0-demo"
+date-released: "2026-10-16"
+keywords: ["atención primaria", "farmacia", "gestión de medicamentos", "CENABAST", "Chile"]
+license: "CC-BY-NC-4.0"

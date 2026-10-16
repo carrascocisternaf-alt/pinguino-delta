@@ -1,0 +1,13 @@
+# ── Protección de datos: NUNCA subir datos reales ──
+# Solo se versionan los Excels ficticios de demo/
+*.xlsx
+*.xls
+*.csv
+*.json
+!demo/*.xlsx
+# Respaldos exportados desde Delta
+*respaldo*
+*backup*
+__pycache__/
+node_modules/
+.DS_Store
