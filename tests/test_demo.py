@@ -49,6 +49,17 @@ async def main():
         t=await st(pg,'st-prog'); ok('80 filas de consumo / 86 de programación' in t,'05 archivo único → '+t[-90:])
         ok('✓ 40 artículos' in await st(pg,'st-cons'),'05 → consumo promedio derivado')
         ok(not errs,f'Sin errores JS ni alertas: {errs}')
+        # ── Escenario C: botón "Cargar datos de prueba" (datos embebidos) ──
+        pg,errs=await nueva(b)
+        await pg.click('#demo-bar button'); await pg.wait_for_timeout(5500)
+        ok('8 archivos de prueba cargados' in await st(pg,'demo-st'),'Botón → '+(await st(pg,'demo-st'))[:60])
+        for sid,txt in [('st-inv','✓ 40 artículos'),('st-prog','doble programación'),('st-disp','años: 2024, 2025, 2026'),('cal-st','✓ 223 despachos'),('difinv-st','✓ 14 artículo(s)'),('gasto-st','✓ 840 registros')]:
+            ok(txt in await st(pg,sid),f'Botón → {sid}')
+        await pg.evaluate("calcularRotacion('arsenal')")
+        c=await pg.evaluate("(()=>{const R=window._rotResultados_arsenal;const L=R.map?R:R.res;const c={};L.forEach(x=>c[x.estado]=(c[x.estado]||0)+1);return c})()")
+        ok(c=={'ok':24,'critico':5,'sobrestock':6,'vence-pronto':5},f'Botón → Rotación: {c}')
+        errs=[e for e in errs if not e.startswith('DIALOGO: Se cargarán los datos FICTICIOS')]
+        ok(not errs,f'Botón → sin errores JS ni alertas: {errs}')
         await b.close()
     print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')
     sys.exit(1 if fallas else 0)

@@ -9,8 +9,9 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 ## ▶ Probar ahora
 
 1. Abrir Delta: **[versión web](https://carrascocisternaf-alt.github.io/pinguino-delta/)** o descargar `index.html` y abrirlo con doble clic (funciona sin internet).
-2. Descargar la carpeta [`demo/`](demo/) — datos **100 % ficticios**.
-3. Cargar los archivos en este orden:
+2. Presionar **🧪 Cargar datos de prueba** (arriba, en Arsenal CESFAM): carga los 8 Excels ficticios con un clic.
+
+**O manualmente:** descargar la carpeta [`demo/`](demo/) — datos **100 % ficticios** — y cargar los archivos en este orden:
 
 | Paso | Archivo | Dónde se carga |
 |---|---|---|
@@ -40,7 +41,7 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 - Nunca subir inventarios, logs de dispensación ni archivos con datos de pacientes.
 
 ## ✅ Pruebas automáticas
-Cada cambio ejecuta [`tests/test_demo.py`](tests/test_demo.py) en GitHub Actions: abre Delta **sin internet**, carga los 9 Excels y exige resultados exactos (40 artículos homologados, 0 no reconocidos, clasificación de rotación 24/5/6/5, sin errores).
+Cada cambio ejecuta [`tests/test_demo.py`](tests/test_demo.py) en GitHub Actions: abre Delta **sin internet**, carga los 9 Excels (a mano y con el botón de datos de prueba) y exige resultados exactos (40 artículos homologados, 0 no reconocidos, clasificación de rotación 24/5/6/5, sin errores).
 
 ```bash
 pip install playwright openpyxl && python -m playwright install chromium
@@ -51,6 +52,7 @@ python tools/generar_demo.py       # regenerar Excels demo (semilla fija, idént
 ## Notas de esta versión
 - Pestaña **Log de farmacia** oculta temporalmente (versión demostración).
 - SheetJS 0.18.5 y JSZip 3.10.1 embebidos en el HTML (funciona 100 % offline).
+- Botón **🧪 Cargar datos de prueba** con los Excels demo embebidos (funciona online y offline).
 - Referencia SAPU incluida anonimizada (cantidades y precios ficticios).
 
 ## Licencia
