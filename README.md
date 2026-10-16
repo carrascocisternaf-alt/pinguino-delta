@@ -1,12 +1,14 @@
 # 🐧 Pingüino Delta
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23420389.svg)](https://doi.org/10.5281/zenodo.23420389) [![Pruebas](https://github.com/carrascocisternaf-alt/pinguino-delta/actions/workflows/pruebas.yml/badge.svg)](https://github.com/carrascocisternaf-alt/pinguino-delta/actions/workflows/pruebas.yml)
+
 Calculadora de **programación, rotación y vencimientos de medicamentos** para farmacia de Atención Primaria (APS), desarrollada en CESFAM Limache Viejo — DESAM Limache (Servicio de Salud Viña del Mar–Quillota–Petorca).
 
 **Un solo archivo HTML, sin instalación y sin servidor.** Los Excels se leen en el navegador de quien lo usa; ningún dato sale del computador.
 
 ## ▶ Probar ahora
 
-1. Abrir Delta: **[versión web](https://USUARIO.github.io/pinguino-delta/)** o descargar `index.html` y abrirlo con doble clic (funciona sin internet).
+1. Abrir Delta: **[versión web](https://carrascocisternaf-alt.github.io/pinguino-delta/)** o descargar `index.html` y abrirlo con doble clic (funciona sin internet).
 2. Descargar la carpeta [`demo/`](demo/) — datos **100 % ficticios**.
 3. Cargar los archivos en este orden:
 
@@ -53,6 +55,9 @@ python tools/generar_demo.py       # regenerar Excels demo (semilla fija, idént
 
 ## Licencia
 CC BY-NC 4.0 — uso y adaptación libres citando la autoría; sin uso comercial. Ver [`LICENSE`](LICENSE).
+
+## Cómo citar
+Carrasco Cisterna, F. (2026). *Pingüino Delta: calculadora de programación y rotación de medicamentos para farmacia de Atención Primaria* (v2.0-demo) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23420389
 
 ## Autor
 Q.F. Felipe Carrasco Cisterna — Ecosistema Pingüino APS. Ver [`CITATION.cff`](CITATION.cff).
