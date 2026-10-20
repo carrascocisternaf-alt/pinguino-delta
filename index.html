@@ -18613,5 +18613,48 @@ async function cargarDatosPrueba(){
   st.innerHTML='✅ <b>'+n+' archivos de prueba cargados.</b> Revisa 🔄 Rotación de stock (5 quiebres, 5 mermas, 6 sobrestock) y la pestaña 📊 Análisis. Datos 100% ficticios.';
 }
 </script>
+
+<!-- ══ Vista celular (oct-2026): solo aplica en pantallas de hasta 820 px; el computador no cambia ══ -->
+<style id="delta-movil">
+@media (max-width:820px){
+  html,body{overflow-x:hidden}
+  .tb{padding:0 .75rem!important}
+  .product-desc{display:none!important}
+  .mode-tabs{overflow-x:auto;flex-wrap:nowrap!important;padding:6px .5rem 0!important;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .mode-tabs::-webkit-scrollbar{display:none}
+  .mtab{flex:0 0 auto;white-space:nowrap;padding:7px 13px!important;margin-left:0!important}
+  .layout:not([style*="none"]){display:block!important}
+  .layout,[id^="view-"]{height:auto!important;overflow:visible!important}
+  .sb{height:auto!important;border-right:none!important;border-bottom:1px solid var(--bdr2);box-shadow:none!important}
+  .sb .dl{max-height:34vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .main{height:auto!important;overflow:visible!important;padding:1rem .75rem 2rem!important}
+  .stabs{overflow-x:auto;flex-wrap:nowrap!important;scrollbar-width:none}
+  .stabs::-webkit-scrollbar{display:none}
+  .stab{flex:0 0 auto;white-space:nowrap;padding:8px 12px!important}
+  .ubanner{grid-template-columns:1fr 1fr!important}
+  [id^="view-"] [style*="grid-template-columns"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  [id^="view-"] [style*="display:flex"]{flex-wrap:wrap!important}
+  [id^="view-"] table{display:block;overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+  [id^="view-"] input,[id^="view-"] select,[id^="view-"] textarea{max-width:100%}
+  [id^="view-"] > div[style*="sticky"]{padding:.45rem .6rem!important;flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none}
+  .an-tab,.sp-tab{flex:0 0 auto;white-space:nowrap}
+  [id^="view-"] h2{font-size:17px}
+  .ph{min-height:30vh}
+}
+@media (max-width:480px){
+  .ubanner{grid-template-columns:1fr!important}
+}
+</style>
+<script id="delta-movil-js">
+/* En celular, al tocar un artículo de la lista se baja automáticamente a su ficha */
+document.addEventListener('click',function(e){
+  if(!window.matchMedia('(max-width:820px)').matches)return;
+  if(e.target.closest('button,input,label,.di-tag'))return;
+  var lista=e.target.closest('.dl');
+  if(!lista||e.target===lista)return;
+  var v=lista.closest('[id^="view-"]');var m=v&&v.querySelector('.main');
+  setTimeout(function(){if(!m)return;var f=[].slice.call(m.querySelectorAll('[id$="panel"]')).find(function(x){return x.offsetParent;});(f||m).scrollIntoView({behavior:'smooth',block:'start'});},300);
+},true);
+</script>
 </body>
 </html>
