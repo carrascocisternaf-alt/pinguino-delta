@@ -36,6 +36,16 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 
 > Los vencimientos demo están calculados desde el **16-10-2026**; con el paso del tiempo los días restantes disminuyen.
 
+## 🧠 IA local (sin internet)
+Todo corre en el navegador; ningún modelo reemplaza un cálculo existente, solo sugiere.
+
+| Módulo | Dónde | Qué hace | Evidencia |
+|---|---|---|---|
+| Homologación que aprende | Análisis → Configuración → Equivalencias de nombres | Sugiere el artículo AVIS para nombres no reconocidos comparando principio activo, dosis y forma; aprende abreviaturas de los diccionarios y de cada equivalencia confirmada; nunca sugiere una dosis distinta | Validación cruzada (5 partes) sobre 196 pares reales: 95% de acierto vs 90% del método anterior; errores de dosis 7 vs 13 |
+| Calidad de datos | Aviso en Mi arsenal · Análisis → Configuración → Calidad de datos | Detecta posibles errores al cargar (cero de más, stock de años, promedio vs real, programación desproporcionada, vencimientos improbables) con mediana y MAD del propio artículo | 0 falsos avisos en los datos demo; detecta errores sembrados |
+| Política por artículo | Análisis → Abastecimiento → Política por artículo | Recomienda cobertura mín/máx por artículo minimizando quiebre (ponderado por VEN) + merma + stock, con simulación de escenarios comunes, FEFO y atrasos | La recomendada nunca es peor que la política actual en los mismos escenarios |
+| Grupos de comportamiento | Análisis → Clasificación → Grupos de comportamiento | k-means sobre variabilidad, meses sin consumo, tendencia, volumen y cobertura; k elegido por silueta; política sugerida por grupo | Prueba automática |
+
 ## 🔒 Datos
 - Este repositorio **solo contiene datos ficticios**. `.gitignore` bloquea cualquier otro Excel.
 - Nunca subir inventarios, logs de dispensación ni archivos con datos de pacientes.

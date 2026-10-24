@@ -465,6 +465,34 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 .ay-item mark{background:#FFF3B0;padding:0 1px;border-radius:2px}
 @media print{.ay-buscador{display:none}}
 </style>
+<style id="ia-local-css">
+.ia-aviso{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 .6rem;padding:.6rem .9rem;border:1.5px solid #F2B84B;border-radius:var(--r);background:#FFF8E6;font-size:12.5px;color:#6B4A00}
+.ia-aviso button{padding:6px 14px;border:1.5px solid #B37A00;border-radius:20px;background:#fff;color:#7A5200;font:700 12px 'DM Sans',sans-serif;cursor:pointer}
+.ia-params{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:.9rem 1rem;margin-bottom:1rem}
+.ia-params label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--ink3);font-weight:600}
+.ia-params input[type=number]{width:120px;padding:7px 8px;border:1.5px solid var(--bdr);border-radius:6px;font:13px 'DM Mono',monospace}
+.ia-params .ia-chk{flex-direction:row;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+.ia-tabla{width:100%;border-collapse:collapse;font-size:12px}
+.ia-tabla th{background:var(--navy);color:#fff;text-align:left;padding:.5rem .7rem;font-size:10.5px;font-weight:700;white-space:nowrap}
+.ia-tabla td{padding:.45rem .7rem;border-bottom:1px solid var(--bdr2);vertical-align:top}
+.ia-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.ia-alta{background:#FDEDEE;color:#9B1C1C}.ia-media{background:#FFF4DC;color:#8A5A00}
+.ia-link{border:none;background:none;color:var(--teal);font:700 12px 'DM Sans',sans-serif;cursor:pointer;padding:0;text-decoration:underline}
+.ia-btn2{padding:8px 14px;border:1.5px solid var(--navy);border-radius:var(--r);background:#fff;color:var(--navy);font:700 12px 'DM Sans',sans-serif;cursor:pointer}
+.ia-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:.4rem}
+.ia-kpis>div{background:#fff;border:1px solid var(--bdr2);border-radius:var(--r);padding:.7rem .9rem;display:flex;flex-direction:column;gap:2px}
+.ia-kpis span{font-size:11px;color:var(--ink3);font-weight:600}.ia-kpis b{font-size:18px;color:var(--navy)}.ia-kpis small{font-size:10.5px;color:var(--ink3)}
+.ia-nota{font-size:11.5px;color:var(--ink3);margin:.7rem 0 0;line-height:1.55}
+.ia-modelo{font-size:12px;color:var(--ink2);background:#F3F8F7;border:1px solid #CFE6E3;border-radius:var(--r);padding:.6rem .8rem;margin-bottom:.7rem;line-height:1.55}
+.ia-grupos{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.ia-grupo{background:#fff;border:1px solid var(--bdr2);border-radius:var(--rl2);padding:.9rem 1rem}
+.ia-grupo-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:.5rem}.ia-grupo-h b{color:var(--navy);font-size:14px}.ia-grupo-h span{font-size:11px;color:var(--ink3)}
+.ia-feats>div{display:grid;grid-template-columns:130px 1fr;align-items:center;gap:8px;font-size:11px;color:var(--ink2);margin:3px 0}
+.ia-zbar{position:relative;display:block;height:8px;background:#EEF1F4;border-radius:4px}.ia-zbar::after{content:'';position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:#9AA4AE}.ia-zbar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.ia-pol{font-size:12px;color:var(--ink2);margin:.6rem 0 .4rem}
+.ia-grupo summary{cursor:pointer;font-size:12px;color:var(--teal);font-weight:700}
+.ia-miembros{font-size:11.5px;color:var(--ink2);max-height:220px;overflow:auto;margin-top:.4rem;line-height:1.6}
+</style>
 </head>
 <body>
 
@@ -552,6 +580,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
         <button class="stab" id="a-stab-pac" onclick="aSwitch('pac')">🔄 Rotación de stock</button>
         <button class="stab" id="a-stab-vis" onclick="aSwitch('vis')">📊 Historial de consumo</button>
       </div>
+        <div id="calidad-aviso" class="ia-aviso" style="display:none"></div>
         <!-- Botón datos de prueba (versión demo GitHub, oct-2026) -->
         <div id="demo-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 .6rem;padding:.55rem .8rem;border:1.5px dashed var(--navy);border-radius:var(--r);background:var(--surf)">
           <button onclick="cargarDatosPrueba()" class="btn-calc" style="padding:8px 16px;white-space:nowrap;width:auto;min-width:max-content;flex:0 0 auto">🧪 Cargar datos de prueba</button>
@@ -1114,6 +1143,9 @@ function visSwitchSubTab(sub){
     <button class="an-tab" data-an="calest" onclick="anSwitch('calest')">📅 Calendario estacional</button>
     <button class="an-tab" data-an="patrones" onclick="anSwitch('patrones')">🧬 Patrones de demanda</button>
     <button class="an-tab" data-an="clusters" onclick="anSwitch('clusters')">🔗 Grupos de riesgo compartido</button>
+    <button class="an-tab" data-an="politica" onclick="anSwitch('politica')">🎛 Política por artículo</button>
+    <button class="an-tab" data-an="gruposcomp" onclick="anSwitch('gruposcomp')">🧩 Grupos de comportamiento</button>
+    <button class="an-tab" data-an="calidad" onclick="anSwitch('calidad')">🩺 Calidad de datos</button>
   </div>
 
   <!-- ══ PANEL 1: CALENDARIO CENABAST ══ -->
@@ -1877,6 +1909,7 @@ function visSwitchSubTab(sub){
 
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem;margin-bottom:1.1rem">
       <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;margin-bottom:.6rem">🤝 Sugerencias automáticas</div>
+      <div class="ia-modelo"><b>🧠 Modelo que aprende:</b> compara el principio activo letra por letra (tolera abreviaturas y truncados), la dosis y la forma farmacéutica, y aprende de cada equivalencia que confirmas. <b>Nunca sugiere un artículo con dosis distinta.</b><div id="hom-modelo-info" style="margin-top:.3rem"></div><button type="button" class="ia-link" onclick="homUiEvaluar()">📏 Medir precisión</button> <span id="hom-eval"></span></div>
       <div style="font-size:12px;color:var(--ink2);margin-bottom:.6rem">Compara los nombres que no se reconocieron en la última carga (inventario, consumo o programación) contra el catálogo de Delta — revisa cada sugerencia antes de confirmar.</div>
       <button style="padding:9px 16px;border:1.5px solid var(--teal);border-radius:var(--r);background:#fff;color:var(--teal);cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:600" onclick="uiEquivGenerarSugerencias()">🔍 Buscar sugerencias</button>
       <div id="equiv-sug-status" style="font-size:12px;color:var(--ink3);margin-top:.5rem"></div>
@@ -1892,6 +1925,37 @@ function visSwitchSubTab(sub){
     </div>
   </div>
 
+  <!-- ══ IA LOCAL (oct-2026): Política por artículo · Grupos de comportamiento · Calidad de datos ══ -->
+  <div id="an-politica" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
+    <div style="margin-bottom:1rem">
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🎛 Política de cobertura por artículo</h2>
+      <p style="font-size:12.5px;color:var(--ink3);margin-top:.3rem">En vez de usar la misma cobertura mínima y máxima para todo el arsenal, prueba 15 combinaciones en cada artículo y recomienda la que menos quiebres y merma produce. Simula cientos de meses posibles con su variabilidad real de consumo, atrasos de entrega al azar y el vencimiento de cada lote (sale primero lo que vence antes). Un artículo Vital solo acepta políticas con riesgo de quiebre ≤ 5% y uno Esencial ≤ 10%. Es una recomendación: no cambia tus umbrales ni la programación.</p>
+    </div>
+    <div class="ia-params">
+      <label>Horizonte (meses)<input type="number" id="pol-h" value="12" min="6" max="24"></label>
+      <label>Escenarios por política<input type="number" id="pol-n" value="200" min="50" max="1000" step="50"></label>
+      <label>Plazo de reposición (meses)<input type="number" id="pol-l" value="1" min="0" max="4"></label>
+      <label>Vida útil de lo que llega (meses)<input type="number" id="pol-s" value="24" min="6" max="60"></label>
+      <label class="ia-chk"><input type="checkbox" id="pol-atraso" checked> Incluir atrasos de entrega al azar</label>
+      <button type="button" class="btn-calc" style="padding:9px 20px" onclick="politicaCalcular()">🎛 Calcular políticas</button>
+    </div>
+    <div id="pol-content"><div class="ph" style="min-height:18vh"><h2>Presiona «Calcular políticas»</h2><p>Necesitas inventario y consumos cargados en Mi arsenal. El historial mensual permite usar la variabilidad real de cada artículo y la clasificación VEN ajusta el riesgo aceptable.</p></div></div>
+  </div>
+  <div id="an-gruposcomp" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
+    <div style="margin-bottom:1rem">
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧩 Grupos de comportamiento</h2>
+      <p style="font-size:12.5px;color:var(--ink3);margin-top:.3rem">Agrupa los artículos que se comportan parecido según cinco rasgos de su historial: variabilidad, meses sin consumo, tendencia, volumen y cobertura de stock. Usa k-means y elige solo el número de grupos (entre 3 y 6) que mejor los separa. Sirve para asignar una política por grupo en vez de cortes fijos, y para ubicar artículos nuevos o sin historial en el grupo más parecido.</p>
+    </div>
+    <button type="button" class="btn-calc" style="padding:9px 20px;margin-bottom:1rem" onclick="gruposCalcular()">🧩 Formar grupos</button>
+    <div id="grc-content"><div class="ph" style="min-height:18vh"><h2>Presiona «Formar grupos»</h2><p>Necesitas consumo mes a mes (12 meses o más) para al menos 8 artículos.</p></div></div>
+  </div>
+  <div id="an-calidad" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
+    <div style="margin-bottom:1rem">
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🩺 Calidad de datos</h2>
+      <p style="font-size:12.5px;color:var(--ink3);margin-top:.3rem">Revisa automáticamente cada archivo que cargas y avisa valores que no calzan con el propio historial de cada artículo: un consumo 10 veces mayor que lo habitual (¿un cero de más?), un stock que equivale a años de consumo, un consumo promedio muy distinto del real, programaciones desproporcionadas o fechas de vencimiento improbables. Usa la mediana y la desviación robusta del artículo, así que un mes alto aislado no distorsiona la referencia.</p>
+    </div>
+    <div id="calidad-content"></div>
+  </div>
   <!-- ══ PANEL: CLASIFICACIÓN VEN (referencia mundial, ago-2026) ══
        100% aditivo: nuevo mapa venMap persistido aparte, no toca PM,
        PM_MANUAL ni ninguna clasificación existente. Metodología
@@ -3468,7 +3532,8 @@ function equivGenerarSugerencias(umbral){
   const universoComparacion=ARTS.filter(a=>!ARTS_DINAMICOS[a]);
   candidatos.forEach(c=>{
     let mejor=null,mejorScore=0;
-    for(const art of universoComparacion){
+    if(typeof homSugerir==='function'){const r=homSugerir(c.raw,universoComparacion);mejor=r.art;mejorScore=r.det&&r.det.bloqueo?0:r.score;}
+    else for(const art of universoComparacion){
       const s=_similitudEquivDelta(c.raw,art);
       if(s>mejorScore){mejorScore=s;mejor=art;}
     }
@@ -18966,11 +19031,11 @@ function descargarEjemploDelta(pre){
    grupos; ninguna se elimina: solo se muestran las del grupo elegido.
    Una pestaña oculta a propósito (Log) sigue oculta. */
 const AN_GRUPOS=[
-  {id:'abast',nombre:'📦 Abastecimiento',tabs:['calendario','prediccion','objetivo','calest','tunel','comparador','sesgo','cpu']},
+  {id:'abast',nombre:'📦 Abastecimiento',tabs:['calendario','prediccion','objetivo','politica','calest','tunel','comparador','sesgo','cpu']},
   {id:'gasto',nombre:'💰 Gasto y presupuesto',tabs:['gasto','presupuesto','presupuesto-prog','scoring']},
   {id:'riesgo',nombre:'⚠️ Riesgo',tabs:['crisis','montecarlo','mapa','clusters','detective','adn']},
-  {id:'clasif',nombre:'📐 Clasificación',tabs:['abcxyz','multicriterio','ven','patrones','correlaciones']},
-  {id:'config',nombre:'⚙️ Configuración y equipo',tabs:['equiv','turnos','log']}
+  {id:'clasif',nombre:'📐 Clasificación',tabs:['abcxyz','multicriterio','ven','gruposcomp','patrones','correlaciones']},
+  {id:'config',nombre:'⚙️ Configuración y equipo',tabs:['calidad','equiv','turnos','log']}
 ];
 function _anGrupoDe(panel){const g=AN_GRUPOS.find(g=>g.tabs.includes(panel));return g?g.id:'abast';}
 function _anVisible(b){return b&&b.style.display!=='none';}
@@ -19178,6 +19243,18 @@ const AYUDA_CATALOGO=[
 {t:'Turnos del equipo',k:'turnos pausas activas almuerzo horario equipo funcionarias',d:'Análisis → ⚙️ Configuración y equipo → Turnos del equipo',go:'an|turnos',
  q:'Organiza las pausas activas y los horarios de almuerzo del equipo durante la semana.',
  c:'Asigna horarios para la jornada diurna y la extensión horaria, procurando no repetir el mismo horario; se puede imprimir y exportar a Excel.',n:'Ingresar a las personas del equipo.'},
+{t:'Política de cobertura por artículo',k:'politica cobertura minima maxima recomendada optimizar quiebre merma simulacion por articulo ia',d:'Análisis → 📦 Abastecimiento → Política por artículo',go:'an|politica',
+ q:'Recomienda, para cada artículo, la cobertura mínima y máxima que menos quiebres y merma produce.',
+ c:'Prueba 15 combinaciones por artículo con cientos de escenarios simulados (variabilidad real del consumo, atrasos al azar y vencimiento de cada lote; sale primero lo que vence antes) usando los mismos escenarios para todas las combinaciones. Elige la de menor costo (quiebre ponderado por VEN + merma + stock inmovilizado), con riesgo máximo de 5% para Vitales y 10% para Esenciales.',n:'Inventario y consumo; el historial mensual y VEN mejoran la recomendación.'},
+{t:'Grupos de comportamiento',k:'grupos clusters kmeans k-means comportamiento segmentacion politica por grupo articulos nuevos sin historial ia',d:'Análisis → 📐 Clasificación → Grupos de comportamiento',go:'an|gruposcomp',
+ q:'Agrupa los artículos que se comportan parecido y sugiere una política de cobertura por grupo.',
+ c:'Calcula cinco rasgos por artículo (variabilidad, meses sin consumo, tendencia, volumen y cobertura), los estandariza y aplica k-means probando de 3 a 6 grupos; se queda con el número que mejor los separa (índice de silueta). Los artículos sin historial se asignan al grupo más parecido por volumen y stock.',n:'Consumo mes a mes (12 meses o más) de al menos 8 artículos.'},
+{t:'Calidad de datos',k:'calidad datos errores digitacion cero de mas revisar atipico outlier validar archivo ia',d:'Análisis → ⚙️ Configuración y equipo → Calidad de datos · aviso en Mi arsenal',go:'an|calidad',
+ q:'Detecta posibles errores en los archivos cargados antes de que afecten los cálculos.',
+ c:'Compara cada valor con el comportamiento propio del artículo usando la mediana y la desviación absoluta mediana (robusta a valores extremos): consumos 8 veces sobre lo habitual, stock equivalente a años de consumo, consumo promedio muy distinto del real, programaciones desproporcionadas y vencimientos improbables. Marca como importante cuando la diferencia parece un cero de más (×10, ×100).',n:'Nada: se ejecuta solo al cargar archivos.'},
+{t:'Sugerencias de equivalencias que aprenden',k:'homologacion aprende modelo sugerencias similitud dosis forma abreviaturas ia machine learning',d:'Análisis → ⚙️ Configuración y equipo → Equivalencias de nombres → Sugerencias automáticas',go:'an|equiv',
+ q:'Sugiere a qué artículo corresponde un nombre no reconocido, y mejora con cada equivalencia que confirmas.',
+ c:'Separa el nombre en principio activo, dosis y forma farmacéutica; compara el principio activo por fragmentos de letras (tolera abreviaturas y nombres truncados) y aprende de los diccionarios y de tus confirmaciones qué abreviatura corresponde a qué palabra (ej. CM → COMPRIMIDO). Nunca sugiere un artículo con dosis distinta. «Medir precisión» lo compara con el método anterior mediante validación cruzada.',n:'Nada; mejora a medida que confirmas equivalencias.'},
 {t:'Homologación automática de nombres',k:'homologacion avis cenabast pm nombres reconoce convierte nuevo ambiguo',d:'Automático al cargar cualquier archivo',go:'an|equiv',
  q:'Convierte los nombres que vienen de CENABAST, PM u otras fuentes al nombre AVIS del arsenal.',
  c:'Busca el nombre en tus equivalencias, en el arsenal y en los diccionarios incluidos. Si no coincide con ninguno, el artículo se agrega igual, marcado 🆕 Nuevo, para que lo revises.',n:'Nada.'}
@@ -19252,6 +19329,476 @@ function ayudaIr(go){
   if(ch)ch.innerHTML=AYUDA_SUGERENCIAS.map(w=>`<button type="button" class="ay-chip" onclick="ayudaBuscar('${w}')">${w}</button>`).join('');
   ayudaBuscar();
 })();
+</script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   IA LOCAL DE PINGÜINO DELTA (oct-2026) — todo corre en el navegador,
+   sin internet. Cuatro módulos:
+     1. Homologación que aprende (sugerencias de equivalencias)
+     2. Revisión de calidad de datos al cargar
+     4. Política de cobertura recomendada por artículo (simulación)
+     6. Grupos de comportamiento (k-means)
+   Principio: ningún modelo reemplaza un cálculo existente; sugiere, y
+   cuando es posible se evalúa contra el método anterior con los mismos
+   datos antes de usarse.
+   ══════════════════════════════════════════════════════════════════ */
+function _iaRng(seed){let a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function _iaEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function _iaMed(a){if(!a.length)return 0;const b=[...a].sort((x,y)=>x-y),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2;}
+function _iaFmt(n,d){return (Math.round(n*Math.pow(10,d||0))/Math.pow(10,d||0)).toLocaleString('es-CL');}
+function _iaArsenalArts(){return ARTS.filter(a=>!(ARTS_DINAMICOS&&ARTS_DINAMICOS[a]&&!inv[a]&&!cons_map[a]));}
+
+/* Serie mensual real de un artículo: solo meses con dato cargado y que
+   ya terminaron (los meses futuros o el mes en curso vienen como 0 del
+   Excel y NO son consumo cero: dato ausente ≠ cero). */
+function iaSerieConsumo(art,maxMeses){
+  const h=(typeof cons_mensual!=='undefined'&&cons_mensual[art])||null;
+  if(!h)return [];
+  const hoy=new Date(),yH=hoy.getFullYear(),mH=hoy.getMonth();
+  const out=[];
+  Object.keys(h).map(Number).filter(y=>!isNaN(y)).sort((a,b)=>a-b).forEach(y=>{
+    MESES.forEach((m,i)=>{
+      if(y>yH||(y===yH&&i>=mH))return;
+      const v=h[y][m];
+      if(v===undefined||v===null||v==='')return;
+      out.push({y,i,v:+v||0});
+    });
+  });
+  return maxMeses?out.slice(-maxMeses):out;
+}
+
+/* ───────────────────────── 1. HOMOLOGACIÓN QUE APRENDE ───────────────────────── */
+const _HOM_FORMAS=[
+  ['INYECTABLE',['INYECTABLE','INY','AMPOLLA','AMPOLLAS','AMP','AM','FAM','IV','IM','PARENTERAL']],
+  ['INHALADOR',['INHALADOR','AEROSOL','INH','INHAL','PUFF']],
+  ['CAPSULA',['CAPSULA','CAPSULAS','CAPS','CAP','CPS']],
+  ['COMPRIMIDO',['COMPRIMIDO','COMPRIMIDOS','CM','CP','COMP','TAB','TABLETA','TABLETAS','GG','GRAGEA','REC','RECUBIERTO','CPR']],
+  ['JARABE',['JARABE','JBE']],
+  ['SUSPENSION',['SUSPENSION','SUSP']],
+  ['GOTAS',['GOTAS','GTS','GOTA']],
+  ['CREMA',['CREMA','CR','POMADA','UNGUENTO']],
+  ['GEL',['GEL']],
+  ['OVULO',['OVULO','OVULOS','VAGINAL']],
+  ['SUPOSITORIO',['SUPOSITORIO','SUPOSITORIOS','SUP']],
+  ['OFTALMICO',['OFTALMICO','OFTALMICA','COLIRIO']],
+  ['IMPLANTE',['IMPLANTE']],
+  ['PARCHE',['PARCHE','TRANSDERMICO']],
+  ['SOLUCION',['SOLUCION','SOL']]
+];
+const _HOM_FORMA_DE=(()=>{const m={};_HOM_FORMAS.forEach(([f,ss])=>ss.forEach(s=>{if(!m[s])m[s]=f;}));return m;})();
+const _HOM_RUIDO=new Set(['MG','ML','MCG','UG','UI','G','GR','MEQ','L','DOSIS','DO','FRA','FRASCO','TUB','TUBO','BLISTER','CAJA','X','A','O','P','Y','DE','DEL','LA','EL','CON','PARA','SIN','EN','POR','ENVASE','ORAL','TOPICA','TOPICO','PROGRAMAR','UNIDAD','UNIDADES','CICLO','CM2','LP','PROLONGADA','LIBERACION']);
+function _homTok(s){
+  let n=String(s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  n=n.replace(/(\d),(\d)/g,'$1.$2').replace(/(\d)([A-Z])/g,'$1 $2').replace(/([A-Z])(\d)/g,'$1 $2');
+  return n.replace(/[^A-Z0-9.\s]/g,' ').split(/\s+/).map(t=>t.replace(/^\.+|\.+$/g,'')).filter(Boolean);
+}
+function _homParse(s,mapa){
+  const toks=_homTok(s);
+  const nums=new Set(),nombre=[];let forma=null,primeraDosis=null;
+  for(let i=0;i<toks.length;i++){
+    let t=toks[i];
+    if(/^\d+(\.\d+)?$/.test(t)){
+      let v=parseFloat(t);const u=toks[i+1]||'';
+      if(u==='G'||u==='GR')v*=1000; else if(u==='MCG'||u==='UG')v/=1000;
+      const key=String(+v.toFixed(4));if(primeraDosis===null)primeraDosis=key;nums.add(key);continue;
+    }
+    if(mapa&&mapa[t])t=mapa[t];
+    const f=_HOM_FORMA_DE[t];
+    if(f){if(!forma)forma=f;continue;}
+    if(t.length<3||_HOM_RUIDO.has(t))continue;
+    nombre.push(t);
+  }
+  const txt=' '+nombre.join(' ')+' ';
+  const tri=new Map();
+  for(let i=0;i<txt.length-2;i++){const g=txt.substr(i,3);tri.set(g,(tri.get(g)||0)+1);}
+  let norma=0;tri.forEach(v=>norma+=v*v);
+  return{nums,forma,nombre,tri,norma:Math.sqrt(norma)||1,primero:nombre[0]||'',primeraDosis};
+}
+function _homCos(a,b){let d=0;const[x,y]=a.tri.size<b.tri.size?[a,b]:[b,a];x.tri.forEach((v,g)=>{const w=y.tri.get(g);if(w)d+=v*w;});return d/(a.norma*b.norma);}
+/* Puntaje 0–1 y motivo. Dosis distintas bloquean (nunca sugiere 50 mg por 500 mg). */
+function _homPuntaje(pe,pa){
+  let nom=_homCos(pe,pa);
+  if(pe.primero&&pa.primero){const k=Math.min(5,pe.primero.length,pa.primero.length);if(k>=4&&pe.primero.slice(0,k)===pa.primero.slice(0,k))nom=Math.min(1,nom+0.15);}
+  let dosis=0.5,bloqueo=false;
+  if(pe.nums.size&&pa.nums.size){let c=0;pa.nums.forEach(n=>{if(pe.nums.has(n))c++;});dosis=c/pa.nums.size;
+    // La dosis principal del artículo (primer número) debe estar en el nombre externo
+    if(!c||(pa.primeraDosis&&!pe.nums.has(pa.primeraDosis)))bloqueo=true;}
+  let forma=0.5;if(pe.forma&&pa.forma)forma=pe.forma===pa.forma?1:0;
+  let s=0.6*nom+0.25*dosis+0.15*forma;
+  if(bloqueo)s*=0.25;
+  // Principio activo poco parecido: la coincidencia de dosis no basta
+  if(nom<0.55)s*=nom/0.55;
+  return{s,nom,dosis,forma,bloqueo};
+}
+/* Aprendizaje: de cada par (nombre externo → artículo AVIS) aprende qué
+   abreviaturas corresponden a qué palabra (ej. CM → COMPRIMIDO). */
+function _homParesEntrenamiento(){
+  const pares=[];
+  const add=(ext,art)=>{if(ext&&art&&!Array.isArray(art))pares.push([String(ext),String(art)]);};
+  if(typeof DICC_CENABAST_AVIS!=='undefined')Object.entries(DICC_CENABAST_AVIS).forEach(([k,v])=>add(k,v));
+  if(typeof DICC_PM_AVIS!=='undefined')Object.entries(DICC_PM_AVIS).forEach(([k,v])=>add(k,v));
+  if(typeof equivFuentes==='function')equivFuentes().forEach(f=>Object.entries(equivManual[f.id]||{}).forEach(([k,v])=>add(k,v)));
+  return pares;
+}
+function _homAprender(pares){
+  const cnt={},tot={};
+  pares.forEach(([e,a])=>{
+    const te=new Set(_homTok(e).filter(t=>!/^\d/.test(t)&&t.length>=2)),ta=new Set(_homTok(a).filter(t=>!/^\d/.test(t)&&t.length>=3));
+    // Solo aprende palabras: las unidades y formas farmacéuticas ya están definidas
+    const util=t=>!_HOM_RUIDO.has(t)&&!_HOM_FORMA_DE[t];
+    const soloE=[...te].filter(t=>util(t)&&!ta.has(t)&&![...ta].some(u=>u.startsWith(t)&&t.length>=4));
+    const soloA=[...ta].filter(t=>util(t)&&!te.has(t));
+    soloE.forEach(t=>{tot[t]=(tot[t]||0)+1;soloA.forEach(u=>{(cnt[t]=cnt[t]||{})[u]=(cnt[t][u]||0)+1;});});
+  });
+  const mapa={};
+  Object.keys(cnt).forEach(t=>{
+    let mejor=null,mc=0;Object.entries(cnt[t]).forEach(([u,c])=>{if(c>mc){mc=c;mejor=u;}});
+    // Solo abreviaturas plausibles: la palabra destino contiene la abreviatura o empieza igual
+    const plausible=mejor&&(mejor.includes(t)||mejor.startsWith(t.slice(0,2)));
+    if(mc>=2&&mc/tot[t]>=0.5&&plausible&&!_HOM_RUIDO.has(mejor))mapa[t]=mejor;
+  });
+  return mapa;
+}
+let _homModelo=null;
+function homModelo(){
+  const pares=_homParesEntrenamiento();
+  if(_homModelo&&_homModelo.n===pares.length)return _homModelo;
+  const mapa=_homAprender(pares);
+  const universo=ARTS.filter(a=>!ARTS_DINAMICOS[a]);
+  _homModelo={n:pares.length,mapa,reglas:Object.keys(mapa).length,universo,parsed:new Map(universo.map(a=>[a,_homParse(a,mapa)]))};
+  return _homModelo;
+}
+function homSugerir(nombre,universo){
+  const M=homModelo();
+  const pe=_homParse(nombre,M.mapa);
+  let mejor=null,ms=-1,det=null;
+  (universo||M.universo).forEach(a=>{const pa=M.parsed.get(a)||_homParse(a,M.mapa);const r=_homPuntaje(pe,pa);if(r.s>ms){ms=r.s;mejor=a;det=r;}});
+  return{art:mejor,score:Math.max(0,ms),det};
+}
+/* Evaluación honesta: validación cruzada en 5 partes sobre los pares
+   conocidos — cada parte se predice con un modelo que NO la vio. */
+function homEvaluar(){
+  const pares=_homParesEntrenamiento().filter(([e,a])=>ARTS.includes(a)&&!ARTS_DINAMICOS[a]);
+  const universo=ARTS.filter(a=>!ARTS_DINAMICOS[a]);
+  const rng=_iaRng(7);const idx=pares.map((_,i)=>i).sort(()=>rng()-0.5);
+  let okN=0,okJ=0,errDosisN=0,errDosisJ=0;
+  const K=5;
+  for(let f=0;f<K;f++){
+    const test=idx.filter((_,j)=>j%K===f).map(i=>pares[i]),train=idx.filter((_,j)=>j%K!==f).map(i=>pares[i]);
+    const mapa=_homAprender(train);
+    const parsedU=universo.map(a=>[a,_homParse(a,mapa)]);
+    test.forEach(([e,a])=>{
+      const pe=_homParse(e,mapa);
+      let mb=null,ms=-1;parsedU.forEach(([u,pu])=>{const s=_homPuntaje(pe,pu).s;if(s>ms){ms=s;mb=u;}});
+      if(mb===a)okN++;else if(_homParse(mb).nums.size&&_homParse(a).nums.size&&[..._homParse(mb).nums].join()!==[..._homParse(a).nums].join())errDosisN++;
+      let jb=null,js=-1;universo.forEach(u=>{const s=_similitudEquivDelta(e,u);if(s>js){js=s;jb=u;}});
+      if(jb===a)okJ++;else if(jb&&_homParse(jb).nums.size&&_homParse(a).nums.size&&[..._homParse(jb).nums].join()!==[..._homParse(a).nums].join())errDosisJ++;
+    });
+  }
+  return{n:pares.length,nuevo:okN/pares.length,anterior:okJ/pares.length,errDosisN,errDosisJ};
+}
+function homRenderModelo(){
+  const el=document.getElementById('hom-modelo-info');if(!el)return;
+  const M=homModelo();
+  el.innerHTML=`Aprendido de <b>${M.n}</b> pares de nombres (diccionarios incluidos + tus equivalencias) · <b>${M.reglas}</b> abreviaturas aprendidas${M.reglas?` (ej. ${Object.entries(M.mapa).slice(0,4).map(([a,b])=>_iaEsc(a)+'→'+_iaEsc(b)).join(', ')})`:''}.`;
+}
+function homUiEvaluar(){
+  const el=document.getElementById('hom-eval');if(!el)return;
+  el.textContent='⏳ Evaluando…';
+  setTimeout(()=>{
+    const r=homEvaluar();
+    el.innerHTML=`Validación cruzada sobre <b>${r.n}</b> pares conocidos (cada nombre se predice con un modelo que no lo vio): acierta el artículo correcto en el <b>${Math.round(r.nuevo*100)}%</b> de los casos, versus <b>${Math.round(r.anterior*100)}%</b> del método anterior (palabras en común). Errores con dosis distinta: <b>${r.errDosisN}</b> vs ${r.errDosisJ}.`;
+  },30);
+}
+
+/* ───────────────────────── 2. CALIDAD DE DATOS ───────────────────────── */
+const _CAL_KEY='delta_calidad_ignorados';
+function _calIgnorados(){try{return new Set(JSON.parse(localStorage.getItem(_CAL_KEY)||'[]'));}catch(e){return new Set();}}
+function _calGuardarIgnorados(s){try{localStorage.setItem(_CAL_KEY,JSON.stringify([...s]));}catch(e){}}
+function _calCercaPotencia10(r){const l=Math.log10(r);return Math.abs(l-Math.round(l))<0.08&&Math.round(l)>=1;}
+function calidadRevisar(){
+  const H=[];const hoy=new Date();const yH=hoy.getFullYear(),mH=hoy.getMonth()+1;
+  const push=(sev,tipo,art,detalle,clave)=>H.push({sev,tipo,art,detalle,clave:tipo+'|'+art+'|'+clave});
+  // a) Inventario
+  Object.entries(inv||{}).forEach(([art,lotes])=>{
+    if(!Array.isArray(lotes)||!lotes.length)return;
+    const c=+cons_map[art]||0;
+    const total=lotes.reduce((s,l)=>s+(+l.stock||0),0);
+    if(c>0){
+      const cob=total/c;
+      if(cob>=36)push(cob>=120?'alta':'media','Inventario',art,`El stock total (${_iaFmt(total)}) equivale a ${_iaFmt(cob)} meses de consumo. ¿Un cero de más o unidades distintas (caja vs. unidad)?`,'cob');
+      lotes.forEach(l=>{if(lotes.length>=2){const otros=lotes.filter(x=>x!==l).map(x=>+x.stock||0);const med=_iaMed(otros);if(med>0&&(+l.stock)>=10*med&&(+l.stock)>=12*c)push('media','Inventario',art,`El lote ${l.lote} tiene ${_iaFmt(+l.stock)} unidades, ${_iaFmt((+l.stock)/med)} veces lo habitual en los otros lotes.`,'lote:'+l.lote);}});
+    }
+    lotes.forEach(l=>{
+      const [mm,yy]=String(l.venc||'').split('/').map(Number);
+      if(yy===2099)push('media','Inventario',art,`El lote ${l.lote} no tiene fecha de vencimiento reconocible.`,'sinvenc:'+l.lote);
+      else if(yy&&yy>yH+8&&yy!==2099)push('media','Inventario',art,`El lote ${l.lote} vence en ${l.venc}: fecha poco probable, revisa el formato.`,'venc:'+l.lote);
+    });
+  });
+  // b) Consumo mes a mes: valores atípicos según el propio historial (mediana y MAD)
+  Object.keys(cons_mensual||{}).forEach(art=>{
+    const s=iaSerieConsumo(art);const pos=s.filter(x=>x.v>0);
+    if(pos.length<6)return;
+    const vals=pos.map(x=>x.v),med=_iaMed(vals),mad=_iaMed(vals.map(v=>Math.abs(v-med)))*1.4826||med*0.1||1;
+    pos.forEach(x=>{
+      const r=x.v/med,z=(x.v-med)/mad;
+      if(r>=8&&z>=6)push(_calCercaPotencia10(r)?'alta':'media','Consumo mensual',art,`${MN[x.i]} ${x.y}: ${_iaFmt(x.v)} unidades, ${_iaFmt(r,1)} veces la mediana del artículo (${_iaFmt(med)}).${_calCercaPotencia10(r)?' Parece un cero de más.':''}`,'alto:'+x.y+'-'+x.i);
+      else if(r<=1/8&&med>=20)push('media','Consumo mensual',art,`${MN[x.i]} ${x.y}: solo ${_iaFmt(x.v)} unidades frente a una mediana de ${_iaFmt(med)}. ¿Mes incompleto o falta un dígito?`,'bajo:'+x.y+'-'+x.i);
+    });
+  });
+  // c) Consumo promedio declarado vs. historial
+  Object.entries(cons_map||{}).forEach(([art,c])=>{
+    c=+c||0;if(c<=0)return;
+    const s=iaSerieConsumo(art,12).filter(x=>x.v>0);if(s.length<6)return;
+    const real=s.reduce((a,x)=>a+x.v,0)/s.length,r=c/real;
+    if(r>=3||r<=1/3)push(_calCercaPotencia10(Math.max(r,1/r))?'alta':'media','Consumo promedio',art,`El consumo promedio cargado (${_iaFmt(c)}) es ${r>=1?_iaFmt(r,1)+' veces mayor':_iaFmt(1/r,1)+' veces menor'} que el promedio real de los últimos meses (${_iaFmt(real)}).`,'prom');
+  });
+  // d) Programación: meses que equivalen a muchos meses de consumo
+  Object.entries(prog||{}).forEach(([art,p])=>{
+    const c=+cons_map[art]||0;if(c<=0||!p||!p.años)return;
+    Object.entries(p.años).forEach(([y,ms])=>{
+      if(+y<yH)return;
+      MESES.forEach((m,i)=>{const v=+ms[m]||0;if(v>=12*c)push(v>=30*c||_calCercaPotencia10(v/c)?'alta':'media','Programación',art,`${MN[i]} ${y}: programadas ${_iaFmt(v)} unidades, equivalentes a ${_iaFmt(v/c)} meses de consumo.`,y+'-'+i);});
+    });
+  });
+  const ign=_calIgnorados();
+  const orden={alta:0,media:1};
+  return H.filter(h=>!ign.has(h.clave)).sort((a,b)=>orden[a.sev]-orden[b.sev]||a.art.localeCompare(b.art));
+}
+let _calTimer=null,_calUltimo=[];
+function calidadActualizarAviso(){
+  _calUltimo=calidadRevisar();
+  const el=document.getElementById('calidad-aviso');
+  const nA=_calUltimo.filter(h=>h.sev==='alta').length;
+  if(el){
+    if(!_calUltimo.length){el.style.display='none';}
+    else{
+      el.style.display='flex';
+      el.innerHTML=`<span>🩺 <b>Revisión de datos:</b> ${_calUltimo.length} posible(s) error(es) en los archivos cargados${nA?` — <b style="color:var(--red)">${nA} importante(s)</b>`:''}. Conviene revisarlos antes de calcular.</span><button type="button" onclick="switchMode('analisis');anSwitch('calidad')">Revisar →</button>`;
+    }
+  }
+  if(document.getElementById('an-calidad')&&document.getElementById('an-calidad').style.display!=='none')calidadRender();
+}
+function calidadRender(){
+  const el=document.getElementById('calidad-content');if(!el)return;
+  _calUltimo=calidadRevisar();
+  const ign=_calIgnorados().size;
+  if(!_calUltimo.length){el.innerHTML=`<div class="ph" style="min-height:18vh"><h2>✅ Sin posibles errores detectados</h2><p>Se revisan inventario, consumo mensual, consumo promedio y programación cada vez que cargas un archivo.${ign?` Hay ${ign} aviso(s) que marcaste como correctos.`:''}</p></div>`;return;}
+  el.innerHTML=`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:.7rem">${_calUltimo.length} aviso(s). «Es correcto» oculta el aviso si el dato es real (queda recordado en este navegador).${ign?` <button type="button" class="ia-link" onclick="calidadRestaurar()">Mostrar ${ign} oculto(s)</button>`:''}</div>
+  <div style="overflow-x:auto"><table class="ia-tabla"><thead><tr><th></th><th>Archivo</th><th>Artículo</th><th>Qué se detectó</th><th></th></tr></thead><tbody>${_calUltimo.map((h,i)=>`<tr><td>${h.sev==='alta'?'<span class="ia-pill ia-alta">Importante</span>':'<span class="ia-pill ia-media">Revisar</span>'}</td><td>${_iaEsc(h.tipo)}</td><td style="font-weight:600">${_iaEsc(h.art)}</td><td>${_iaEsc(h.detalle)}</td><td><button type="button" class="ia-link" onclick="calidadIgnorar(${i})">Es correcto</button></td></tr>`).join('')}</tbody></table></div>`;
+}
+function calidadIgnorar(i){const h=_calUltimo[i];if(!h)return;const s=_calIgnorados();s.add(h.clave);_calGuardarIgnorados(s);calidadRender();calidadActualizarAviso();}
+function calidadRestaurar(){_calGuardarIgnorados(new Set());calidadRender();calidadActualizarAviso();}
+
+/* ───────────────────────── 4. POLÍTICA DE COBERTURA POR ARTÍCULO ───────────────────────── */
+const _POL_GRILLA=(()=>{const g=[];[1,1.5,2,3,4].forEach(mn=>[1,2,4].forEach(d=>{const mx=mn+d;if(mx<=8)g.push([mn,mx]);}));return g;})();
+function _polLotes(art){
+  const hoy=new Date(),y0=hoy.getFullYear(),m0=hoy.getMonth()+1;
+  return(inv[art]||[]).map(l=>{const [mm,yy]=String(l.venc||'').split('/').map(Number);const mv=(yy&&mm&&yy!==2099)?((yy-y0)*12+(mm-m0)):999;return{q:+l.stock||0,v:mv};}).filter(l=>l.q>0);
+}
+function _polCV(art){const s=iaSerieConsumo(art,12).map(x=>x.v);if(s.length<6)return null;const m=s.reduce((a,b)=>a+b,0)/s.length;if(m<=0)return null;const sd=Math.sqrt(s.reduce((a,b)=>a+(b-m)*(b-m),0)/(s.length-1));return sd/m;}
+/* Simula una política (cobertura mín, máx) con números aleatorios comunes. */
+function _polSimular(lotes0,media,mn,mx,esc,P){
+  let quiebreRuns=0,falt=0,merma=0,stockSum=0;
+  for(let r=0;r<P.N;r++){
+    const lotes=lotes0.map(l=>({q:l.q,v:l.v}));const pend=[];let quebro=false;
+    for(let t=0;t<P.H;t++){
+      for(let k=pend.length-1;k>=0;k--)if(pend[k].t===t){lotes.push({q:pend[k].q,v:t+P.S});pend.splice(k,1);}
+      let d=media*esc.dem[r][t];
+      lotes.sort((a,b)=>a.v-b.v);
+      for(const l of lotes){if(d<=0)break;const u=Math.min(l.q,d);l.q-=u;d-=u;}
+      if(d>0.5){falt+=d;quebro=true;}
+      for(let k=lotes.length-1;k>=0;k--){if(lotes[k].v<=t){merma+=lotes[k].q;lotes.splice(k,1);}else if(lotes[k].q<=0)lotes.splice(k,1);}
+      const enMano=lotes.reduce((s,l)=>s+l.q,0);stockSum+=enMano;
+      const pos=enMano+pend.reduce((s,o)=>s+o.q,0);
+      if(pos<mn*media){pend.push({t:t+P.L+esc.atr[r][t],q:mx*media-pos});}
+    }
+    if(quebro)quiebreRuns++;
+  }
+  return{pq:quiebreRuns/P.N,falt:falt/P.N,merma:merma/P.N,stock:stockSum/(P.N*P.H)};
+}
+function _polEscenarios(seed,cv,P){
+  const rng=_iaRng(seed);const sg=Math.sqrt(Math.log(1+cv*cv)),mu=-sg*sg/2;
+  const dem=[],atr=[];
+  for(let r=0;r<P.N;r++){const d=[],a=[];for(let t=0;t<P.H;t++){const u1=rng()||1e-9,u2=rng();const z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);d.push(Math.exp(mu+sg*z));const ua=rng();a.push(P.atraso?(ua<0.7?0:ua<0.9?1:2):0);}dem.push(d);atr.push(a);}
+  return{dem,atr};
+}
+let politicaRes=null;
+function _polParams(){
+  const g=id=>parseFloat(document.getElementById(id)?.value);
+  return{H:g('pol-h')||12,N:g('pol-n')||200,L:g('pol-l')||1,S:g('pol-s')||24,atraso:document.getElementById('pol-atraso')?document.getElementById('pol-atraso').checked:true,
+    cMin:parseFloat(document.getElementById('a-rot-cmin')?.value)||2,cMax:parseFloat(document.getElementById('a-rot-cmax')?.value)||6};
+}
+const _POL_PESO={V:20,E:8,N:3};const _POL_LIM={V:0.05,E:0.10};
+function politicaCalcularArticulo(art,P,i){
+  const media=+cons_map[art]||0;if(media<=0)return null;
+  const cvH=_polCV(art),cv=cvH==null?0.3:Math.max(0.05,Math.min(cvH,1.5));
+  const esc=_polEscenarios(1000+i*7919,cv,P);const lotes=_polLotes(art);
+  const ven=(typeof venMap!=='undefined'&&venMap[art])||null;const w=_POL_PESO[ven]||5,lim=_POL_LIM[ven]||1;
+  const costo=r=>w*r.falt+r.merma+0.02*r.stock*P.H;
+  const actual=_polSimular(lotes,media,P.cMin,P.cMax,esc,P);
+  let mejor=null;
+  _POL_GRILLA.forEach(([mn,mx])=>{const r=_polSimular(lotes,media,mn,mx,esc,P);r.mn=mn;r.mx=mx;r.c=costo(r);r.cumple=r.pq<=lim;
+    if(!mejor||(r.cumple&&!mejor.cumple)||(r.cumple===mejor.cumple&&(r.cumple?r.c<mejor.c:r.pq<mejor.pq||(r.pq===mejor.pq&&r.c<mejor.c))))mejor=r;});
+  actual.c=costo(actual);
+  return{art,ven,media,cv,cvEstimado:cvH==null,actual,rec:mejor};
+}
+function politicaCalcular(){
+  const el=document.getElementById('pol-content');if(!el)return;
+  const P=_polParams();
+  const arts=Object.keys(cons_map||{}).filter(a=>+cons_map[a]>0).sort((a,b)=>a.localeCompare(b,'es'));
+  if(!arts.length){el.innerHTML='<div class="ph" style="min-height:18vh"><h2>Faltan datos</h2><p>Necesitas inventario y consumos cargados en Mi arsenal.</p></div>';return;}
+  const res=[];let i=0;
+  el.innerHTML='<div class="ph" style="min-height:12vh"><h2 id="pol-prog">⏳ Simulando…</h2></div>';
+  const paso=()=>{
+    const fin=Math.min(i+8,arts.length);
+    for(;i<fin;i++){const r=politicaCalcularArticulo(arts[i],P,i);if(r)res.push(r);}
+    const pr=document.getElementById('pol-prog');if(pr)pr.textContent=`⏳ Simulando… ${i}/${arts.length} artículos`;
+    if(i<arts.length)setTimeout(paso,0);else{politicaRes={P,res,fecha:new Date()};politicaRender();if(gruposRes)gruposRender(true);}
+  };
+  setTimeout(paso,10);
+}
+function politicaRender(){
+  const el=document.getElementById('pol-content');if(!el||!politicaRes)return;
+  const {P,res}=politicaRes;
+  const sum=(k,f)=>res.reduce((s,r)=>s+f(r[k]),0);
+  const qA=sum('actual',x=>x.pq),qR=sum('rec',x=>x.pq),mA=sum('actual',x=>x.merma),mR=sum('rec',x=>x.merma);
+  const grp=gruposRes?Object.fromEntries(gruposRes.asig.map(a=>[a.art,a.g])):{};
+  const filas=[...res].sort((a,b)=>(b.actual.c-b.rec.c)/Math.max(1,b.actual.c)-(a.actual.c-a.rec.c)/Math.max(1,a.actual.c));
+  const pct=x=>Math.round(x*100)+'%';
+  el.innerHTML=`<div class="ia-kpis">
+    <div><span>Artículos con quiebre esperado</span><b>${_iaFmt(qA,1)} → ${_iaFmt(qR,1)}</b><small>suma de probabilidades en ${P.H} meses</small></div>
+    <div><span>Merma esperada (unidades)</span><b>${_iaFmt(mA)} → ${_iaFmt(mR)}</b><small>política actual → recomendada</small></div>
+    <div><span>Política actual (global)</span><b>${P.cMin}–${P.cMax} meses</b><small>umbrales de Rotación de stock</small></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:.6rem 0"><button type="button" class="ia-btn2" onclick="politicaExportar()">⬇ Exportar Excel</button></div>
+  <div style="overflow-x:auto"><table class="ia-tabla"><thead><tr><th>Artículo</th><th>VEN</th>${gruposRes?'<th>Grupo</th>':''}<th>Actual<br>mín–máx</th><th>P(quiebre)</th><th>Merma</th><th>Recomendada<br>mín–máx</th><th>P(quiebre)</th><th>Merma</th><th>Stock prom.</th></tr></thead><tbody>
+  ${filas.map(r=>{const mejora=r.rec.mn!==P.cMin||r.rec.mx!==P.cMax;return `<tr><td style="font-weight:600">${_iaEsc(r.art)}${r.cvEstimado?' <span title="Sin historial suficiente: variabilidad supuesta 30%" style="color:var(--ink3)">*</span>':''}</td><td>${r.ven||'—'}</td>${gruposRes?`<td>${grp[r.art]!=null?_iaEsc(gruposRes.grupos[grp[r.art]].nombre):'—'}</td>`:''}<td>${P.cMin}–${P.cMax}</td><td>${pct(r.actual.pq)}</td><td>${_iaFmt(r.actual.merma)}</td><td style="font-weight:700;color:${mejora?'var(--navy)':'var(--ink3)'}">${r.rec.mn}–${r.rec.mx}${r.rec.cumple?'':' ⚠'}${r.rec.pq>=0.9?' <span class="ia-pill ia-alta" title="El stock actual no alcanza a cubrir el plazo de reposición: ninguna política lo evita. Revisa Pedido especial.">Quiebre inminente</span>':''}</td><td>${pct(r.rec.pq)}</td><td>${_iaFmt(r.rec.merma)}</td><td>${_iaFmt(r.rec.stock)}</td></tr>`;}).join('')}
+  </tbody></table></div>
+  <p class="ia-nota">* Sin historial suficiente: se supuso una variabilidad del 30%. ⚠ Ninguna combinación cumplió el límite de riesgo del artículo (Vital ≤ 5%, Esencial ≤ 10%); se muestra la de menor riesgo. «Quiebre inminente»: con el stock actual el artículo se agota antes de que alcance a llegar una reposición, así que ninguna política lo evita; corresponde un pedido especial. Es una recomendación: Delta no cambia tus umbrales ni la programación.</p>`;
+}
+function politicaExportar(){
+  if(!politicaRes||typeof XLSX==='undefined')return;
+  const g=gruposRes?Object.fromEntries(gruposRes.asig.map(a=>[a.art,gruposRes.grupos[a.g].nombre])):{};
+  const filas=politicaRes.res.map(r=>({'Artículo':r.art,'VEN':r.ven||'','Grupo':g[r.art]||'','Consumo mensual':Math.round(r.media),'Variabilidad (CV)':+r.cv.toFixed(2),'Actual mín':politicaRes.P.cMin,'Actual máx':politicaRes.P.cMax,'P(quiebre) actual':+r.actual.pq.toFixed(3),'Merma actual':Math.round(r.actual.merma),'Recomendada mín':r.rec.mn,'Recomendada máx':r.rec.mx,'P(quiebre) recomendada':+r.rec.pq.toFixed(3),'Merma recomendada':Math.round(r.rec.merma),'Stock promedio recomendado':Math.round(r.rec.stock),'Cumple límite de riesgo':r.rec.cumple?'Sí':'No'}));
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(filas),'Política por artículo');
+  XLSX.writeFile(wb,'Politica_por_articulo_Delta.xlsx');
+}
+
+/* ───────────────────────── 6. GRUPOS DE COMPORTAMIENTO (k-means) ───────────────────────── */
+const _GR_FEATS=[
+  {k:'cv',n:'Variabilidad',alto:'variable',bajo:'estable'},
+  {k:'ceros',n:'Meses sin consumo',alto:'intermitente',bajo:null},
+  {k:'tend',n:'Tendencia anual',alto:'en alza',bajo:'a la baja'},
+  {k:'vol',n:'Volumen',alto:'de alto volumen',bajo:'de bajo volumen'},
+  {k:'cob',n:'Cobertura de stock',alto:'con mucho stock',bajo:'con poco stock'}
+];
+function _grFeatures(art){
+  const s=iaSerieConsumo(art,24).map(x=>x.v);
+  const c=+cons_map[art]||0;const stock=(inv[art]||[]).reduce((a,l)=>a+(+l.stock||0),0);
+  const media=s.length?s.reduce((a,b)=>a+b,0)/s.length:c;
+  const f={vol:Math.log10((media||c)+1),cob:Math.log10(1+(c>0?stock/c:0))};
+  if(s.length>=12&&media>0){
+    const sd=Math.sqrt(s.reduce((a,b)=>a+(b-media)*(b-media),0)/(s.length-1));
+    const n=s.length,xm=(n-1)/2;let num=0,den=0;s.forEach((v,i)=>{num+=(i-xm)*(v-media);den+=(i-xm)*(i-xm);});
+    f.cv=sd/media;f.ceros=s.filter(v=>v===0).length/n;f.tend=Math.max(-1,Math.min(1,(num/den)*12/media));f.completo=true;
+  }
+  return f;
+}
+function _grKmeans(X,k,seed){
+  const rng=_iaRng(seed),n=X.length,d=X[0].length;
+  const C=[X[Math.floor(rng()*n)].slice()];
+  while(C.length<k){const D=X.map(x=>Math.min(...C.map(c=>c.reduce((s,v,j)=>s+(v-x[j])**2,0))));const T=D.reduce((a,b)=>a+b,0);let r=rng()*T,i=0;while(i<n-1&&(r-=D[i])>0)i++;C.push(X[i].slice());}
+  let A=new Array(n).fill(0);
+  for(let it=0;it<60;it++){
+    let cambio=false;
+    X.forEach((x,i)=>{let b=0,bd=Infinity;C.forEach((c,j)=>{const dd=c.reduce((s,v,q)=>s+(v-x[q])**2,0);if(dd<bd){bd=dd;b=j;}});if(A[i]!==b){A[i]=b;cambio=true;}});
+    for(let j=0;j<k;j++){const m=X.filter((_,i)=>A[i]===j);if(m.length)for(let q=0;q<d;q++)C[j][q]=m.reduce((s,x)=>s+x[q],0)/m.length;}
+    if(!cambio&&it)break;
+  }
+  const inercia=X.reduce((s,x,i)=>s+C[A[i]].reduce((t,v,q)=>t+(v-x[q])**2,0),0);
+  return{C,A,inercia};
+}
+function _grSilueta(X,A,k){
+  const dist=(a,b)=>Math.sqrt(a.reduce((s,v,i)=>s+(v-b[i])**2,0));let tot=0;
+  X.forEach((x,i)=>{const prom=j=>{const m=X.filter((_,q)=>A[q]===j&&q!==i);return m.length?m.reduce((s,y)=>s+dist(x,y),0)/m.length:0;};
+    const a=prom(A[i]);let b=Infinity;for(let j=0;j<k;j++)if(j!==A[i]&&X.some((_,q)=>A[q]===j))b=Math.min(b,prom(j));tot+=(b===Infinity||Math.max(a,b)===0)?0:(b-a)/Math.max(a,b);});
+  return tot/X.length;
+}
+let gruposRes=null;
+function gruposCalcular(){
+  const el=document.getElementById('grc-content');if(!el)return;
+  const arts=Object.keys(cons_map||{}).filter(a=>+cons_map[a]>0);
+  const datos=arts.map(a=>({art:a,f:_grFeatures(a)}));
+  const comp=datos.filter(x=>x.f.completo);
+  if(comp.length<8){el.innerHTML='<div class="ph" style="min-height:18vh"><h2>Falta historial</h2><p>Se necesitan al menos 8 artículos con 12 meses o más de consumo mes a mes.</p></div>';return;}
+  const keys=_GR_FEATS.map(f=>f.k);
+  const mu={},sd={};keys.forEach(k=>{const v=comp.map(x=>x.f[k]);mu[k]=v.reduce((a,b)=>a+b,0)/v.length;sd[k]=Math.sqrt(v.reduce((a,b)=>a+(b-mu[k])**2,0)/v.length)||1;});
+  const X=comp.map(x=>keys.map(k=>(x.f[k]-mu[k])/sd[k]));
+  let mejor=null;
+  for(let k=3;k<=Math.min(6,comp.length-1);k++){let best=null;for(let s=0;s<8;s++){const r=_grKmeans(X,k,101+s*31+k);if(!best||r.inercia<best.inercia)best=r;}const sil=_grSilueta(X,best.A,k);if(!mejor||sil>mejor.sil+0.02)mejor={...best,k,sil};}
+  const grupos=mejor.C.map((c,j)=>{
+    const desc=keys.map((k,q)=>({f:_GR_FEATS[q],z:c[q]})).filter(o=>Math.abs(o.z)>=0.6&&(o.z>0?o.f.alto:o.f.bajo)).sort((a,b)=>Math.abs(b.z)-Math.abs(a.z)).slice(0,2).map(o=>o.z>0?o.f.alto:o.f.bajo);
+    const desc3=keys.map((k,q)=>({f:_GR_FEATS[q],z:c[q]})).filter(o=>Math.abs(o.z)>=0.3&&(o.z>0?o.f.alto:o.f.bajo)).sort((a,b)=>Math.abs(b.z)-Math.abs(a.z)).map(o=>o.z>0?o.f.alto:o.f.bajo);
+    return{j,desc,desc3,z:c,miembros:[]};
+  });
+  const usados=new Set();
+  grupos.forEach(g=>{
+    let partes=g.desc.length?g.desc:g.desc3.slice(0,2);
+    let nombre=partes.length?partes.join(', '):'comportamiento típico';
+    if(usados.has(nombre)&&g.desc3.length>partes.length)nombre=g.desc3.slice(0,partes.length+1).join(', ');
+    let base=nombre,n=2;while(usados.has(nombre))nombre=base+' ('+(n++)+')';
+    usados.add(nombre);g.nombre=nombre.charAt(0).toUpperCase()+nombre.slice(1);
+  });
+  const asig=[];
+  comp.forEach((x,i)=>{grupos[mejor.A[i]].miembros.push(x.art);asig.push({art:x.art,g:mejor.A[i],aprox:false});});
+  // Artículos sin historial suficiente: grupo más parecido por volumen y cobertura
+  const iv=keys.indexOf('vol'),ic=keys.indexOf('cob');
+  const sinHist=datos.filter(x=>!x.f.completo).map(x=>{const zv=(x.f.vol-mu.vol)/sd.vol,zc=(x.f.cob-mu.cob)/sd.cob;let b=0,bd=Infinity;mejor.C.forEach((c,j)=>{const d=(c[iv]-zv)**2+(c[ic]-zc)**2;if(d<bd){bd=d;b=j;}});asig.push({art:x.art,g:b,aprox:true});return{art:x.art,g:b};});
+  gruposRes={k:mejor.k,sil:mejor.sil,grupos,asig,sinHist,mu,sd};
+  gruposRender();
+}
+function _grPolitica(g){
+  if(!politicaRes)return null;
+  const rs=politicaRes.res.filter(r=>g.miembros.includes(r.art));if(!rs.length)return null;
+  return{mn:_iaMed(rs.map(r=>r.rec.mn)),mx:_iaMed(rs.map(r=>r.rec.mx)),n:rs.length};
+}
+function gruposRender(sinPolitica){
+  const el=document.getElementById('grc-content');if(!el||!gruposRes)return;
+  const G=gruposRes;const keys=_GR_FEATS;
+  const barra=z=>{const w=Math.min(50,Math.abs(z)*20);return `<span class="ia-zbar"><i style="${z>=0?'left:50%':'right:50%'};width:${w}%;background:${z>=0?'var(--teal)':'#EE881C'}"></i></span>`;};
+  el.innerHTML=`<div class="ia-nota" style="margin-top:0">${G.k} grupos formados con k-means sobre ${G.asig.filter(a=>!a.aprox).length} artículos con historial (calidad de separación: ${G.sil.toFixed(2)} en una escala de −1 a 1). ${G.sinHist.length?`${G.sinHist.length} artículo(s) sin historial suficiente se asignaron al grupo más parecido por volumen y stock.`:''} ${politicaRes?'La política sugerida es la mediana de las recomendadas para los artículos del grupo.':'Calcula «Política por artículo» para ver la política sugerida de cada grupo.'}</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:.2rem 0 .8rem"><button type="button" class="ia-btn2" onclick="gruposExportar()">⬇ Exportar Excel</button><span class="ia-nota" style="margin:0 0 0 12px">Barras: <b style="color:var(--teal)">hacia la derecha</b> = más que el promedio del arsenal · <b style="color:#EE881C">hacia la izquierda</b> = menos.</span></div>
+  <div class="ia-grupos">${G.grupos.filter(g=>g.miembros.length||G.sinHist.some(s=>s.g===g.j)).map(g=>{const pol=_grPolitica(g);const extra=G.sinHist.filter(s=>s.g===g.j);return `<div class="ia-grupo">
+    <div class="ia-grupo-h"><b>${_iaEsc(g.nombre)}</b><span>${g.miembros.length} artículo(s)${extra.length?` + ${extra.length} sin historial`:''}</span></div>
+    <div class="ia-feats">${keys.map((f,q)=>`<div><span>${f.n}</span>${barra(g.z[q])}</div>`).join('')}</div>
+    <div class="ia-pol">${pol?`Política sugerida: <b>${pol.mn}–${pol.mx} meses</b> de cobertura (mediana de ${pol.n})`:'Política sugerida: calcula «Política por artículo»'}</div>
+    <details><summary>Ver artículos</summary><div class="ia-miembros">${g.miembros.map(a=>_iaEsc(a)).join('<br>')}${extra.length?'<br><i>Sin historial:</i><br>'+extra.map(s=>_iaEsc(s.art)).join('<br>'):''}</div></details>
+  </div>`;}).join('')}</div>`;
+  if(politicaRes&&!sinPolitica)politicaRender();
+}
+function gruposExportar(){
+  if(!gruposRes||typeof XLSX==='undefined')return;
+  const filas=gruposRes.asig.map(a=>{const g=gruposRes.grupos[a.g];const pol=_grPolitica(g);return{'Artículo':a.art,'Grupo':g.nombre,'Asignación':a.aprox?'Aproximada (sin historial)':'Por historial','Política sugerida mín':pol?pol.mn:'','Política sugerida máx':pol?pol.mx:''};});
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(filas),'Grupos');
+  XLSX.writeFile(wb,'Grupos_de_comportamiento_Delta.xlsx');
+}
+
+/* ───────────────────────── Integración ───────────────────────── */
+(function(){
+  // Revisión de calidad automática tras cada carga que se guarda en memoria
+  if(typeof pdbGuardar==='function'){
+    const base=pdbGuardar;
+    window.pdbGuardar=pdbGuardar=function(tipo){const r=base.apply(this,arguments);if(['inv','cons_map','prog','cons_mensual'].includes(tipo)){clearTimeout(_calTimer);_calTimer=setTimeout(calidadActualizarAviso,500);}return r;};
+  }
+  // Al guardar equivalencias, el modelo de homologación se reentrena solo (caché por tamaño del corpus)
+  if(typeof anSwitch==='function'){
+    const base=window.anSwitch;
+    window.anSwitch=anSwitch=function(p){const r=base.apply(this,arguments);if(p==='calidad')calidadRender();if(p==='equiv')homRenderModelo();return r;};
+  }
+  setTimeout(calidadActualizarAviso,1500);
+})();
+
 </script>
 </body>
 </html>
