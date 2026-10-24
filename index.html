@@ -2428,25 +2428,25 @@ function visSwitchSubTab(sub){
         </div>
         <div class="arch-card">
           <div class="arch-h"><span>📅 Despachos CENABAST</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('06')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>📊 Análisis → Calendario CENABAST</b></div>
+          <div class="arch-donde">Se carga en: <b>📊 Análisis → 📦 Abastecimiento → Calendario CENABAST</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Fecha despacho</td></tr><tr><th class="xr">2</th><td>IBUPROFENO 200 MG/5 M…</td><td>02/10/2026</td></tr><tr><th class="xr">3</th><td>PREDNISONA 20 MG COMP…</td><td>02/10/2026</td></tr></tbody></table></div>
           <div class="arch-nota"><b>Artículo</b> y <b>Fecha despacho</b> (DD/MM/AAAA o fecha de Excel). Una fila por despacho.</div>
         </div>
         <div class="arch-card">
           <div class="arch-h"><span>💲 Valor unitario</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('07')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>📊 Análisis → Gasto y consumo → Valor unitario</b></div>
+          <div class="arch-donde">Se carga en: <b>📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Valor unitario</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Costo unitario (CLP, neto)</td></tr><tr><th class="xr">2</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">9</td></tr><tr><th class="xr">3</th><td>METFORMINA (CLORHIDRA…</td><td class="xn">14</td></tr></tbody></table></div>
           <div class="arch-nota"><b>Artículo</b> y una columna con <b>“Costo”</b>, <b>“Precio”</b> o <b>“Valor”</b>. Se leen todas las hojas del libro.</div>
         </div>
         <div class="arch-card">
           <div class="arch-h"><span>⚖ Diferencias de inventario</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('08')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>📊 Análisis → Gasto y consumo → Diferencias de inventario</b></div>
+          <div class="arch-donde">Se carga en: <b>📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Diferencias de inventario</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Diferencia</td></tr><tr><th class="xr">2</th><td>METFORMINA (CLORHIDRA…</td><td class="xn">85</td></tr><tr><th class="xr">3</th><td>CARVEDILOL 25 MG COMP…</td><td class="xn">26</td></tr></tbody></table></div>
           <div class="arch-nota"><b>Artículo</b> y <b>Diferencia</b> (positiva = sobrante, negativa = faltante). También acepta dos columnas separadas, <b>Sobrante</b> y <b>Faltante</b>.</div>
         </div>
         <div class="arch-card">
           <div class="arch-h"><span>🧾 Gasto / consumo externo (opcional)</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('09')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>📊 Análisis → Gasto y consumo → Excel externo</b></div>
+          <div class="arch-donde">Se carga en: <b>📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Excel externo</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Mes</td><td>Año</td><td>Cantidad</td><td>Costo unitario</td></tr><tr><th class="xr">2</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">1</td><td class="xn">2025</td><td class="xn">24.428</td><td class="xn">9</td></tr><tr><th class="xr">3</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">2</td><td class="xn">2025</td><td class="xn">23.518</td><td class="xn">9</td></tr></tbody></table></div>
           <div class="arch-nota"><b>Artículo</b>, <b>Mes</b> (1–12), <b>Año</b>, <b>Cantidad</b> y <b>Costo unitario</b>. Solo si tienes un reporte de otro sistema.</div>
         </div>
