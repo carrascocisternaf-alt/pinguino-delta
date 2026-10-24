@@ -1068,7 +1068,7 @@ function visSwitchSubTab(sub){
     <button class="an-tab" data-an="abcxyz" onclick="anSwitch('abcxyz')">📐 Matriz ABC-XYZ</button>
     <button class="an-tab" data-an="multicriterio" onclick="anSwitch('multicriterio')">🧮 ABC Multicriterio</button>
     <button class="an-tab" data-an="prediccion" onclick="anSwitch('prediccion')">🔮 Predicción y Proyección</button>
-    <button class="an-tab" data-an="equiv" onclick="anSwitch('equiv')">🔗 Equivalencias CENABAST/PM</button>
+    <button class="an-tab" data-an="equiv" onclick="anSwitch('equiv')">🔗 Equivalencias de nombres</button>
     <button class="an-tab" data-an="ven" onclick="anSwitch('ven')">⚕️ Clasificación VEN</button>
     <button class="an-tab" data-an="cpu" onclick="anSwitch('cpu')">Ⓒ CPU</button>
     <button class="an-tab" data-an="adn" onclick="anSwitch('adn')">🧬 ADN del Arsenal</button>
@@ -1790,10 +1790,19 @@ function visSwitchSubTab(sub){
        cargas futuras lo reconozcan aunque el texto no coincida. ══ -->
   <div id="an-equiv" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🔗 Equivalencias CENABAST / Planilla PM → Delta</h2>
-      <p style="font-size:12.5px;color:var(--ink3);margin-top:.3rem">Registra qué nombre usa CENABAST o la Planilla de Programas Ministeriales para un artículo que en Delta ya tiene otro nombre — así las próximas cargas lo reconocen directo, sin quedar como "nuevo" o "ambiguo". Esto complementa (no reemplaza) los diccionarios de fábrica: si un artículo ya está ahí, puedes corregirlo acá y esta corrección manda.</p>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🔗 Equivalencias de nombres → Delta</h2>
+      <p style="font-size:12.5px;color:var(--ink3);margin-top:.3rem">Registra cómo se llama un artículo en otra fuente (CENABAST, Planilla PM del Servicio de Salud, una droguería, otro sistema o establecimiento) cuando en Delta tiene otro nombre. Así las próximas cargas lo reconocen directamente, sin quedar como «nuevo» o «ambiguo». Las equivalencias guardadas tienen prioridad sobre los diccionarios incluidos.</p>
     </div>
 
+    <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem;margin-bottom:1.1rem">
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;margin-bottom:.6rem">🏷 Fuentes de nombres</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:.6rem">CENABAST y PM · Servicio de Salud vienen incluidas. Agrega todas las fuentes que necesites; el nombre es opcional (si lo dejas vacío queda como «Fuente 1», «Fuente 2»…) y puedes cambiarlo después con ✏️.</div>
+      <div id="equiv-fuentes-lista" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.7rem"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="equiv-nueva-fuente" maxlength="60" placeholder="Nombre de la nueva fuente (opcional)" style="flex:1;min-width:220px;padding:8px 12px;border:1px solid var(--bdr2);border-radius:var(--r);font-family:DM Sans,sans-serif;font-size:12.5px" onkeydown="if(event.key==='Enter')uiEquivCrearFuenteDesdeCampo()">
+        <button style="padding:9px 16px;border:1.5px solid var(--teal);border-radius:var(--r);background:#fff;color:var(--teal);cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:600" onclick="uiEquivCrearFuenteDesdeCampo()">➕ Agregar fuente</button>
+      </div>
+    </div>
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem;margin-bottom:1.1rem">
       <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;margin-bottom:.6rem">✏️ Agregar equivalencia manual</div>
       <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
@@ -1802,13 +1811,13 @@ function visSwitchSubTab(sub){
           <input type="text" id="equiv-art-delta" list="equiv-arts-lista" placeholder="Escribe para buscar…" style="width:100%">
           <datalist id="equiv-arts-lista"></datalist>
         </div>
-        <div class="fld" style="min-width:220px;flex:1">
-          <label>Nombre CENABAST</label>
-          <input type="text" id="equiv-nombre-cen" placeholder="Nombre tal como aparece en CENABAST" style="width:100%">
+        <div class="fld" style="min-width:180px">
+          <label>Fuente</label>
+          <select id="equiv-fuente-manual" style="width:100%" onchange="if(this.value==='__nueva'){if(!uiEquivNuevaFuente())this.value='cenabast';}"></select>
         </div>
-        <div class="fld" style="min-width:220px;flex:1">
-          <label>Nombre PM</label>
-          <input type="text" id="equiv-nombre-pm" placeholder="Nombre tal como aparece en la Planilla PM" style="width:100%">
+        <div class="fld" style="min-width:240px;flex:1">
+          <label>Nombre en esa fuente</label>
+          <input type="text" id="equiv-nombre-ext" placeholder="Tal como aparece en la fuente" style="width:100%">
         </div>
         <button class="btn-calc" style="padding:9px 20px;white-space:nowrap" onclick="uiEquivAgregarManual()">➕ Agregar a la lista</button>
       </div>
@@ -1816,7 +1825,8 @@ function visSwitchSubTab(sub){
 
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem;margin-bottom:1.1rem">
       <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;margin-bottom:.6rem">📄 Cargar Excel de equivalencias</div>
-      <div style="font-size:12px;color:var(--ink2);margin-bottom:.6rem">Columnas esperadas (nombres flexibles): <em>Artículo Delta/AVIS</em>, <em>Nombre CENABAST</em>, <em>Nombre PM</em>. Solo hace falta que traiga las columnas que necesites — acepta también los diccionarios reales de Delta tal cual (NOMBRE_CENABAST/NOMBRE_AVIS, NOMBRE_PM/ARTICULO_NOMBRE_AVIS, etc.). Puedes seleccionar varios archivos a la vez.</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:.6rem">Una columna con el <em>Artículo Delta / AVIS</em> y una columna por fuente. Se reconocen <em>Nombre CENABAST</em> y <em>Nombre PM</em>; una columna como <em>Nombre RAYEN</em> crea (o reutiliza) la fuente «RAYEN» automáticamente. Las columnas genéricas (<em>Nombre</em>, <em>Nombre externo</em>, <em>Sinónimo</em>) se asignan a la fuente elegida aquí:</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:.6rem"><label style="font-size:12px;color:var(--ink2)">Fuente para columnas genéricas</label><select id="equiv-fuente-excel" style="padding:5px 8px;font-size:12px"></select></div>
       <input type="file" id="equiv-file" accept=".xlsx,.xls,.csv" multiple onchange="equivCargarExcel(event)">
       <div id="equiv-file-status" style="font-size:12px;color:var(--ink3);margin-top:.5rem"></div>
     </div>
@@ -1840,7 +1850,7 @@ function visSwitchSubTab(sub){
 
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem">
       <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;margin-bottom:.6rem">📚 Equivalencias guardadas (<span id="equiv-guard-count">0</span>)</div>
-      <input type="text" id="equiv-q" placeholder="🔎 Buscar por nombre…" oninput="renderEquivTablaGuardadas()" style="width:100%;padding:8px 12px;border:1px solid var(--bdr2);border-radius:var(--r);margin-bottom:.7rem;font-family:DM Sans,sans-serif;font-size:12.5px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.7rem"><input type="text" id="equiv-q" placeholder="🔎 Buscar por nombre…" oninput="renderEquivTablaGuardadas()" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--bdr2);border-radius:var(--r);font-family:DM Sans,sans-serif;font-size:12.5px"><select id="equiv-filtro-fuente" onchange="renderEquivTablaGuardadas()" style="padding:8px 10px;border:1px solid var(--bdr2);border-radius:var(--r);font-size:12.5px"><option value="">Todas las fuentes</option></select></div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="background:var(--navy)"><th style="text-align:left;padding:.5rem .8rem;color:#fff;font-size:10.5px">Fuente</th><th style="text-align:left;padding:.5rem .8rem;color:rgba(255,255,255,.85);font-size:10.5px">Nombre externo</th><th style="text-align:left;padding:.5rem .8rem;color:rgba(255,255,255,.85);font-size:10.5px">Artículo Delta</th><th></th></tr></thead>
         <tbody id="equiv-guard-tbody"></tbody>
       </table></div>
@@ -2365,8 +2375,8 @@ function visSwitchSubTab(sub){
     </div>
 
     <div style="background:#F7EAF5;border:1px solid #CE93D8;border-radius:var(--rl2);padding:1.1rem 1.25rem;margin-bottom:1.5rem">
-      <div style="font-size:14px;font-weight:700;color:#7D1F73;margin-bottom:.5rem">🔗 Homologación de nombres (CENABAST / PM / AVIS)</div>
-      <p style="font-size:12px;color:var(--ink2);margin:0">Un mismo artículo puede venir con el nombre CENABAST, el nombre PM, o el nombre AVIS del arsenal. Al cargar cualquier archivo (Arsenal o Servicio de Salud), Delta reconoce las 3 fuentes automáticamente y las convierte al nombre AVIS. Si un artículo no coincide con ninguna, se agrega igual al arsenal marcado <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#B4720A;background:#FFF3E5">🆕 Nuevo</span> — nunca se pierde ni se descarta. Filtra por "🆕 Nuevos" en la lista lateral para revisarlos.</p>
+      <div style="font-size:14px;font-weight:700;color:#7D1F73;margin-bottom:.5rem">🔗 Homologación de nombres (AVIS, CENABAST, PM y otras fuentes)</div>
+      <p style="font-size:12px;color:var(--ink2);margin:0">Un mismo artículo puede venir con el nombre CENABAST, el nombre PM, o el nombre AVIS del arsenal. Al cargar cualquier archivo (Arsenal o Servicio de Salud), Delta reconoce las 3 fuentes automáticamente y las convierte al nombre AVIS. Si un artículo no coincide con ninguna, se agrega igual al arsenal marcado <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#B4720A;background:#FFF3E5">🆕 Nuevo</span> — nunca se pierde ni se descarta. Filtra por "🆕 Nuevos" en la lista lateral para revisarlos. En <strong>📊 Análisis → 🔗 Equivalencias de nombres</strong> puedes agregar otras fuentes (una droguería, otro sistema u otro establecimiento), con o sin nombre, y registrar cómo se llama cada artículo en ellas.</p>
     </div>
 
 
@@ -3181,11 +3191,88 @@ function _similitudEquivDelta(a,b){
   const union=ta.size+tb.size-inter;
   return union>0?inter/union:0;
 }
+/* ══ FUENTES DE NOMBRES CONFIGURABLES (a pedido de Felipe, oct-2026) ══
+   Además de CENABAST y PM (Servicio de Salud), el usuario puede crear
+   cuantas fuentes quiera (droguería, otro sistema, otro establecimiento…),
+   con o sin nombre (sin nombre → "Fuente 1", "Fuente 2"…), renombrarlas
+   y eliminarlas. Cada fuente es un mapa nombreNormalizado → artículo
+   Delta dentro de equivManual (equivManual[id]); los nombres de las
+   fuentes propias se guardan en equivManual.__fuentes, así que viajan
+   en la misma memoria persistente y en el respaldo, sin claves nuevas. */
+const EQUIV_FUENTES_FIJAS=[
+  {id:'cenabast',nombre:'CENABAST',color:'#1A56B0',bg:'#E8F0FE'},
+  {id:'pm',nombre:'PM · Servicio de Salud',color:'#A12895',bg:'#F7EAF5'}
+];
+const _EQUIV_PALETA=[['#0D7A6F','#E0F4F1'],['#B4530A','#FDEFE3'],['#5B3FA0','#EEE8FA'],['#7A6200','#FBF3D6'],['#1F6F9F','#E3F1FA'],['#9C2B4E','#FBE6EE']];
+function _eqEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function _equivAsegurar(){
+  if(!equivManual||typeof equivManual!=='object')equivManual={};
+  if(!equivManual.cenabast)equivManual.cenabast={};
+  if(!equivManual.pm)equivManual.pm={};
+  if(!equivManual.__fuentes||typeof equivManual.__fuentes!=='object')equivManual.__fuentes={};
+  Object.keys(equivManual.__fuentes).forEach(id=>{if(!equivManual[id])equivManual[id]={};});
+}
+function equivFuentes(){
+  _equivAsegurar();
+  const propias=Object.entries(equivManual.__fuentes)
+    .sort((a,b)=>(a[1].creado||0)-(b[1].creado||0))
+    .map(([id,f],i)=>{const c=_EQUIV_PALETA[i%_EQUIV_PALETA.length];return{id,nombre:f.nombre||'Fuente sin nombre',color:c[0],bg:c[1],propia:true};});
+  return EQUIV_FUENTES_FIJAS.map(f=>Object.assign({propia:false},f)).concat(propias);
+}
+function equivFuente(id){return equivFuentes().find(f=>f.id===id)||{id,nombre:String(id),color:'#555',bg:'#EEE',propia:false};}
+function equivBadgeFuente(id){
+  const f=equivFuente(id);
+  return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;background:${f.bg};color:${f.color};white-space:nowrap">${_eqEsc(f.nombre)}</span>`;
+}
+function equivOpcionesFuente(sel){
+  return equivFuentes().map(f=>`<option value="${f.id}"${f.id===sel?' selected':''}>${_eqEsc(f.nombre)}</option>`).join('');
+}
+function equivCrearFuente(nombre){
+  _equivAsegurar();
+  nombre=String(nombre||'').replace(/\s+/g,' ').trim().slice(0,60);
+  if(nombre){
+    const ya=equivFuentes().find(f=>normArt(f.nombre)===normArt(nombre));
+    if(ya)return ya.id;
+  }else{
+    const usados=new Set(equivFuentes().map(f=>f.nombre));
+    let k=1;while(usados.has('Fuente '+k))k++;
+    nombre='Fuente '+k;
+  }
+  const id='f'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  equivManual.__fuentes[id]={nombre,creado:Date.now()};
+  equivManual[id]={};
+  pdbGuardar('equivManual');
+  return id;
+}
+function equivRenombrarFuente(id,nombre){
+  _equivAsegurar();
+  if(!equivManual.__fuentes[id])return false;
+  nombre=String(nombre||'').replace(/\s+/g,' ').trim().slice(0,60);
+  if(!nombre)return false;
+  equivManual.__fuentes[id].nombre=nombre;
+  pdbGuardar('equivManual');
+  return true;
+}
+function equivEliminarFuente(id){
+  _equivAsegurar();
+  if(!equivManual.__fuentes[id])return false;
+  delete equivManual.__fuentes[id];
+  delete equivManual[id];
+  _equivPendientes=_equivPendientes.filter(p=>p.fuente!==id);
+  pdbGuardar('equivManual');
+  return true;
+}
+function equivTieneEquivalencia(n){
+  return equivFuentes().some(f=>equivManual[f.id]&&equivManual[f.id][n]);
+}
+function _equivContar(id){return Object.keys(equivManual[id]||{}).length;}
+
 // Cola de filas pendientes por guardar (manual o Excel) — no se
 // persiste hasta apretar "💾 Guardar equivalencias".
 let _equivPendientes=[];
 function equivAgregarPendiente(fila){
-  const fuente=fila.fuente==='pm'?'pm':'cenabast';
+  _equivAsegurar();
+  const fuente=(fila.fuente&&fila.fuente!=='__fuentes'&&equivManual[fila.fuente])?fila.fuente:'cenabast';
   const nombreExterno=(fila.nombreExterno||'').trim();
   const articuloDelta=(fila.articuloDelta||'').trim();
   if(!nombreExterno||!articuloDelta)return false;
@@ -3198,6 +3285,7 @@ function equivGuardarPendientes(){
   _equivPendientes.forEach(f=>{
     if(!ARTS.includes(f.articuloDelta)&&!ARTS_DINAMICOS[f.articuloDelta]){omitidas++;return;}
     const clave=normArt(f.nombreExterno);
+    if(!equivManual[f.fuente])equivManual[f.fuente]={};
     equivManual[f.fuente][clave]=f.articuloDelta;
     n++;
   });
@@ -3207,7 +3295,7 @@ function equivGuardarPendientes(){
   return n;
 }
 function equivEliminar(fuente,claveNorm){
-  delete equivManual[fuente][claveNorm];
+  if(equivManual[fuente])delete equivManual[fuente][claveNorm];
   pdbGuardar('equivManual');
 }
 
@@ -3255,10 +3343,9 @@ function equivCargarExcel(evt){
         // términos — así "NOMBRE_PM" se reconoce igual que "NOMBRE PM".
         const hdrNorm=rows[hi].map(c=>String(c).toLowerCase().trim().replace(/_/g,' '));
         const cDelta=_detectarColEquiv(hdrNorm,['avis','delta','arsenal']);
-        const cCen=_detectarColEquiv(hdrNorm,['cenabast']);
-        const cPM=_detectarColEquiv(hdrNorm,['pm','programa ministerial','planilla']);
         if(cDelta<0){archivosSinColumnas.push(file.name);return;}
-        if(cCen<0&&cPM<0){archivosSinColumnas.push(file.name);return;}
+        const colsFuente=_equivColumnasFuente(rows[hi],hdrNorm,cDelta);
+        if(!colsFuente.length){archivosSinColumnas.push(file.name);return;}
         for(let i=hi+1;i<rows.length;i++){
           const row=rows[i];
           const artRaw=String(row[cDelta]||'').trim();
@@ -3266,14 +3353,10 @@ function equivCargarExcel(evt){
           const artNorm=normArt(artRaw);
           const artDelta=_ARTS_NORM_MAP[artNorm]||(ARTS.includes(artRaw)?artRaw:null);
           if(!artDelta){totalSinMatch++;continue;}
-          if(cCen>=0){
-            const nc=String(row[cCen]||'').trim();
-            if(nc&&equivAgregarPendiente({fuente:'cenabast',nombreExterno:nc,articuloDelta:artDelta,origen:'excel'}))totalN++;
-          }
-          if(cPM>=0){
-            const np=String(row[cPM]||'').trim();
-            if(np&&equivAgregarPendiente({fuente:'pm',nombreExterno:np,articuloDelta:artDelta,origen:'excel'}))totalN++;
-          }
+          colsFuente.forEach(({col,fuente})=>{
+            const nx=String(row[col]||'').trim();
+            if(nx&&equivAgregarPendiente({fuente,nombreExterno:nx,articuloDelta:artDelta,origen:'excel'}))totalN++;
+          });
         }
       }catch(err){archivosSinColumnas.push(file.name+' (error: '+err.message+')');}
       pendientes--;
@@ -3282,12 +3365,41 @@ function equivCargarExcel(evt){
     r.readAsArrayBuffer(file);
   });
 }
+// Columnas de nombres de un Excel de equivalencias → fuente de cada una
+// (oct-2026). CENABAST y PM/Servicio de Salud se reconocen por su
+// nombre; "Nombre RAYEN" crea (o reutiliza) la fuente "RAYEN"; una
+// columna genérica ("Nombre", "Nombre externo", "Sinónimo"…) va a la
+// fuente elegida en el selector del panel. Se ignoran columnas de
+// códigos (código, ATC, barra) para no confundirlas con nombres.
+function _equivColumnasFuente(hdrRaw,hdrNorm,cDelta){
+  const out=[];
+  const genSel=document.getElementById('equiv-fuente-excel');
+  let genFuente=genSel?genSel.value:'';
+  hdrNorm.forEach((h,i)=>{
+    if(i===cDelta||!h)return;
+    if(/codigo|código|\bcod\b|atc|barra|\bid\b/.test(h))return;
+    if(h.includes('cenabast')){out.push({col:i,fuente:'cenabast'});return;}
+    if(/\bpm\b|programa ministerial|planilla|servicio de salud|\bssvq/.test(h)){out.push({col:i,fuente:'pm'});return;}
+    const esNombre=/nombre|sinonimo|sinónimo|equivalente|externo|alias/.test(h);
+    if(!esNombre)return;
+    const etiqueta=String(hdrRaw[i]||'').replace(/_/g,' ').replace(/\b(nombre|nombres|del|de|en|articulo|artículo|producto)\b/gi,' ').replace(/\s+/g,' ').trim();
+    const generico=!etiqueta||/^(externo|equivalente|sinonimo|sinónimo|alias|otro|otra fuente)$/i.test(etiqueta);
+    if(generico){
+      if(!genFuente||genFuente==='__nueva')genFuente=equivCrearFuente('');
+      out.push({col:i,fuente:genFuente});
+    }else{
+      out.push({col:i,fuente:equivCrearFuente(etiqueta)});
+    }
+  });
+  return out;
+}
 function _equivMostrarResumenCarga(nArchivos,n,sinMatch,archivosSinColumnas){
   let msg=`📄 ${n} fila(s) leídas de ${nArchivos} archivo(s)`;
   if(sinMatch)msg+=` · ${sinMatch} fila(s) sin artículo Delta reconocido, omitidas`;
   if(archivosSinColumnas.length)msg+=` · ⚠ ${archivosSinColumnas.length} archivo(s) sin columnas reconocibles: ${archivosSinColumnas.join(', ')}`;
   msg+=n?' — revisa y presiona "💾 Guardar equivalencias".':'';
   document.getElementById('equiv-file-status').textContent=msg;
+  renderEquivFuentes();
   renderEquivPendientes();
 }
 // Sugerencias automáticas: compara los nombres NO reconocidos en la
@@ -3299,7 +3411,7 @@ function equivGenerarSugerencias(umbral){
   umbral=umbral||0.45;
   const pendientesNorm=new Set(_equivPendientes.map(f=>f.nombreExterno&&normArt(f.nombreExterno)));
   const candidatos=_ultimosNoReconocidos.filter(x=>{
-    if(equivManual.cenabast[x.n]||equivManual.pm[x.n])return false; // ya tiene equivalencia guardada
+    if(equivTieneEquivalencia(x.n))return false; // ya tiene equivalencia guardada (cualquier fuente)
     if(pendientesNorm.has(x.n))return false; // ya está en la cola pendiente
     return true;
   });
@@ -3329,6 +3441,7 @@ function equivGenerarSugerencias(umbral){
 // ── Render del panel completo ──
 function renderEquivPanel(){
   _poblarDatalistEquivArts();
+  renderEquivFuentes();
   renderEquivPendientes();
   renderEquivTablaGuardadas();
   const wrap=document.getElementById('equiv-sug-wrap');
@@ -3344,6 +3457,24 @@ function _poblarDatalistEquivArts(){
 function _equivCeldaExterna(f,nombre){
   return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;background:${f==='cenabast'?'#E8F0FE':'#F7EAF5'};color:${f==='cenabast'?'#1A56B0':'#A12895'};margin-right:6px">${f==='cenabast'?'CENABAST':'PM'}</span>${nombre}`;
 }
+// Lista de fuentes con su conteo + selects de fuente del panel
+function renderEquivFuentes(){
+  const wrap=document.getElementById('equiv-fuentes-lista');
+  if(wrap){
+    wrap.innerHTML=equivFuentes().map(f=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--bdr2);border-radius:20px;background:#fff">
+      ${equivBadgeFuente(f.id)}<span style="font-size:11px;color:var(--ink3)">${_equivContar(f.id)} equiv.</span>
+      ${f.propia?`<button title="Renombrar" style="border:none;background:none;cursor:pointer;font-size:12px" onclick="uiEquivRenombrarFuente('${f.id}')">✏️</button><button title="Eliminar fuente" style="border:none;background:none;cursor:pointer;font-size:12px;color:var(--red)" onclick="uiEquivEliminarFuente('${f.id}')">🗑</button>`:'<span style="font-size:10px;color:var(--ink3)">fija</span>'}
+    </div>`).join('');
+  }
+  [['equiv-fuente-manual',false],['equiv-fuente-excel',true]].forEach(([id,conNueva])=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    const prev=sel.value;
+    sel.innerHTML=equivOpcionesFuente(prev)+(conNueva?'<option value="__nueva">➕ Crear fuente nueva al cargar</option>':'')+(id==='equiv-fuente-manual'?'<option value="__nueva">➕ Nueva fuente…</option>':'');
+    if(prev&&[...sel.options].some(o=>o.value===prev))sel.value=prev;
+  });
+  const fq=document.getElementById('equiv-filtro-fuente');
+  if(fq){const prev=fq.value;fq.innerHTML='<option value="">Todas las fuentes</option>'+equivOpcionesFuente(prev);if(prev&&[...fq.options].some(o=>o.value===prev))fq.value=prev;}
+}
 function renderEquivPendientes(){
   const card=document.getElementById('equiv-pendientes-card');
   const cnt=document.getElementById('equiv-pend-count');
@@ -3353,8 +3484,8 @@ function renderEquivPendientes(){
   card.style.display=_equivPendientes.length?'block':'none';
   tbody.innerHTML=_equivPendientes.map((f,i)=>`<tr style="border-bottom:1px solid var(--bdr2)">
     <td style="padding:.4rem .8rem">${f.articuloDelta}</td>
-    <td style="padding:.4rem .8rem">${f.fuente==='cenabast'?'CENABAST':'PM'}</td>
-    <td style="padding:.4rem .8rem">${f.nombreExterno}</td>
+    <td style="padding:.4rem .8rem">${equivBadgeFuente(f.fuente)}</td>
+    <td style="padding:.4rem .8rem">${_eqEsc(f.nombreExterno)}</td>
     <td style="padding:.4rem .8rem"><span style="font-size:10.5px;color:var(--ink3)">${f.origen}</span></td>
     <td style="padding:.4rem .8rem"><button style="border:none;background:none;cursor:pointer;color:var(--red)" onclick="uiEquivEliminarPendiente(${i})">✖</button></td>
   </tr>`).join('');
@@ -3365,15 +3496,18 @@ function renderEquivTablaGuardadas(){
   if(!tbody)return;
   const q=normArt(document.getElementById('equiv-q')?.value||'');
   const filas=[];
-  Object.keys(equivManual.cenabast||{}).forEach(k=>filas.push({fuente:'cenabast',clave:k,nombreExterno:k,articuloDelta:equivManual.cenabast[k]}));
-  Object.keys(equivManual.pm||{}).forEach(k=>filas.push({fuente:'pm',clave:k,nombreExterno:k,articuloDelta:equivManual.pm[k]}));
+  const soloFuente=document.getElementById('equiv-filtro-fuente')?.value||'';
+  equivFuentes().forEach(fu=>{
+    if(soloFuente&&fu.id!==soloFuente)return;
+    Object.keys(equivManual[fu.id]||{}).forEach(k=>filas.push({fuente:fu.id,clave:k,nombreExterno:k,articuloDelta:equivManual[fu.id][k]}));
+  });
   const filtradas=filas.filter(f=>!q||f.nombreExterno.includes(q)||normArt(f.articuloDelta).includes(q));
   if(cnt)cnt.textContent=filas.length;
   if(!filtradas.length){tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;color:var(--ink3);padding:1rem">Sin equivalencias guardadas${q?' que coincidan con la búsqueda':''}</td></tr>`;return;}
   tbody.innerHTML=filtradas.map(f=>`<tr style="border-bottom:1px solid var(--bdr2)">
-    <td style="padding:.4rem .8rem">${f.fuente==='cenabast'?'CENABAST':'PM'}</td>
-    <td style="padding:.4rem .8rem">${f.nombreExterno}</td>
-    <td style="padding:.4rem .8rem">${f.articuloDelta}</td>
+    <td style="padding:.4rem .8rem">${equivBadgeFuente(f.fuente)}</td>
+    <td style="padding:.4rem .8rem">${_eqEsc(f.nombreExterno)}</td>
+    <td style="padding:.4rem .8rem">${_eqEsc(f.articuloDelta)}</td>
     <td style="padding:.4rem .8rem"><button style="border:none;background:none;cursor:pointer;color:var(--red)" onclick="uiEquivEliminarGuardada('${f.fuente}','${f.clave.replace(/'/g,"\\'")}')">🗑</button></td>
   </tr>`).join('');
 }
@@ -3394,7 +3528,7 @@ function renderEquivSugerencias(){
       <td style="padding:.4rem .8rem">${s.articuloDelta}</td>
       <td style="text-align:center;padding:.4rem .8rem"><span style="font-weight:700;color:${s.score>=0.75?'var(--teal)':s.score>=0.6?'#EE881C':'var(--ink3)'}">${Math.round(s.score*100)}%</span></td>
       <td style="white-space:nowrap;padding:.4rem .8rem">
-        <select id="equiv-sug-fuente-${i}" style="font-size:11px;padding:2px 4px;margin-right:4px"><option value="cenabast">CENABAST</option><option value="pm">PM</option></select>
+        <select id="equiv-sug-fuente-${i}" style="font-size:11px;padding:2px 4px;margin-right:4px">${equivOpcionesFuente('cenabast')}</select>
         <button style="border:1px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px" onclick="uiEquivConfirmarSugerencia(${i})">✓ Confirmar</button>
         <button style="border:none;background:none;cursor:pointer;color:var(--ink3)" onclick="uiEquivDescartarSugerencia(${i})">✖</button>
       </td>
@@ -3405,22 +3539,53 @@ function renderEquivSugerencias(){
 // ── Handlers de interfaz ──
 function uiEquivAgregarManual(){
   const articuloDelta=document.getElementById('equiv-art-delta').value.trim();
-  const nombreCen=document.getElementById('equiv-nombre-cen').value.trim();
-  const nombrePM=document.getElementById('equiv-nombre-pm').value.trim();
+  const nombreExt=document.getElementById('equiv-nombre-ext').value.trim();
+  let fuente=document.getElementById('equiv-fuente-manual').value;
   if(!articuloDelta){alert('Elige el artículo de Delta al que corresponde.');return;}
-  if(!nombreCen&&!nombrePM){alert('Escribe al menos un nombre (CENABAST o PM).');return;}
+  if(!nombreExt){alert('Escribe el nombre tal como aparece en la fuente.');return;}
   const artNorm=normArt(articuloDelta);
   const artReal=_ARTS_NORM_MAP[artNorm]||(ARTS.includes(articuloDelta)?articuloDelta:null);
   if(!artReal){alert('"'+articuloDelta+'" no es un artículo reconocido del catálogo de Delta. Elígelo de la lista.');return;}
-  let n=0;
-  if(nombreCen&&equivAgregarPendiente({fuente:'cenabast',nombreExterno:nombreCen,articuloDelta:artReal,origen:'manual'}))n++;
-  if(nombrePM&&equivAgregarPendiente({fuente:'pm',nombreExterno:nombrePM,articuloDelta:artReal,origen:'manual'}))n++;
-  if(n){
+  if(fuente==='__nueva'){fuente=uiEquivNuevaFuente();if(!fuente)return;}
+  if(equivAgregarPendiente({fuente,nombreExterno:nombreExt,articuloDelta:artReal,origen:'manual'})){
     document.getElementById('equiv-art-delta').value='';
-    document.getElementById('equiv-nombre-cen').value='';
-    document.getElementById('equiv-nombre-pm').value='';
+    document.getElementById('equiv-nombre-ext').value='';
     renderEquivPendientes();
   }
+}
+function uiEquivNuevaFuente(){
+  const inp=document.getElementById('equiv-nueva-fuente');
+  let nombre=inp?inp.value:'';
+  if(!inp||document.activeElement!==inp&&!nombre){
+    const r=prompt('Nombre de la nueva fuente (opcional — si lo dejas vacío queda como "Fuente 1", "Fuente 2"…):','');
+    if(r===null)return null;
+    nombre=r;
+  }
+  const id=equivCrearFuente(nombre);
+  if(inp)inp.value='';
+  renderEquivFuentes();
+  const sel=document.getElementById('equiv-fuente-manual');if(sel)sel.value=id;
+  return id;
+}
+function uiEquivCrearFuenteDesdeCampo(){
+  const inp=document.getElementById('equiv-nueva-fuente');
+  const id=equivCrearFuente(inp?inp.value:'');
+  if(inp)inp.value='';
+  renderEquivFuentes();
+  const sel=document.getElementById('equiv-fuente-manual');if(sel)sel.value=id;
+}
+function uiEquivRenombrarFuente(id){
+  const f=equivFuente(id);
+  const r=prompt('Nuevo nombre para la fuente «'+f.nombre+'»:',f.nombre);
+  if(r===null)return;
+  if(!equivRenombrarFuente(id,r)){alert('El nombre no puede quedar vacío.');return;}
+  renderEquivFuentes();renderEquivPendientes();renderEquivTablaGuardadas();
+}
+function uiEquivEliminarFuente(id){
+  const f=equivFuente(id),n=_equivContar(id);
+  if(!confirm('¿Eliminar la fuente «'+f.nombre+'»'+(n?' y sus '+n+' equivalencia(s) guardada(s)':'')+'? No se puede deshacer.'))return;
+  equivEliminarFuente(id);
+  renderEquivFuentes();renderEquivPendientes();renderEquivTablaGuardadas();
 }
 function uiEquivGuardar(){
   const n=equivGuardarPendientes();
@@ -3480,6 +3645,13 @@ function resolverNombreArticulo(raw){
     // de fábrica si el usuario decidió corregir una entrada ahí.
     if(equivManual.cenabast&&equivManual.cenabast[n]) return{avis:equivManual.cenabast[n],origen:'CENABAST',reconocido:true,manual:true};
     if(equivManual.pm&&equivManual.pm[n]) return{avis:equivManual.pm[n],origen:'PM',reconocido:true,manual:true};
+    // Fuentes propias (oct-2026): mismas reglas, después de CENABAST/PM.
+    if(equivManual.__fuentes){
+      for(const id of Object.keys(equivManual.__fuentes)){
+        const m=equivManual[id];
+        if(m&&m[n])return{avis:m[n],origen:'fuente:'+id,reconocido:true,manual:true};
+      }
+    }
     if(_ARTS_NORM_MAP[n]) return{avis:_ARTS_NORM_MAP[n],origen:'arsenal',reconocido:true};
     if(typeof DICC_CENABAST_AVIS!=='undefined'&&DICC_CENABAST_AVIS[n]!==undefined){
       const v=DICC_CENABAST_AVIS[n];
@@ -3502,6 +3674,7 @@ function resumenHomologacion(stats){
   const partes=[];
   if(stats.CENABAST) partes.push(`${stats.CENABAST} por diccionario CENABAST`);
   if(stats.PM) partes.push(`${stats.PM} por diccionario PM`);
+  Object.keys(stats).forEach(k=>{if(k.startsWith('fuente:')&&stats[k])partes.push(`${stats[k]} por diccionario ${equivFuente(k.slice(7)).nombre}`);});
   if(stats.ambiguo) partes.push(`${stats.ambiguo} ambiguo(s) — revisar`);
   if(stats.nuevo) partes.push(`${stats.nuevo} nuevo(s) — no en arsenal ni diccionarios`);
   return partes.length?` (homologación: ${partes.join(', ')})`:'';
