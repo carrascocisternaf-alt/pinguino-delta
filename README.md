@@ -9,21 +9,21 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 ## ▶ Probar ahora
 
 1. Abrir Delta: **[versión web](https://carrascocisternaf-alt.github.io/pinguino-delta/)** o descargar `index.html` y abrirlo con doble clic (funciona sin internet).
-2. Presionar **🧪 Cargar datos de prueba** (arriba, en Arsenal CESFAM): carga los 8 Excels ficticios con un clic.
+2. Presionar **🧪 Cargar datos de prueba** (arriba, en Mi arsenal): carga los 8 Excels ficticios con un clic.
 
 **O manualmente:** descargar la carpeta [`demo/`](demo/) — datos **100 % ficticios** — y cargar los archivos en este orden:
 
 | Paso | Archivo | Dónde se carga |
 |---|---|---|
-| 1 | `01_Inventario_lotes_DEMO.xlsx` | Arsenal CESFAM → Inventario de lotes |
-| 2 | `02_Consumo_promedio_DEMO.xlsx` | Arsenal CESFAM → Consumos promedio |
-| 3 | `03_Programacion_vigente_DEMO.xlsx` | Arsenal CESFAM → Programación vigente |
-| 4 | `04_Consumo_mes_a_mes_DEMO.xlsx` | Arsenal CESFAM → Consumo mes a mes |
+| 1 | `01_Inventario_lotes_DEMO.xlsx` | Mi arsenal → Inventario de lotes |
+| 2 | `02_Consumo_promedio_DEMO.xlsx` | Mi arsenal → Consumos promedio |
+| 3 | `03_Programacion_vigente_DEMO.xlsx` | Mi arsenal → Programación vigente |
+| 4 | `04_Consumo_mes_a_mes_DEMO.xlsx` | Mi arsenal → Consumo mes a mes |
 | alt. | `05_Archivo_unico_Consumo_y_Programacion_DEMO.xlsx` | Reemplaza 2–4 en un solo archivo (columna *Origen*) |
-| 5 | `06_Despachos_CENABAST_DEMO.xlsx` | 📊 Análisis → Calendario CENABAST |
-| 6 | `07_Valor_unitario_DEMO.xlsx` | 📊 Análisis → Gasto y consumo → Valor unitario |
-| 7 | `08_Diferencias_inventario_DEMO.xlsx` | 📊 Análisis → Gasto y consumo → Diferencias de inventario |
-| 8 | `09_Gasto_consumo_externo_DEMO.xlsx` | 📊 Análisis → Gasto y consumo → Excel externo (opcional) |
+| 5 | `06_Despachos_CENABAST_DEMO.xlsx` | 📊 Análisis → 📦 Abastecimiento → Calendario CENABAST |
+| 6 | `07_Valor_unitario_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Valor unitario |
+| 7 | `08_Diferencias_inventario_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Diferencias de inventario |
+| 8 | `09_Gasto_consumo_externo_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Excel externo (opcional) |
 
 `00_Guion_escenarios_DEMO.xlsx` indica qué debe mostrar Delta para cada artículo.
 

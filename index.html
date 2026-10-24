@@ -431,6 +431,15 @@ table.xls tr.xh td{background:#E2EFDA;font-weight:700;color:#1F3A1F}
 table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 @media (max-width:820px){.arch-grid{grid-template-columns:1fr}}
 </style>
+<style id="an-grupos-css">
+.an-grupos{display:flex;flex-wrap:wrap;gap:6px;padding:.6rem 1.75rem .2rem;background:var(--surf)}
+.an-grupo{padding:6px 14px;border:1.5px solid var(--bdr2);border-radius:20px;background:#fff;color:var(--ink2);cursor:pointer;font:600 12.5px 'DM Sans',sans-serif}
+.an-grupo:hover{border-color:var(--teal)}
+.an-grupo.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.an-grupo .n{font-weight:400;opacity:.75;margin-left:4px;font-size:11px}
+.an-tab.an-fuera-grupo{display:none!important}
+@media (max-width:820px){.an-grupos{padding:.5rem .75rem .2rem}}
+</style>
 </head>
 <body>
 
@@ -476,11 +485,11 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
   <button onclick="pdbBorrarTodo()" style="white-space:nowrap;padding:5px 12px;border:1px solid #1E5C1E;border-radius:6px;background:#fff;color:#1E5C1E;cursor:pointer;font-size:11.5px">🗑 Borrar toda la memoria guardada</button>
 </div>
 <div class="mode-tabs">
-  <button class="mtab m-on" id="mtab-arsenal" onclick="switchMode('arsenal')">Arsenal CESFAM</button>
-  <button class="mtab" id="mtab-libre" onclick="switchMode('libre')">Modo libre</button>
-  <button class="mtab" id="mtab-ss" onclick="switchMode('ss')">Servicio de Salud</button>
+  <button class="mtab m-on" id="mtab-arsenal" onclick="switchMode('arsenal')">Mi arsenal</button>
+  <button class="mtab" id="mtab-libre" onclick="switchMode('libre')">Artículos fuera del arsenal</button>
+  <button class="mtab" id="mtab-ss" onclick="switchMode('ss')">Programación Ministerial (PM)</button>
   <button class="mtab" id="mtab-analisis" onclick="switchMode('analisis')">📊 Análisis</button>
-  <button class="mtab" id="mtab-sapu" onclick="switchMode('sapu')">🚑 SAPU</button>
+  <button class="mtab" id="mtab-sapu" onclick="switchMode('sapu')">🚑 Urgencia (SAPU)</button>
   <button class="mtab" id="mtab-ayuda" onclick="switchMode('ayuda')" style="margin-left:auto;background:rgba(255,255,255,.12);border-radius:20px;padding:4px 14px">❓ Ayuda</button>
 </div>
 
@@ -512,11 +521,11 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
   <main class="main">
       <!-- Sub-pestañas Arsenal -->
       <div class="stabs">
-        <button class="stab s-on" id="a-stab-art" onclick="aSwitch('art')">Artículo</button>
-        <button class="stab" id="a-stab-dash" onclick="aSwitch('dash')">Dashboard</button>
-        <button class="stab" id="a-stab-masiva" onclick="aSwitch('masiva')">Reprogramación masiva</button>
+        <button class="stab s-on" id="a-stab-art" onclick="aSwitch('art')">Simular un artículo</button>
+        <button class="stab" id="a-stab-dash" onclick="aSwitch('dash')">Resumen general</button>
+        <button class="stab" id="a-stab-masiva" onclick="aSwitch('masiva')">Reprogramar todo</button>
         <button class="stab" id="a-stab-pac" onclick="aSwitch('pac')">🔄 Rotación de stock</button>
-        <button class="stab" id="a-stab-vis" onclick="aSwitch('vis')">📊 Visualizador</button>
+        <button class="stab" id="a-stab-vis" onclick="aSwitch('vis')">📊 Historial de consumo</button>
       </div>
         <!-- Botón datos de prueba (versión demo GitHub, oct-2026) -->
         <div id="demo-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 .6rem;padding:.55rem .8rem;border:1.5px dashed var(--navy);border-radius:var(--r);background:var(--surf)">
@@ -577,7 +586,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 <div class="a-panel" id="a-view-dash" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
       <div>
-        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Dashboard — Arsenal CESFAM</h2>
+        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Resumen general — Mi arsenal</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:4px">Resumen de todos los artículos con consumo cargado.</p>
       </div>
       <button onclick="calcularDashboard('arsenal')" class="btn-calc" style="flex:0;padding:10px 24px;font-size:14px;white-space:nowrap">Generar dashboard</button>
@@ -591,8 +600,8 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 
 <div class="a-panel" id="a-view-masiva" style="display:none">
     <div style="margin-bottom:1.25rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Reprogramación masiva — Arsenal CESFAM</h2>
-      <p style="font-size:13px;color:var(--ink3);margin-top:4px;margin-bottom:.9rem">Simula todos los artículos cargados en modo libre.</p>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Reprogramar todo — Mi arsenal</h2>
+      <p style="font-size:13px;color:var(--ink3);margin-top:4px;margin-bottom:.9rem">Simula todos los artículos cargados fuera del arsenal.</p>
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--r);padding:.85rem 1rem">
         <div class="fld" style="min-width:110px;flex:1">
           <label>Desde mes</label>
@@ -672,7 +681,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 
 <div class="a-panel" id="a-view-pac" style="display:none">
     <div style="margin-bottom:1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Semáforo de rotación — Arsenal CESFAM</h2>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Semáforo de rotación — Mi arsenal</h2>
       <p style="font-size:13px;color:var(--ink3);margin-top:4px;margin-bottom:.9rem">Detecta artículos con stock estancado y artículos en riesgo de desabastecimiento.</p>
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:1rem">
         <div class="fld" style="min-width:140px;flex:1">
@@ -706,7 +715,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
     <div id="a-pac-content"><div class="ph" style="min-height:30vh">
       <div class="ph-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
       <h2>Presiona "Analizar rotación"</h2>
-      <p>Necesitas inventario y consumos cargados en Modo libre.</p>
+      <p>Necesitas inventario y consumos cargados en «Artículos fuera del arsenal».</p>
     </div></div>
 
     <!-- Riesgo por origen de programación (implementación A de la
@@ -728,12 +737,12 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 <div class="a-panel" id="a-view-vis" style="display:none;padding:1.25rem 1.75rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:10px">
       <div>
-        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">📊 Visualizador de consumo</h2>
+        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">📊 Historial de consumo</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:3px">Comparativa anual · Tendencia · Índice estacional</p>
       </div>
     </div>
     <!-- Puntero al slot de carga (a pedido de Felipe, ago-2026): el
-         historial mensual que este Visualizador usa se carga arriba en
+         historial mensual que este Historial de consumo usa se carga arriba en
          Arsenal, no aquí adentro — se agrega este aviso para que no
          haya que adivinar dónde. -->
     <div style="background:#EEF2F8;border:1px solid var(--navy);border-radius:var(--r);padding:.7rem 1rem;margin-bottom:1rem;font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -870,11 +879,11 @@ function visSwitchSubTab(sub){
 
   <!-- Sub-tabs -->
   <div class="stabs">
-    <button class="stab s-on" id="l-stab-art" onclick="lSwitch('art')">Artículo</button>
-    <button class="stab" id="l-stab-dash" onclick="lSwitch('dash')">Dashboard</button>
-    <button class="stab" id="l-stab-masiva" onclick="lSwitch('masiva')">Reprogramación masiva</button>
+    <button class="stab s-on" id="l-stab-art" onclick="lSwitch('art')">Simular un artículo</button>
+    <button class="stab" id="l-stab-dash" onclick="lSwitch('dash')">Resumen general</button>
+    <button class="stab" id="l-stab-masiva" onclick="lSwitch('masiva')">Reprogramar todo</button>
     <button class="stab" id="l-stab-pac" onclick="lSwitch('pac')">🔄 Rotación de stock</button>
-    <button class="stab" id="l-stab-vis" onclick="lSwitch('vis')">📊 Visualizador</button>
+    <button class="stab" id="l-stab-vis" onclick="lSwitch('vis')">📊 Historial de consumo</button>
   </div>
 
   <!-- Vista artículo -->
@@ -889,11 +898,11 @@ function visSwitchSubTab(sub){
     </div>
   </div>
 
-  <!-- Vista Dashboard -->
+  <!-- Vista Resumen general -->
   <div class="l-panel" id="l-view-dash" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
       <div>
-        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Dashboard — Modo libre</h2>
+        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Resumen general — Artículos fuera del arsenal</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:4px">Resumen de todos los artículos con consumo cargado.</p>
       </div>
       <button onclick="calcularDashboard('libre')" class="btn-calc" style="flex:0;padding:10px 24px;font-size:14px;white-space:nowrap">Generar dashboard</button>
@@ -905,11 +914,11 @@ function visSwitchSubTab(sub){
     </div></div>
   </div>
 
-  <!-- Vista Reprogramación masiva -->
+  <!-- Vista Reprogramar todo -->
   <div class="l-panel" id="l-view-masiva" style="display:none">
     <div style="margin-bottom:1.25rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Reprogramación masiva — Modo libre</h2>
-      <p style="font-size:13px;color:var(--ink3);margin-top:4px;margin-bottom:.9rem">Simula todos los artículos cargados en modo libre.</p>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Reprogramar todo — Artículos fuera del arsenal</h2>
+      <p style="font-size:13px;color:var(--ink3);margin-top:4px;margin-bottom:.9rem">Simula todos los artículos cargados fuera del arsenal.</p>
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--r);padding:.85rem 1rem">
         <div class="fld" style="min-width:110px;flex:1">
           <label>Desde mes</label>
@@ -983,7 +992,7 @@ function visSwitchSubTab(sub){
   <!-- Vista Rotación de stock -->
   <div class="l-panel" id="l-view-pac" style="display:none">
     <div style="margin-bottom:1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Semáforo de rotación — Modo libre</h2>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Semáforo de rotación — Artículos fuera del arsenal</h2>
       <p style="font-size:13px;color:var(--ink3);margin-top:4px;margin-bottom:.9rem">Detecta artículos con stock estancado y artículos en riesgo de desabastecimiento.</p>
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:1rem">
         <div class="fld" style="min-width:140px;flex:1">
@@ -1004,14 +1013,14 @@ function visSwitchSubTab(sub){
     <div id="l-pac-content"><div class="ph" style="min-height:30vh">
       <div class="ph-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
       <h2>Presiona "Analizar rotación"</h2>
-      <p>Necesitas inventario y consumos cargados en Modo libre.</p>
+      <p>Necesitas inventario y consumos cargados en «Artículos fuera del arsenal».</p>
     </div></div>
   </div><!-- /l-view-pac -->
 
   <div class="l-panel" id="l-view-vis" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:10px">
       <div>
-        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">📊 Visualizador de consumo</h2>
+        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">📊 Historial de consumo</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:3px">Comparativa anual · Tendencia · Índice estacional</p>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -1052,33 +1061,34 @@ function visSwitchSubTab(sub){
        (como "Calendario de Riesgo Estacional") invisibles. Ahora
        saltan a una segunda línea con flex-wrap, así todas quedan
        visibles siempre sin necesitar scrollear horizontalmente. -->
-  <div style="background:var(--surf);border-bottom:1px solid var(--bdr2);padding:.5rem 1.75rem;display:flex;flex-wrap:wrap;gap:4px 4px;align-items:center;position:sticky;top:0;z-index:10">
+  <div id="an-grupos" class="an-grupos" role="tablist" aria-label="Grupos de análisis"></div>
+  <div id="an-tabs-bar" style="background:var(--surf);border-bottom:1px solid var(--bdr2);padding:.5rem 1.75rem;display:flex;flex-wrap:wrap;gap:4px 4px;align-items:center;position:sticky;top:0;z-index:10">
     <button class="an-tab an-on" data-an="calendario" onclick="anSwitch('calendario')">📅 Calendario CENABAST</button>
     <button class="an-tab" data-an="gasto" onclick="anSwitch('gasto')">💰 Gasto y consumo</button>
     <!-- LOG oculto temporalmente (demo congreso, oct-2026): quitar style="display:none" para reactivar --><button class="an-tab" data-an="log" onclick="anSwitch('log')" style="display:none">🔍 Log de farmacia</button>
-    <button class="an-tab" data-an="turnos" onclick="anSwitch('turnos')">📆 Turnos</button>
-    <button class="an-tab" data-an="crisis" onclick="anSwitch('crisis')" style="margin-left:auto">🧪 Simulador de crisis</button>
+    <button class="an-tab" data-an="turnos" onclick="anSwitch('turnos')">📆 Turnos del equipo</button>
+    <button class="an-tab" data-an="crisis" onclick="anSwitch('crisis')">🧪 Simulador de atrasos y alzas</button>
     <button class="an-tab" data-an="mapa" onclick="anSwitch('mapa')">🗺️ Mapa del arsenal</button>
-    <button class="an-tab" data-an="scoring" onclick="anSwitch('scoring')">🧮 Priorización explicable</button>
-    <button class="an-tab" data-an="montecarlo" onclick="anSwitch('montecarlo')">🎲 Monte Carlo</button>
-    <button class="an-tab" data-an="tunel" onclick="anSwitch('tunel')">⏳ Túnel del tiempo</button>
+    <button class="an-tab" data-an="scoring" onclick="anSwitch('scoring')">🧮 Prioridad de compra</button>
+    <button class="an-tab" data-an="montecarlo" onclick="anSwitch('montecarlo')">🎲 Probabilidad de quiebre</button>
+    <button class="an-tab" data-an="tunel" onclick="anSwitch('tunel')">⏳ Arsenal mes a mes</button>
     <button class="an-tab" data-an="presupuesto" onclick="anSwitch('presupuesto')">💰 Optimizador de presupuesto</button>
     <button class="an-tab" data-an="objetivo" onclick="anSwitch('objetivo')">🎯 Objetivo de cobertura</button>
     <button class="an-tab" data-an="correlaciones" onclick="anSwitch('correlaciones')">🔗 Correlaciones</button>
     <button class="an-tab" data-an="abcxyz" onclick="anSwitch('abcxyz')">📐 Matriz ABC-XYZ</button>
     <button class="an-tab" data-an="multicriterio" onclick="anSwitch('multicriterio')">🧮 ABC Multicriterio</button>
-    <button class="an-tab" data-an="prediccion" onclick="anSwitch('prediccion')">🔮 Predicción y Proyección</button>
+    <button class="an-tab" data-an="prediccion" onclick="anSwitch('prediccion')">🔮 Predicción y proyección</button>
     <button class="an-tab" data-an="equiv" onclick="anSwitch('equiv')">🔗 Equivalencias de nombres</button>
     <button class="an-tab" data-an="ven" onclick="anSwitch('ven')">⚕️ Clasificación VEN</button>
-    <button class="an-tab" data-an="cpu" onclick="anSwitch('cpu')">Ⓒ CPU</button>
-    <button class="an-tab" data-an="adn" onclick="anSwitch('adn')">🧬 ADN del Arsenal</button>
-    <button class="an-tab" data-an="detective" onclick="anSwitch('detective')">🕵️ Detective de anomalías</button>
-    <button class="an-tab" data-an="sesgo" onclick="anSwitch('sesgo')">🧠 Aprende tu criterio</button>
-    <button class="an-tab" data-an="comparador" onclick="anSwitch('comparador')">⚖️ Comparador de políticas</button>
-    <button class="an-tab" data-an="presupuesto-prog" onclick="anSwitch('presupuesto-prog')">💵 Control Presupuestario</button>
-    <button class="an-tab" data-an="calest" onclick="anSwitch('calest')">📅 Calendario Estacional</button>
-    <button class="an-tab" data-an="patrones" onclick="anSwitch('patrones')">🧬 Patrones de Demanda</button>
-    <button class="an-tab" data-an="clusters" onclick="anSwitch('clusters')">🔗 Clusters de Riesgo</button>
+    <button class="an-tab" data-an="cpu" onclick="anSwitch('cpu')">Ⓒ Cuidados paliativos (CPU)</button>
+    <button class="an-tab" data-an="adn" onclick="anSwitch('adn')">🧬 Puntaje global del arsenal</button>
+    <button class="an-tab" data-an="detective" onclick="anSwitch('detective')">🕵️ Consumos fuera de patrón</button>
+    <button class="an-tab" data-an="sesgo" onclick="anSwitch('sesgo')">🧠 Mis ajustes manuales</button>
+    <button class="an-tab" data-an="comparador" onclick="anSwitch('comparador')">⚖️ Comparar criterios de cobertura</button>
+    <button class="an-tab" data-an="presupuesto-prog" onclick="anSwitch('presupuesto-prog')">💵 Control presupuestario</button>
+    <button class="an-tab" data-an="calest" onclick="anSwitch('calest')">📅 Calendario estacional</button>
+    <button class="an-tab" data-an="patrones" onclick="anSwitch('patrones')">🧬 Patrones de demanda</button>
+    <button class="an-tab" data-an="clusters" onclick="anSwitch('clusters')">🔗 Grupos de riesgo compartido</button>
   </div>
 
   <!-- ══ PANEL 1: CALENDARIO CENABAST ══ -->
@@ -1152,7 +1162,7 @@ function visSwitchSubTab(sub){
         </div>
         <button onclick="cruzarCalendarioRotacion()" style="padding:9px 16px;white-space:nowrap;border:none;border-radius:var(--r);background:#EB5A5E;color:#fff;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700">🎯 Cruzar con Rotación</button>
       </div>
-      <div id="cal-cruce-content"><div class="ph" style="min-height:15vh"><h2>Presiona "Cruzar con Rotación"</h2><p>Necesitas este calendario cargado y Rotación calculada en Arsenal CESFAM (Inventario + Consumos).</p></div></div>
+      <div id="cal-cruce-content"><div class="ph" style="min-height:15vh"><h2>Presiona "Cruzar con Rotación"</h2><p>Necesitas este calendario cargado y Rotación calculada en Mi arsenal (Inventario + Consumos).</p></div></div>
     </div>
   </div>
 
@@ -1284,7 +1294,7 @@ function visSwitchSubTab(sub){
 
     <!-- Valor unitario por artículo (carga aparte, ago-2026): no requiere
          subir toda la planilla de Gasto, solo Artículo + Costo/Precio.
-         Alimenta la Proyección de gasto de Reprogramación masiva.
+         Alimenta la Proyección de gasto de Reprogramar todo.
          CORRECCIÓN (a pedido de Felipe, ago-2026): los radios Bruto/Con
          IVA vivían DENTRO de un <label for="costo-fi"> — el navegador
          interceptaba el clic para abrir el selector de archivo antes de
@@ -1297,7 +1307,7 @@ function visSwitchSubTab(sub){
           <input type="file" id="costo-fi" accept=".xlsx,.xls" onchange="cargarCosto(event)">
           <span style="font-size:20px">💲</span>
           <div>
-            <div class="u-title">Valor unitario por artículo (aparte)</div>
+            <div class="u-title">Valor unitario</div>
             <div class="u-sub" id="costo-st">Artículo · Costo/Precio — no necesitas la planilla completa de Gasto</div>
           </div>
         </label>
@@ -1312,7 +1322,7 @@ function visSwitchSubTab(sub){
          de forma más flexible. Todo lo que se sube ahora entra como
          "bruto" por defecto — se corrige desde el Listado si hace
          falta. -->
-    <div style="font-size:11px;color:var(--ink3);margin:0 0 1rem">🔍 ¿Buscas "Consumo declarado vs. real"? Ahora vive en <strong>Visualizador → 🔍 Consumo declarado vs. real</strong>.</div>
+    <div style="font-size:11px;color:var(--ink3);margin:0 0 1rem">🔍 ¿Buscas "Consumo declarado vs. real"? Ahora vive en <strong>Historial de consumo → 🔍 Consumo declarado vs. real</strong>.</div>
     <div id="gasto-extra-content"></div>
 
     <!-- Resultado análisis agrupado -->
@@ -1438,11 +1448,11 @@ function visSwitchSubTab(sub){
 
   <!-- ══ PANEL 5: SIMULADOR DE CRISIS (nuevo, ago-2026) ══
        100% aditivo: usa simularArticulo() tal cual existe, sin tocarla.
-       No modifica ningún estado usado por Dashboard/Rotación/Masiva. -->
+       No modifica ningún estado usado por Resumen general/Rotación/Masiva. -->
   <div id="an-crisis" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧪 Simulador de crisis</h2>
-      <p style="font-size:13px;color:var(--ink3);margin-top:3px">Simula un escenario disruptivo sobre todo el arsenal cargado en Arsenal CESFAM (no toca ningún cálculo ni dato ya hecho) y muestra mes a mes en cuántos artículos se proyecta quiebre.</p>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧪 Simulador de atrasos y alzas</h2>
+      <p style="font-size:13px;color:var(--ink3);margin-top:3px">Simula un escenario disruptivo sobre todo el arsenal cargado en Mi arsenal (no toca ningún cálculo ni dato ya hecho) y muestra mes a mes en cuántos artículos se proyecta quiebre.</p>
     </div>
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1.1rem 1.25rem;margin-bottom:1.1rem">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:14px;align-items:end">
@@ -1462,7 +1472,7 @@ function visSwitchSubTab(sub){
       </div>
       <div style="margin-top:.8rem;font-size:11.5px;color:var(--ink3)">💡 Ejemplos: "CENABAST atrasa todo 2 meses" → Atraso=2, Aumento=0. "Brote respiratorio, consumo +50%" → Atraso=0, Aumento=50. Se pueden combinar ambos a la vez.</div>
     </div>
-    <div id="crisis-content"><div class="ph" style="min-height:20vh"><h2>Configura el escenario y presiona "Simular crisis"</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div></div>
+    <div id="crisis-content"><div class="ph" style="min-height:20vh"><h2>Configura el escenario y presiona "Simular crisis"</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div></div>
   </div>
 
   <!-- ══ PANEL 6: MAPA DEL ARSENAL — treemap (nuevo, ago-2026) ══
@@ -1485,7 +1495,7 @@ function visSwitchSubTab(sub){
   <div id="an-scoring" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:1.1rem;flex-wrap:wrap">
       <div>
-        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧮 Priorización explicable</h2>
+        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧮 Prioridad de compra</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:3px">Ranking único de qué atender primero, combinando ABC, Rotación y Diferencias de inventario — cada puntaje muestra exactamente de dónde sale, nada de caja negra.</p>
       </div>
       <div style="display:flex;gap:8px">
@@ -1504,7 +1514,7 @@ function visSwitchSubTab(sub){
   <div id="an-presupuesto" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
       <h2 style="font-size:18px;font-weight:600;color:var(--navy)">💰 Optimizador de presupuesto</h2>
-      <p style="font-size:13px;color:var(--ink3);margin-top:3px">Tienes un monto disponible, no ilimitado. Ordena las necesidades por prioridad (mismo puntaje de "Priorización explicable") y asigna el presupuesto hasta que se acabe — mostrando claramente qué queda cubierto y qué no.</p>
+      <p style="font-size:13px;color:var(--ink3);margin-top:3px">Tienes un monto disponible, no ilimitado. Ordena las necesidades por prioridad (mismo puntaje de "Prioridad de compra") y asigna el presupuesto hasta que se acabe — mostrando claramente qué queda cubierto y qué no.</p>
     </div>
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1.1rem 1.25rem;margin-bottom:1.1rem">
       <div style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end">
@@ -1543,7 +1553,7 @@ function visSwitchSubTab(sub){
           </select>
         </div>
       </div>
-      <div style="margin-top:.8rem;font-size:11.5px;color:var(--ink3)">💡 La necesidad se calcula directo con estos parámetros de cobertura y consumo — ya no depende de haber corrido Reprogramación masiva antes. Requiere el 💲 Valor unitario cargado (Análisis → Gasto) para poder ordenar por $.</div>
+      <div style="margin-top:.8rem;font-size:11.5px;color:var(--ink3)">💡 La necesidad se calcula directo con estos parámetros de cobertura y consumo — ya no depende de haber corrido Reprogramar todo antes. Requiere el 💲 Valor unitario cargado (Análisis → Gasto) para poder ordenar por $.</div>
     </div>
     <div id="presupuesto-content"><div class="ph" style="min-height:20vh"><h2>Ingresa un monto y presiona "Asignar presupuesto"</h2><p>Necesitas Rotación calculada y costo unitario cargado.</p></div></div>
   </div>
@@ -1587,7 +1597,7 @@ function visSwitchSubTab(sub){
       <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px">
         <div class="fld" style="min-width:200px;flex:1">
           <label>Fuente de consumo</label>
-          <select id="obj-fuente" style="width:100%;padding:7px 8px;border:1.5px solid var(--bdr);border-radius:var(--r);font-family:DM Sans,sans-serif;font-size:13px" title="Mismo criterio que Reprogramación masiva y Servicio de Salud. Si un artículo no tiene suficiente historial real, cae automáticamente al consumo promedio.">
+          <select id="obj-fuente" style="width:100%;padding:7px 8px;border:1.5px solid var(--bdr);border-radius:var(--r);font-family:DM Sans,sans-serif;font-size:13px" title="Mismo criterio que Reprogramar todo y Programación Ministerial (PM). Si un artículo no tiene suficiente historial real, cae automáticamente al consumo promedio.">
             <option value="promedio">Consumo promedio (actual)</option>
             <option value="real3">Consumo real — últimos 3 meses</option>
             <option value="real6">Consumo real — últimos 6 meses</option>
@@ -1600,7 +1610,7 @@ function visSwitchSubTab(sub){
         </label>
       </div>
     </div>
-    <div id="objetivo-content"><div class="ph" style="min-height:20vh"><h2>Configura el objetivo y presiona "Calcular"</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM. "Solo Clase A/B/C" requiere ABC calculado (costo cargado).</p></div></div>
+    <div id="objetivo-content"><div class="ph" style="min-height:20vh"><h2>Configura el objetivo y presiona "Calcular"</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal. "Solo Clase A/B/C" requiere ABC calculado (costo cargado).</p></div></div>
   </div>
 
   <!-- ══ PANEL 12: CORRELACIONES (ago-2026) ══
@@ -1613,7 +1623,7 @@ function visSwitchSubTab(sub){
       </div>
       <button onclick="detectarCorrelaciones()" class="btn-calc" style="padding:9px 20px;white-space:nowrap">🔗 Detectar correlaciones</button>
     </div>
-    <div id="correlaciones-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Detectar correlaciones"</h2><p>Necesitas el historial de Consumo mes a mes cargado (Visualizador) — a más meses de historial, mejor la detección.</p></div></div>
+    <div id="correlaciones-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Detectar correlaciones"</h2><p>Necesitas el historial de Consumo mes a mes cargado (Historial de consumo) — a más meses de historial, mejor la detección.</p></div></div>
   </div>
 
   <!-- ══ PANEL: MATRIZ ABC-XYZ (referencia mundial, ago-2026) ══
@@ -1652,7 +1662,7 @@ function visSwitchSubTab(sub){
         </label>
       </div>
     </div>
-    <div id="abcxyz-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Generar matriz"</h2><p>Necesitas el 💲 Valor unitario cargado (para ABC) y el historial de Consumo mes a mes (Visualizador, para XYZ).</p></div></div>
+    <div id="abcxyz-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Generar matriz"</h2><p>Necesitas el 💲 Valor unitario cargado (para ABC) y el historial de Consumo mes a mes (Historial de consumo, para XYZ).</p></div></div>
   </div>
 
   <!-- ══ PANEL: ABC MULTICRITERIO (a pedido de Felipe, ago-2026,
@@ -1696,7 +1706,7 @@ function visSwitchSubTab(sub){
     <div style="display:flex;gap:8px;margin-bottom:1.1rem;border-bottom:1px solid var(--bdr2)">
       <button id="pred-subtab-articulo" class="pred-subtab on" onclick="prediccionSwitchSubTab('articulo')" style="padding:9px 16px;border:none;border-bottom:3px solid var(--teal);background:none;color:var(--navy);cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700">📋 Por artículo</button>
       <button id="pred-subtab-tabla" class="pred-subtab" onclick="prediccionSwitchSubTab('tabla')" style="padding:9px 16px;border:none;border-bottom:3px solid transparent;background:none;color:var(--ink3);cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700">📅 Planilla de proyección</button>
-      <button id="pred-subtab-dashboard" class="pred-subtab" onclick="prediccionSwitchSubTab('dashboard')" style="padding:9px 16px;border:none;border-bottom:3px solid transparent;background:none;color:var(--ink3);cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700">📊 Dashboard global</button>
+      <button id="pred-subtab-dashboard" class="pred-subtab" onclick="prediccionSwitchSubTab('dashboard')" style="padding:9px 16px;border:none;border-bottom:3px solid transparent;background:none;color:var(--ink3);cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700">📊 Resumen global</button>
       <button id="pred-subtab-simulacion" class="pred-subtab" onclick="prediccionSwitchSubTab('simulacion')" style="padding:9px 16px;border:none;border-bottom:3px solid transparent;background:none;color:var(--ink3);cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700">🎛️ ¿Qué pasa si...?</button>
     </div>
 
@@ -1765,7 +1775,7 @@ function visSwitchSubTab(sub){
         <button onclick="calcularTablaPrediccion()" class="btn-calc" style="padding:9px 20px;white-space:nowrap">📅 Generar planilla</button>
         <button onclick="exportarTablaPrediccion()" style="padding:9px 16px;white-space:nowrap;border:1.5px solid #A12895;border-radius:var(--r);background:#fff;color:#A12895;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:600">⬇ Exportar Excel</button>
       </div>
-      <div id="pred-tabla-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Generar planilla"</h2><p>Muestra, para cada artículo con historial suficiente, la proyección de consumo mes a mes — la misma vista de conjunto que la Reprogramación masiva, pero con el consumo proyectado en vez de la programación sugerida.</p></div></div>
+      <div id="pred-tabla-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Generar planilla"</h2><p>Muestra, para cada artículo con historial suficiente, la proyección de consumo mes a mes — la misma vista de conjunto que Reprogramar todo, pero con el consumo proyectado en vez de la programación sugerida.</p></div></div>
     </div>
 
     <!-- Sub-pestaña: dashboard global -->
@@ -1889,7 +1899,7 @@ function visSwitchSubTab(sub){
       <button onclick="renderPanelCPU()" class="btn-calc" style="padding:9px 20px;white-space:nowrap">Ⓒ Ver artículos CPU</button>
       <button onclick="calcularAbastecimientoCPU()" style="padding:9px 20px;white-space:nowrap;border:1.5px solid #A12895;border-radius:var(--r);background:#F7EAF5;color:#7D1F73;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700">🧮 Calcular abastecimiento CPU</button>
     </div>
-    <div id="cpu-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Ver artículos CPU"</h2><p>Necesitas al menos un artículo marcado con Ⓒ en la lista de Arsenal CESFAM.</p></div></div>
+    <div id="cpu-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Ver artículos CPU"</h2><p>Necesitas al menos un artículo marcado con Ⓒ en la lista de Mi arsenal.</p></div></div>
   </div>
 
   <!-- ══ PANEL: ADN DEL ARSENAL (a pedido de Felipe, ago-2026) ══
@@ -1897,11 +1907,11 @@ function visSwitchSubTab(sub){
        calculados en un puntaje único con historial guardado. -->
   <div id="an-adn" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧬 ADN del Arsenal</h2>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧬 Puntaje global del arsenal</h2>
       <p style="font-size:13px;color:var(--ink3);margin-top:3px">Un solo puntaje (0-100) que combina cobertura, estabilidad de consumo (XYZ), cumplimiento de Programación Ministerial, merma y diferencias de inventario — para ver de un vistazo cómo estás en general, y si vas mejorando o empeorando mes a mes. Cada vez que lo generas, queda guardado un punto en el historial.</p>
     </div>
     <button onclick="calcularADNArsenal()" class="btn-calc" style="padding:10px 22px;margin-bottom:1.1rem">🧬 Calcular ADN de hoy</button>
-    <div id="adn-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Calcular ADN de hoy"</h2><p>Necesitas Rotación calculable (Inventario + Consumos) en Arsenal CESFAM.</p></div></div>
+    <div id="adn-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Calcular ADN de hoy"</h2><p>Necesitas Rotación calculable (Inventario + Consumos) en Mi arsenal.</p></div></div>
   </div>
 
   <!-- ══ PANEL: DETECTIVE DE ANOMALÍAS (a pedido de Felipe, ago-2026) ══
@@ -1909,7 +1919,7 @@ function visSwitchSubTab(sub){
        salen del propio comportamiento histórico de cada artículo. -->
   <div id="an-detective" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🕵️ Detective de anomalías</h2>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🕵️ Consumos fuera de patrón</h2>
       <p style="font-size:13px;color:var(--ink3);margin-top:3px">No avisa cuando algo cruza un límite fijo (eso ya lo hace Rotación) — busca cosas que no calzan con su propio comportamiento histórico: consumos que se dispararon sin razón visible, artículos Vitales sin programación, correlaciones que se rompieron, diferencias de inventario grandes en proporción al stock. Te dice "esto es raro, revísalo", no "esto está mal".</p>
     </div>
     <button onclick="detectarAnomaliasCompleto()" class="btn-calc" style="padding:10px 22px;margin-bottom:1.1rem">🕵️ Buscar anomalías</button>
@@ -1919,14 +1929,14 @@ function visSwitchSubTab(sub){
   <!-- ══ PANEL: DELTA APRENDE TU CRITERIO (a pedido de Felipe, ago-2026) ══
        100% aditivo: analiza overrideLog, que se llena solo cada vez que
        se ajusta manualmente una programación sugerida — no pide nada
-       nuevo, usa lo que ya se hace en Reprogramación masiva. -->
+       nuevo, usa lo que ya se hace en Reprogramar todo. -->
   <div id="an-sesgo" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧠 Delta aprende tu criterio</h2>
-      <p style="font-size:13px;color:var(--ink3);margin-top:3px">Cada vez que ajustas manualmente un número sugerido en Reprogramación masiva, Delta guarda ambos valores — lo sugerido y lo que pusiste. Con el tiempo, esto muestra tu propio patrón de corrección: no para que lo sigas ciegamente, sino para que veas tu sesgo con evidencia.</p>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🧠 Mis ajustes manuales</h2>
+      <p style="font-size:13px;color:var(--ink3);margin-top:3px">Cada vez que ajustas manualmente un número sugerido en Reprogramar todo, Delta guarda ambos valores — lo sugerido y lo que pusiste. Con el tiempo, esto muestra tu propio patrón de corrección: no para que lo sigas ciegamente, sino para que veas tu sesgo con evidencia.</p>
     </div>
     <button onclick="analizarSesgoUsuario()" class="btn-calc" style="padding:10px 22px;margin-bottom:1.1rem">🧠 Analizar mis ajustes</button>
-    <div id="sesgo-content"><div class="ph" style="min-height:20vh"><h2>Todavía no hay suficientes ajustes registrados</h2><p>Ajusta manualmente algunas cantidades en Reprogramación masiva (Arsenal) — cada ajuste queda registrado automáticamente, sin que tengas que hacer nada especial.</p></div></div>
+    <div id="sesgo-content"><div class="ph" style="min-height:20vh"><h2>Todavía no hay suficientes ajustes registrados</h2><p>Ajusta manualmente algunas cantidades en Reprogramar todo (Arsenal) — cada ajuste queda registrado automáticamente, sin que tengas que hacer nada especial.</p></div></div>
 
     <div style="margin:2rem 0 1.1rem;padding-top:1.5rem;border-top:1px solid var(--bdr2)">
       <h2 style="font-size:16px;font-weight:600;color:var(--navy)">📸 Fotos de programación</h2>
@@ -1942,7 +1952,7 @@ function visSwitchSubTab(sub){
        vez por cada política definida, y compara los resultados. -->
   <div id="an-comparador" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">⚖️ Comparador de políticas</h2>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">⚖️ Comparar criterios de cobertura</h2>
       <p style="font-size:13px;color:var(--ink3);margin-top:3px">En vez de simular un artículo a la vez, define hasta 3 políticas completas (cobertura mín/máx, fuente de consumo, fluctuación estacional) y compáralas sobre <strong>todo el arsenal</strong> — cuántos artículos quedan en riesgo con cada una, cuánto presupuesto exige, cuánta merma proyecta. La decisión de qué regla general adoptar, con números reales.</p>
     </div>
     <div id="comparador-politicas-form">
@@ -2071,7 +2081,7 @@ function visSwitchSubTab(sub){
       <p style="font-size:13px;color:var(--ink3);margin-top:3px">La clasificación XYZ dice <em>cuánto</em> varía un artículo, pero no <em>cómo</em> varía. Dos artículos Z pueden necesitar estrategias opuestas: uno cuya demanda es impredecible pero constante (más colchón ayuda) y otro cuya demanda aparece en eventos puntuales con meses en cero entre medio (más colchón solo aumenta el riesgo de vencimiento). Esta vista separa ambos casos.</p>
     </div>
     <button onclick="generarPatronesDemanda()" class="btn-calc" style="padding:10px 22px;margin-bottom:1.1rem">🧬 Analizar patrones</button>
-    <div id="patrones-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Analizar patrones"</h2><p>Necesitas consumo mes a mes cargado (Visualizador) para artículos que clasifiquen como Y o Z en XYZ.</p></div></div>
+    <div id="patrones-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Analizar patrones"</h2><p>Necesitas consumo mes a mes cargado (Historial de consumo) para artículos que clasifiquen como Y o Z en XYZ.</p></div></div>
   </div>
 
   <!-- ══ PANEL: CLUSTERS DE RIESGO CORRELACIONADO (a pedido de Felipe,
@@ -2080,11 +2090,11 @@ function visSwitchSubTab(sub){
        modifica ninguna función previa. -->
   <div id="an-clusters" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🔗 Clusters de Riesgo Correlacionado</h2>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🔗 Grupos de riesgo compartido</h2>
       <p style="font-size:13px;color:var(--ink3);margin-top:3px">Un grupo de artículos que se mueven juntos, donde la mayoría no es puramente estable (X), no es "varios problemas separados" — es un solo fenómeno que los afecta a todos a la vez. Elige qué composición mostrar (Z, Y, o ambas) e identifica el artículo más volátil de cada grupo como "líder" a vigilar: si él se dispara, revisa todo el cluster antes de que cada uno active su propia alerta por separado.</p>
     </div>
     <button onclick="detectarClustersRiesgo()" class="btn-calc" style="padding:10px 22px;margin-bottom:1.1rem">🔗 Buscar clusters</button>
-    <div id="clusters-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Buscar clusters"</h2><p>Necesitas el historial de Consumo mes a mes cargado (Visualizador) para al menos varios artículos.</p></div></div>
+    <div id="clusters-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Buscar clusters"</h2><p>Necesitas el historial de Consumo mes a mes cargado (Historial de consumo) para al menos varios artículos.</p></div></div>
   </div>
 
   <!-- ══ PANEL 8: MONTE CARLO (nuevo, ago-2026) ══
@@ -2092,7 +2102,7 @@ function visSwitchSubTab(sub){
        aleatoria — no modifica la función ni ningún dato ya cargado. -->
   <div id="an-montecarlo" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="margin-bottom:1.1rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🎲 Simulación Monte Carlo</h2>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🎲 Probabilidad de quiebre (simulación Monte Carlo)</h2>
       <p style="font-size:13px;color:var(--ink3);margin-top:3px">En vez de un solo "qué pasa si", corre cientos de variaciones aleatorias de consumo y atraso de entregas — y entrega una <strong>probabilidad</strong> de quiebre por artículo, no un sí/no.</p>
     </div>
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1.1rem 1.25rem;margin-bottom:1.1rem">
@@ -2113,7 +2123,7 @@ function visSwitchSubTab(sub){
       </div>
       <div style="margin-top:.8rem;font-size:11.5px;color:var(--ink3)">💡 En cada corrida, el atraso de entregas también varía al azar (con más probabilidad de que no haya atraso, y menos de que sea grande) — así se representa que en la realidad no todos los meses son iguales.</div>
     </div>
-    <div id="montecarlo-content"><div class="ph" style="min-height:20vh"><h2>Configura y presiona "Correr simulación"</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM. Con 100 corridas y ~200 artículos puede tardar algunos segundos.</p></div></div>
+    <div id="montecarlo-content"><div class="ph" style="min-height:20vh"><h2>Configura y presiona "Correr simulación"</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal. Con 100 corridas y ~200 artículos puede tardar algunos segundos.</p></div></div>
   </div>
 
   <!-- ══ PANEL 9: TÚNEL DEL TIEMPO (nuevo, ago-2026) ══
@@ -2123,7 +2133,7 @@ function visSwitchSubTab(sub){
   <div id="an-tunel" class="an-panel" style="display:none;padding:1.5rem 1.75rem">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:1.1rem;flex-wrap:wrap">
       <div>
-        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">⏳ Túnel del tiempo</h2>
+        <h2 style="font-size:18px;font-weight:600;color:var(--navy)">⏳ Arsenal mes a mes</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:3px">Desliza para ver el arsenal en cualquier mes, pasado o futuro. El pasado usa tu historial real de consumo cargado; el futuro usa la simulación con la fuente de consumo que elijas abajo.</p>
       </div>
       <button onclick="generarTunelTiempo()" class="btn-calc" style="padding:9px 20px;white-space:nowrap">⏳ Generar túnel</button>
@@ -2143,7 +2153,7 @@ function visSwitchSubTab(sub){
         🎯 Vista realista — solo lo programado (sin asumir pedidos automáticos)
       </label>
     </div>
-    <div id="tunel-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Generar túnel"</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM — el historial mensual (Visualizador) mejora la vista del pasado, pero no es obligatorio.</p></div></div>
+    <div id="tunel-content"><div class="ph" style="min-height:20vh"><h2>Presiona "Generar túnel"</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal — el historial mensual (Historial de consumo) mejora la vista del pasado, pero no es obligatorio.</p></div></div>
   </div>
 
 </div><!-- end view-analisis -->
@@ -2153,7 +2163,7 @@ function visSwitchSubTab(sub){
 <!-- ══════════════════════════════════════════════════════════════
      🚑 MÓDULO SAPU (a pedido de Felipe, oct-2026)
      Cruce del Arsenal SAPU (Botiquín · Carro de paro · Maletín Rp) con
-     el stock y consumo de Arsenal CESFAM, usando el consumo de un SAPU
+     el stock y consumo de Mi arsenal, usando el consumo de un SAPU
      de referencia (referencia demo) para proyectar el impacto de la
      apertura sobre el stock y anticipar compras. 100% aditivo: lee
      inv / cons_map / prog / costoMap, no modifica nada de lo existente.
@@ -2234,7 +2244,7 @@ function visSwitchSubTab(sub){
   <div style="padding:1.25rem 1.75rem 0">
     <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:.8rem">
       <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🚑 Apertura SAPU — impacto sobre el stock CESFAM</h2>
-      <span class="sp-note">El SAPU se abastece del mismo stock que hoy tiene Arsenal CESFAM: su consumo se suma al del CESFAM desde el mes de apertura.</span>
+      <span class="sp-note">El SAPU se abastece del mismo stock que hoy tiene Mi arsenal: su consumo se suma al del CESFAM desde el mes de apertura.</span>
     </div>
     <div class="sp-box" style="margin-bottom:0">
       <div class="sp-params">
@@ -2347,7 +2357,7 @@ function visSwitchSubTab(sub){
     <div class="sp-box">
       <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.5rem">Cómo calcula</div>
       <div class="sp-note" style="font-size:12.5px;color:var(--ink2);max-width:80ch">
-        <p style="margin-bottom:.5rem"><b>Stock inicial</b> = lotes cargados en Arsenal CESFAM → Inventario de lotes para el artículo asociado. <b>Consumo CESFAM</b> = Consumos promedio de Arsenal CESFAM. <b>Consumo SAPU</b> = consumo promedio mensual de la referencia × escala (o el valor manual que escribas).</p>
+        <p style="margin-bottom:.5rem"><b>Stock inicial</b> = lotes cargados en Mi arsenal → Inventario de lotes para el artículo asociado. <b>Consumo CESFAM</b> = Consumos promedio de Mi arsenal. <b>Consumo SAPU</b> = consumo promedio mensual de la referencia × escala (o el valor manual que escribas).</p>
         <p style="margin-bottom:.5rem">Se proyecta mes a mes desde el mes actual, consumiendo los lotes en orden FEFO; un lote que llega a su mes de vencimiento sin consumirse cuenta como merma. Desde el mes de apertura la demanda pasa a ser CESFAM + SAPU, y ese mes se retira además la dotación inicial. Si activas "Sumar entregas programadas", la Programación vigente (con tus ajustes manuales) entra como ingreso al inicio de cada mes.</p>
         <p style="margin-bottom:.5rem"><b>Compra anticipada</b> = demanda que el stock no alcanza a cubrir desde hoy hasta (apertura + cobertura post-apertura). <b>Extra por SAPU</b> = esa compra menos la que igual habría que hacer sin SAPU. <b>Pedir antes de</b> = mes de quiebre con SAPU − plazo de reposición.</p>
         <p><b>Precio</b>: valor unitario cargado en Delta (Análisis → Gasto); si no hay, el NETO de la referencia. Valores sin IVA.</p>
@@ -2376,7 +2386,7 @@ function visSwitchSubTab(sub){
 
     <div style="background:#F7EAF5;border:1px solid #CE93D8;border-radius:var(--rl2);padding:1.1rem 1.25rem;margin-bottom:1.5rem">
       <div style="font-size:14px;font-weight:700;color:#7D1F73;margin-bottom:.5rem">🔗 Homologación de nombres (AVIS, CENABAST, PM y otras fuentes)</div>
-      <p style="font-size:12px;color:var(--ink2);margin:0">Un mismo artículo puede venir con el nombre CENABAST, el nombre PM, o el nombre AVIS del arsenal. Al cargar cualquier archivo (Arsenal o Servicio de Salud), Delta reconoce las 3 fuentes automáticamente y las convierte al nombre AVIS. Si un artículo no coincide con ninguna, se agrega igual al arsenal marcado <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#B4720A;background:#FFF3E5">🆕 Nuevo</span> — nunca se pierde ni se descarta. Filtra por "🆕 Nuevos" en la lista lateral para revisarlos. En <strong>📊 Análisis → 🔗 Equivalencias de nombres</strong> puedes agregar otras fuentes (una droguería, otro sistema u otro establecimiento), con o sin nombre, y registrar cómo se llama cada artículo en ellas.</p>
+      <p style="font-size:12px;color:var(--ink2);margin:0">Un mismo artículo puede venir con el nombre CENABAST, el nombre PM, o el nombre AVIS del arsenal. Al cargar cualquier archivo (Mi arsenal o Programación Ministerial), Delta reconoce las 3 fuentes automáticamente y las convierte al nombre AVIS. Si un artículo no coincide con ninguna, se agrega igual al arsenal marcado <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#B4720A;background:#FFF3E5">🆕 Nuevo</span> — nunca se pierde ni se descarta. Filtra por "🆕 Nuevos" en la lista lateral para revisarlos. En <strong>📊 Análisis → 🔗 Equivalencias de nombres</strong> puedes agregar otras fuentes (una droguería, otro sistema u otro establecimiento), con o sin nombre, y registrar cómo se llama cada artículo en ellas.</p>
     </div>
 
 
@@ -2388,25 +2398,25 @@ function visSwitchSubTab(sub){
       <div class="arch-grid">
         <div class="arch-card">
           <div class="arch-h"><span>📦 Inventario de lotes</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('01')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>Arsenal CESFAM → Inventario de lotes</b></div>
+          <div class="arch-donde">Se carga en: <b>Mi arsenal → Inventario de lotes</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Lote</td><td>Vencimiento</td><td>Stock</td></tr><tr><th class="xr">2</th><td>LOSARTAN (POTASICO) 5…</td><td>LC41433</td><td>30/08/2028</td><td class="xn">36.849</td></tr><tr><th class="xr">3</th><td>LOSARTAN (POTASICO) 5…</td><td>LD43728</td><td>30/06/2027</td><td class="xn">21.470</td></tr></tbody></table></div>
           <div class="arch-nota">Obligatorias: <b>Artículo</b> y <b>Stock</b> (o “Cantidad”). Opcionales: <b>Lote</b> y <b>Vencimiento</b> (DD/MM/AAAA, MM/AAAA o fecha de Excel). Una fila por lote.</div>
         </div>
         <div class="arch-card">
           <div class="arch-h"><span>📉 Consumos promedio</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('02')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>Arsenal CESFAM → Consumos promedio</b></div>
+          <div class="arch-donde">Se carga en: <b>Mi arsenal → Consumos promedio</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Consumo promedio mensual</td></tr><tr><th class="xr">2</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">24.636</td></tr><tr><th class="xr">3</th><td>METFORMINA (CLORHIDRA…</td><td class="xn">30.318</td></tr></tbody></table></div>
           <div class="arch-nota">Dos columnas: <b>Artículo</b> y una columna cuyo título contenga <b>“consumo”</b> o <b>“promedio”</b>, con el consumo mensual en unidades.</div>
         </div>
         <div class="arch-card">
           <div class="arch-h"><span>📋 Programación vigente</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('03')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>Arsenal CESFAM → Programación vigente</b></div>
+          <div class="arch-donde">Se carga en: <b>Mi arsenal → Programación vigente</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>…</th><th>O</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Origen</td><td>Año</td><td>Enero</td><td>…</td><td>Diciembre</td></tr><tr><th class="xr">2</th><td>LOSARTAN (POTASICO) 5…</td><td>CENABAST</td><td class="xn">2026</td><td class="xn">18.477</td><td>…</td><td class="xn">18.477</td></tr><tr><th class="xr">3</th><td>LOSARTAN (POTASICO) 5…</td><td>SSVQP</td><td class="xn">2026</td><td class="xn">6.159</td><td>…</td><td class="xn">6.159</td></tr></tbody></table></div>
           <div class="arch-nota"><b>Artículo</b>, <b>Año</b> y los 12 meses con su nombre completo (<b>Enero</b> … <b>Diciembre</b>). <b>Origen</b> (CENABAST, SSVQP…) es opcional: si un artículo trae dos filas del mismo año con distinto origen, se suman.</div>
         </div>
         <div class="arch-card">
           <div class="arch-h"><span>📈 Consumo mes a mes</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('04')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>Arsenal CESFAM → Consumo mes a mes</b></div>
+          <div class="arch-donde">Se carga en: <b>Mi arsenal → Consumo mes a mes</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>…</th><th>N</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Año</td><td>Enero</td><td>Febrero</td><td>…</td><td>Diciembre</td></tr><tr><th class="xr">2</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">2024</td><td class="xn">19.626</td><td class="xn">21.613</td><td>…</td><td class="xn">22.990</td></tr><tr><th class="xr">3</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">2025</td><td class="xn">24.428</td><td class="xn">23.518</td><td>…</td><td class="xn">21.666</td></tr></tbody></table></div>
           <div class="arch-nota"><b>Artículo</b>, <b>Año</b> y una columna por mes (acepta “Enero”, “Ene” o 1–12). Una fila por artículo y año. Si no hay columna Año, se toma del nombre del archivo (ej. consumo_2025.xlsx).</div>
         </div>
@@ -2445,29 +2455,29 @@ function visSwitchSubTab(sub){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
 
       <div style="background:#F0F6FD;border:1px solid #C8D8EE;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:.6rem">⚡ Arsenal CESFAM — simulación individual</div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:.6rem">⚡ Mi arsenal — simulación individual</div>
         <ol style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.85">
           <li>Carga <strong>Inventario</strong>, <strong>Consumos</strong> y <strong>Programación vigente</strong>.</li>
           <li>Selecciona un artículo. El punto 📌 junto a cada artículo de la lista lo marca/desmarca como <strong>PM</strong> con un clic — queda guardado.</li>
           <li>Configura mes inicio, mes de reprogramar, cobertura mín/máx.</li>
-          <li>📊 <strong>Fluctuación de consumo mensual</strong>: si cargaste el historial en Visualizador, activa este check para que la simulación use el índice estacional real en vez de un consumo constante.</li>
-          <li>💾 Junto al campo <strong>Envase</strong>: guárdalo una vez y queda recordado para ese artículo — se usa también en Reprogramación masiva para redondear a cajas completas.</li>
+          <li>📊 <strong>Fluctuación de consumo mensual</strong>: si cargaste el historial en Historial de consumo, activa este check para que la simulación use el índice estacional real en vez de un consumo constante.</li>
+          <li>💾 Junto al campo <strong>Envase</strong>: guárdalo una vez y queda recordado para ese artículo — se usa también en Reprogramar todo para redondear a cajas completas.</li>
           <li>Calcula. Cada celda de ingreso mensual tiene un tooltip con la <em>regla</em> que la generó (programación vigente / calculado / tope por sobrestock).</li>
         </ol>
       </div>
 
       <div style="background:#EAF5EA;border:1px solid #A5D6A7;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#1B5E20;margin-bottom:.6rem">🔓 Modo libre</div>
+        <div style="font-size:14px;font-weight:700;color:#1B5E20;margin-bottom:.6rem">🔓 Artículos fuera del arsenal</div>
         <ol style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.85">
           <li>Para artículos que no están en el arsenal precargado. La carga de inventario, consumos y programación es opcional.</li>
           <li>Busca o usa <strong>+ Seleccionar lo escrito</strong> para artículos no listados.</li>
           <li>Mismo motor de simulación que Arsenal (envase guardado, fluctuación estacional, tooltips de regla).</li>
-          <li>Nota: la homologación CENABAST/PM no se aplica aquí — Modo libre acepta cualquier nombre tal cual.</li>
+          <li>Nota: la homologación CENABAST/PM no se aplica aquí — Artículos fuera del arsenal acepta cualquier nombre tal cual.</li>
         </ol>
       </div>
 
       <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#E65100;margin-bottom:.6rem">📊 Dashboard</div>
+        <div style="font-size:14px;font-weight:700;color:#E65100;margin-bottom:.6rem">📊 Resumen general</div>
         <p style="font-size:12px;color:var(--ink2);margin:0 0 .5rem">Panorama ejecutivo de todo el arsenal. Usa el mismo cálculo que Rotación de stock, por lo que ambas pantallas siempre coinciden.</p>
         <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.85">
           <li>KPIs: quiebre (actual o proyectado), sobrestock, merma, normal.</li>
@@ -2485,7 +2495,7 @@ function visSwitchSubTab(sub){
       </div>
 
       <div style="background:#F7EAF5;border:1px solid #CE93D8;border-radius:var(--rl2);padding:1.25rem;grid-column:1/-1">
-        <div style="font-size:14px;font-weight:700;color:#7D1F73;margin-bottom:.6rem">⚙️ Reprogramación masiva</div>
+        <div style="font-size:14px;font-weight:700;color:#7D1F73;margin-bottom:.6rem">⚙️ Reprogramar todo</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <div>
             <div style="font-size:12.5px;font-weight:700;color:#7D1F73;margin-bottom:.3rem">📅 Reprogramación</div>
@@ -2511,7 +2521,7 @@ function visSwitchSubTab(sub){
       </div>
 
       <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#92400E;margin-bottom:.6rem">📊 Visualizador</div>
+        <div style="font-size:14px;font-weight:700;color:#92400E;margin-bottom:.6rem">📊 Historial de consumo</div>
         <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.85">
           <li>Requiere el archivo <strong>📈 Consumo mes a mes</strong> cargado.</li>
           <li>Comparativa anual, tendencia, índice estacional por artículo.</li>
@@ -2521,7 +2531,7 @@ function visSwitchSubTab(sub){
       </div>
 
       <div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#0D47A1;margin-bottom:.6rem">🏥 Servicio de Salud</div>
+        <div style="font-size:14px;font-weight:700;color:#0D47A1;margin-bottom:.6rem">🏥 Programación Ministerial (PM)</div>
         <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.85">
           <li><strong>Reprogramación PM:</strong> carga prog. ministerial y consumos — homologados igual que en Arsenal.</li>
           <li>La lista de artículos disponibles usa la clasificación PM real, incluidos los que marcaste manualmente con 📌 en Arsenal.</li>
@@ -2532,6 +2542,7 @@ function visSwitchSubTab(sub){
 
       <div style="background:#FBE9E7;border:1px solid #FFAB91;border-radius:var(--rl2);padding:1.25rem;grid-column:1/-1">
         <div style="font-size:14px;font-weight:700;color:#BF360C;margin-bottom:.6rem">📈 Análisis</div>
+        <p style="font-size:12px;color:var(--ink2);margin:0 0 .7rem">Las pestañas están ordenadas en cinco grupos: <strong>📦 Abastecimiento</strong>, <strong>💰 Gasto y presupuesto</strong>, <strong>⚠️ Riesgo</strong>, <strong>📐 Clasificación</strong> y <strong>⚙️ Configuración y equipo</strong>. Elige el grupo y luego la pestaña.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:12px;color:var(--ink2)">
           <div><strong>📅 Calendario CENABAST:</strong> carga el Excel de despachos de intermediación (Artículo + fecha) y muestra la grilla mensual de entregas. Botón <strong>🎯 Cruzar con Rotación</strong>: de los artículos en riesgo, cuáles tienen despacho programado y cuáles no.</div>
           <div style="display:none"><strong>🔍 Log de farmacia:</strong> log AVIS — dispensaciones, horarios, anomalías, PBC referencial. Botón <strong>🔗 Generar consumo</strong>: usa las mismas dispensaciones para llenar el historial mensual, sin cargar un Excel aparte.</div>
@@ -2569,7 +2580,7 @@ function visSwitchSubTab(sub){
 
           <div style="background:#fff;border:1px solid #E1BEE7;border-radius:var(--r);padding:1rem">
             <div style="font-size:13px;font-weight:700;color:#7D1F73;margin-bottom:.4rem">📐 ¿Qué es XYZ?</div>
-            <p style="font-size:12px;color:var(--ink2);margin:0 0 .5rem">ABC mide <em>cuánto vale</em> un artículo; XYZ mide algo distinto: <strong>qué tan predecible es su consumo</strong>, usando el historial mensual real cargado en Visualizador.</p>
+            <p style="font-size:12px;color:var(--ink2);margin:0 0 .5rem">ABC mide <em>cuánto vale</em> un artículo; XYZ mide algo distinto: <strong>qué tan predecible es su consumo</strong>, usando el historial mensual real cargado en Historial de consumo.</p>
             <ul style="font-size:11.5px;color:var(--ink2);margin:0;padding-left:16px;line-height:1.7">
               <li><strong>Clase X</strong> — consumo estable, fácil de proyectar.</li>
               <li><strong>Clase Y</strong> — consumo variable, con cierto patrón.</li>
@@ -2597,7 +2608,7 @@ function visSwitchSubTab(sub){
 
           <div style="background:#fff;border:1px solid #E1BEE7;border-radius:var(--r);padding:1rem">
             <div style="font-size:13px;font-weight:700;color:#7D1F73;margin-bottom:.4rem">🎲 ¿Qué es la simulación Monte Carlo?</div>
-            <p style="font-size:12px;color:var(--ink2);margin:0 0 .5rem">El Simulador de crisis entrega un resultado para un escenario que tú eliges (ej. "atraso de 2 meses"). Monte Carlo hace algo distinto: corre <strong>cientos de simulaciones</strong>, cada una con una variación distinta al azar (consumo un poco más alto o más bajo, atraso de 0 a 3 meses con distinta probabilidad cada vez) — y en vez de un sí/no, entrega una <strong>probabilidad</strong>:</p>
+            <p style="font-size:12px;color:var(--ink2);margin:0 0 .5rem">El Simulador de atrasos y alzas entrega un resultado para un escenario que tú eliges (ej. "atraso de 2 meses"). Monte Carlo hace algo distinto: corre <strong>cientos de simulaciones</strong>, cada una con una variación distinta al azar (consumo un poco más alto o más bajo, atraso de 0 a 3 meses con distinta probabilidad cada vez) — y en vez de un sí/no, entrega una <strong>probabilidad</strong>:</p>
             <p style="font-size:12px;color:#7D1F73;background:#F7EAF5;border-radius:6px;padding:.4rem .6rem;margin:0">"Este artículo tiene 73% de probabilidad de quebrar en los próximos 4 meses" — no una certeza, una estimación honesta de riesgo.</p>
           </div>
 
@@ -2606,14 +2617,14 @@ function visSwitchSubTab(sub){
         <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #E1BEE7">
           <div style="font-size:13px;font-weight:700;color:#7D1F73;margin-bottom:.5rem">Las demás pestañas de Análisis avanzado, en una línea cada una</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .8rem;font-size:12px;color:var(--ink2)">
-            <div>🧪 <strong>Simulador de crisis:</strong> un escenario específico ("¿qué pasa si atrasan 2 meses?") aplicado a todo el arsenal a la vez.</div>
+            <div>🧪 <strong>Simulador de atrasos y alzas:</strong> un escenario específico ("¿qué pasa si atrasan 2 meses?") aplicado a todo el arsenal a la vez.</div>
             <div>🗺️ <strong>Mapa del arsenal:</strong> todo el arsenal como rectángulos — tamaño = gasto, color = riesgo. Un vistazo en vez de leer tablas.</div>
-            <div>⏳ <strong>Túnel del tiempo:</strong> control deslizante para ver el mapa del arsenal en cualquier mes, pasado o futuro.</div>
-            <div>🧮 <strong>Priorización explicable:</strong> un puntaje único que combina Rotación + ABC + Diferencias — con el motivo exacto de cada punto, nunca una caja negra.</div>
+            <div>⏳ <strong>Arsenal mes a mes:</strong> control deslizante para ver el mapa del arsenal en cualquier mes, pasado o futuro.</div>
+            <div>🧮 <strong>Prioridad de compra:</strong> un puntaje único que combina Rotación + ABC + Diferencias — con el motivo exacto de cada punto, nunca una caja negra.</div>
             <div>💰 <strong>Optimizador de presupuesto:</strong> das un monto disponible, ordena por prioridad y te dice qué alcanza a cubrir y qué queda pendiente.</div>
             <div>🎯 <strong>Objetivo de cobertura:</strong> al revés de lo normal — planteas la meta ("que nunca baje de 3 meses") y Delta calcula qué pedir para lograrlo.</div>
             <div>🔗 <strong>Correlaciones:</strong> qué artículos suben y bajan juntos en el consumo — útil para explicar anomalías.</div>
-            <div style="grid-column:1/-1">📝 <strong>Resumen narrativo</strong> (dentro de Priorización explicable): un párrafo redactado automáticamente con lo más importante — con botón para copiar.</div>
+            <div style="grid-column:1/-1">📝 <strong>Resumen narrativo</strong> (dentro de Prioridad de compra): un párrafo redactado automáticamente con lo más importante — con botón para copiar.</div>
           </div>
         </div>
 
@@ -2643,7 +2654,7 @@ function visSwitchSubTab(sub){
 
   <!-- Slots de carga -->
   <div style="background:#F0F6FD;border:1px solid #1CAFAA;border-radius:8px;padding:1rem;margin-bottom:1rem">
-    <strong style="color:#0F2A4A;font-size:15px">📋 Servicio de Salud — Reprogramación PM</strong>
+    <strong style="color:#0F2A4A;font-size:15px">📋 Programación Ministerial (PM) — Reprogramación</strong>
     <p style="color:#444;font-size:13px;margin:4px 0 0">Carga los archivos y genera el informe comparativo para el SS.</p>
   </div>
   <!-- Puente con Arsenal (evaluación de migración, ago-2026): si ya
@@ -2653,7 +2664,7 @@ function visSwitchSubTab(sub){
   <div style="background:#E8F5F4;border:1px solid #0D6E4E;border-radius:8px;padding:.9rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
     <div style="flex:1;min-width:220px">
       <div style="font-size:13px;font-weight:700;color:#0D6E4E">🔗 Usar datos ya cargados en Arsenal</div>
-      <div style="font-size:11.5px;color:#2E5C4A">Si ya cargaste Inventario, Consumos y/o Programación en Arsenal CESFAM, cópialos aquí en vez de subir los mismos archivos de nuevo.</div>
+      <div style="font-size:11.5px;color:#2E5C4A">Si ya cargaste Inventario, Consumos y/o Programación en Mi arsenal, cópialos aquí en vez de subir los mismos archivos de nuevo.</div>
     </div>
     <button onclick="ssUsarDatosArsenal()" style="padding:9px 16px;white-space:nowrap;border:none;border-radius:6px;background:#0D6E4E;color:#fff;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700">🔗 Copiar desde Arsenal</button>
   </div>
@@ -2857,7 +2868,7 @@ function progOverrideChange(el,ctx){
     if(!map[art])map[art]={};
     if(!map[art][anio])map[art][anio]={};
     map[art][anio][mes]=val;
-    // "Delta aprende tu criterio" (a pedido de Felipe, ago-2026): cada
+    // "Mis ajustes manuales" (a pedido de Felipe, ago-2026): cada
     // ajuste real (val distinto de orig) queda registrado con AMBOS
     // números — lo sugerido y lo que puso — para poder analizar el
     // patrón de corrección más adelante. Se acota a los últimos 500
@@ -2905,8 +2916,8 @@ function togglePM(art){
 let CPU_TAGS={},FOFAR_TAGS={},IAAPS_TAGS={}; // avis -> true si está etiquetado
 let cpuUsuarios={}; // avis -> N° usuarios vigentes CPU
 let cpuConsumoMensual={}; // avis -> total mensual (uds) que llevan los usuarios CPU — puede diferir del consumo general del artículo
-/* ══ ADN del Arsenal + Detective de anomalías + Delta aprende tu
-   criterio + Comparador de políticas (a pedido de Felipe, ago-2026) ══
+/* ══ Puntaje global del arsenal + Consumos fuera de patrón + Delta aprende tu
+   criterio + Comparar criterios de cobertura (a pedido de Felipe, ago-2026) ══
    adnHistorial: array de snapshots {fecha, score, componentes} — cada
    vez que se genera el ADN, se agrega un punto nuevo (o se reemplaza el
    de hoy si ya existía uno), para poder ver la tendencia en el tiempo.
@@ -4155,13 +4166,13 @@ function renderPanel(art){
    ago-2026) — 100% aditiva: nueva función separada, se agrega al final
    de buildProgTab() en ambos casos (con y sin programación cargada),
    sin tocar la tabla de programación vigente existente. Solo lectura:
-   este historial se carga desde Visualizador, no se edita aquí. */
+   este historial se carga desde Historial de consumo, no se edita aquí. */
 function _tablaConsumoHistoricoHTML(art){
   const hist=cons_mensual[art];
   if(!hist||!Object.keys(hist).length)return'';
   const años=Object.keys(hist).map(Number).sort();
   return `<div class="fc" style="margin-top:1rem"><div class="fc-title">📊 Consumo mes a mes cargado</div>
-    <div style="font-size:11px;color:var(--ink3);margin:-4px 0 8px">Historial real cargado en Visualizador — solo lectura. Se usa para estacionalidad, XYZ, Gasto histórico y proyecciones. Para editarlo, vuelve a subir el Excel en Visualizador.</div>
+    <div style="font-size:11px;color:var(--ink3);margin:-4px 0 8px">Historial real cargado en Historial de consumo — solo lectura. Se usa para estacionalidad, XYZ, Gasto histórico y proyecciones. Para editarlo, vuelve a subir el Excel en Historial de consumo.</div>
     <div class="ptw"><table class="pt">
     <thead><tr><th>Año</th>${MESES.map(m=>`<th>${MC[MESES.indexOf(m)]}</th>`).join('')}<th>Total</th></tr></thead>
     <tbody>${años.map(an=>{
@@ -4226,7 +4237,7 @@ function buildSimTab(art,consInit,consV,dispV,lots,opM,opA){
   // antes había un solo botón "Usar mes a mes" con un promedio fijo del
   // último Excel subido (disp_map). Ahora se puede elegir la ventana —
   // mismo criterio y misma función (_promedioUltimosMeses) que ya se usa
-  // en Reprogramación masiva, para que el criterio sea consistente en
+  // en Reprogramar todo, para que el criterio sea consistente en
   // toda la herramienta.
   const tieneHistorial=!!cons_mensual[art];
   const selectorReal=tieneHistorial?`<div style="display:flex;gap:6px;align-items:center;margin-top:5px;flex-wrap:wrap">
@@ -4284,7 +4295,7 @@ function buildSimTab(art,consInit,consV,dispV,lots,opM,opA){
     <div style="margin-top:8px">
       <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;color:var(--ink2);cursor:pointer">
         <input type="checkbox" id="chk-estac-real" style="accent-color:var(--teal)">
-        📊 Usar fluctuación de consumo mensual (índice estacional real, calculado del historial cargado en Visualizador) en vez de un consumo constante
+        📊 Usar fluctuación de consumo mensual (índice estacional real, calculado del historial cargado en Historial de consumo) en vez de un consumo constante
       </label>
       <div id="estac-real-aviso" style="display:none;margin-top:4px;font-size:11.5px;color:#B4720A;background:#FFF3E5;border-radius:6px;padding:5px 9px"></div>
     </div>
@@ -4375,7 +4386,7 @@ function calcular(){
   // Fluctuación de consumo mensual (a pedido de Felipe, ago-2026): en vez
   // de simular con un consumo constante todos los meses, si el usuario
   // activa el check se usa el índice estacional real calculado a partir
-  // del historial cargado en el Visualizador (_estIdx, un multiplicador
+  // del historial cargado en el Historial de consumo (_estIdx, un multiplicador
   // por mes derivado de datos reales, no un supuesto manual). Si no hay
   // historial suficiente para el artículo, se avisa y se sigue calculando
   // con consumo constante — nunca se bloquea el cálculo por esto.
@@ -4387,7 +4398,7 @@ function calcular(){
       mults=_estIdx[sel];
       if(avisoEl){avisoEl.style.display='block';avisoEl.style.color='#0D6E4E';avisoEl.style.background='#E8F5F4';avisoEl.textContent='✓ Usando índice estacional real de '+(Object.keys(cons_mensual[sel]||{}).length)+' año(s) de historial cargado.';}
     } else {
-      if(avisoEl){avisoEl.style.display='block';avisoEl.style.color='#B4720A';avisoEl.style.background='#FFF3E5';avisoEl.textContent='⚠ No hay historial de consumo mensual suficiente para este artículo (carga el archivo "Consumo mes a mes" en el Visualizador) — se calculó con consumo constante.';}
+      if(avisoEl){avisoEl.style.display='block';avisoEl.style.color='#B4720A';avisoEl.style.background='#FFF3E5';avisoEl.textContent='⚠ No hay historial de consumo mensual suficiente para este artículo (carga el archivo "Consumo mes a mes" en el Historial de consumo) — se calculó con consumo constante.';}
     }
   } else if(avisoEl){avisoEl.style.display='none';}
 
@@ -4857,8 +4868,8 @@ function resetSel(){
    MODO LIBRE
 ══════════════════════════════════════════════════ */
 let lInv={}, lCons={}, lProg={};
-let lProgOverride={}; // igual que progOverride pero para Modo libre
-let lEnvaseMap={}; // igual que envaseMap pero para Modo libre
+let lProgOverride={}; // igual que progOverride pero para Artículos fuera del arsenal
+let lEnvaseMap={}; // igual que envaseMap pero para Artículos fuera del arsenal
 let lSel=null, lLid=0;
 let lArts=[]; // artículos conocidos desde los archivos cargados
 
@@ -5045,7 +5056,7 @@ function _lProcProg(rows,fn){{
   }
 }
 
-/* Panel del modo libre — reutiliza mismo motor que el modo arsenal */
+/* Panel del Artículos fuera del arsenal — reutiliza mismo motor que el modo arsenal */
 function lRenderPanel(art){
   const p=document.getElementById('l-panel');
   // Mostrar el contenedor lw y ocultar el placeholder llw
@@ -5162,7 +5173,7 @@ function lBuildSimTab(art,consInit,consPreload,lDispV,lotesInv,opM,opA){
     <div style="margin-top:8px">
       <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;color:var(--ink2);cursor:pointer">
         <input type="checkbox" id="chk-estac-real-l" style="accent-color:var(--teal)">
-        📊 Usar fluctuación de consumo mensual (índice estacional real, calculado del historial cargado en Visualizador) en vez de un consumo constante
+        📊 Usar fluctuación de consumo mensual (índice estacional real, calculado del historial cargado en Historial de consumo) en vez de un consumo constante
       </label>
       <div id="estac-real-aviso-l" style="display:none;margin-top:4px;font-size:11.5px;color:#B4720A;background:#FFF3E5;border-radius:6px;padding:5px 9px"></div>
     </div>
@@ -5190,7 +5201,7 @@ function lSwitchTab(t){
   });
 }
 
-/* Lotes modo libre — mismas funciones con prefijo l */
+/* Lotes Artículos fuera del arsenal — mismas funciones con prefijo l */
 function lAddLote(n='',q='',v=''){
   lLid++;const id=lLid;const w=document.getElementById('llw');if(!w)return;
   const d=document.createElement('div');d.className='lr';d.id=`llr-${id}`;
@@ -5363,7 +5374,7 @@ function _procDisp(rows,fn){{
     // año más VIEJO por accidente. Ahora se calcula explícitamente con
     // el AÑO MÁS RECIENTE de cada artículo — los años anteriores siguen
     // completos en cons_mensual (útiles para ver tendencia en la Matriz
-    // ABC-XYZ y el Túnel del tiempo), pero no se mezclan en el promedio
+    // ABC-XYZ y el Arsenal mes a mes), pero no se mezclan en el promedio
     // que alimenta el cálculo principal.
     const añosPorArt={};
     // Oct-2026: el nombre se homologa al artículo AVIS (igual que
@@ -5886,7 +5897,7 @@ function calcularConEscenario(){
    para cada artículo con cmin/cmax fijos en 2/4 — un segundo cálculo
    completo, independiente de los umbrales configurables que el usuario
    define en la pestaña Rotación, y por eso podía mostrar un panorama
-   distinto al de Rotación para el mismo dato. Ahora Dashboard es una
+   distinto al de Rotación para el mismo dato. Ahora Resumen general es una
    vista resumen sobre el MISMO resultado que ya calcula calcularRotacion()
    (que corre la misma simulación FEFO/multianual): no se duplica el
    cálculo y ambas pantallas quedan garantizadamente consistentes. */
@@ -5907,7 +5918,7 @@ function calcularDashboard(ctx){
     const t0=performance.now();
     calcularRotacion(ctx); // fuente única: calcula y cachea en window['_rotResultados_'+ctx]
     const rot=window['_rotResultados_'+ctx]||[];
-    // Mapear vocabulario de Rotación (7 estados) al resumen ejecutivo de Dashboard.
+    // Mapear vocabulario de Rotación (7 estados) al resumen ejecutivo de Resumen general.
     const resultados=rot.map(r=>({
       art:r.art,cons:r.cons,
       minCob:r.minCob!==null?r.minCob:999,
@@ -6507,7 +6518,7 @@ function masivaSwitchTab(ctx,tab){
 }
 
 /* ══ EVALUACIÓN DE AJUSTES (a pedido de Felipe, ago-2026) ══
-   Sub-pestaña dentro de Reprogramación masiva que, sobre el MISMO
+   Sub-pestaña dentro de Reprogramar todo que, sobre el MISMO
    resultado ya calculado (sin volver a simular), separa dos situaciones
    accionables que la tabla principal no resume por sí sola:
    1. "Bajar a cero": meses donde había programación vigente (progOrig>0)
@@ -6521,7 +6532,7 @@ function masivaSwitchTab(ctx,tab){
    No se inventa ningún dato nuevo: todo sale de los campos progOrig/ing/
    cob/esFuturo que ya calculó calcularMasiva(). */
 /* ══ 📦 SOLO CENABAST — vigente vs. propuesta (a pedido de Felipe,
-   ago-2026) ══ Sub-pestaña dentro de Reprogramación masiva que filtra
+   ago-2026) ══ Sub-pestaña dentro de Reprogramar todo que filtra
    el MISMO resultado ya calculado (sin volver a simular) a solo los
    artículos con origen CENABAST (usa tieneOrigenCenabast(), ya
    existente), y lo muestra con el mismo formato de dos filas por
@@ -6562,7 +6573,7 @@ function renderMasivaCenabastSS(ctx){
     return{...r,requiereCambio};
   });
   let h=`<div style="background:#F7EAF5;border:1px solid #A12895;border-radius:var(--r);padding:.7rem 1rem;margin-bottom:1.1rem;font-size:12px;color:#7D1F73">
-    📦 ${resCenabast.length} artículo(s) con origen CENABAST — ${nRequierenCambio} requieren ajuste sobre lo vigente. Mismo formato que Reprogramación Servicio de Salud: cada artículo con cambios muestra su fila "Vigente" y, debajo, "↳ Ajuste propuesto".
+    📦 ${resCenabast.length} artículo(s) con origen CENABAST — ${nRequierenCambio} requieren ajuste sobre lo vigente. Mismo formato que la Reprogramación PM: cada artículo con cambios muestra su fila "Vigente" y, debajo, "↳ Ajuste propuesto".
   </div>`;
   h+=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
     <div class="kc" style="flex:1;min-width:100px"><div class="kc-lbl">Artículos CENABAST</div><div class="kc-val kv-b">${resCenabast.length}</div></div>
@@ -6623,7 +6634,7 @@ function exportarMasivaCenabastSS(ctx){
   _descargarXLSXConEstilo([{nombre:'CENABAST vigente vs propuesta',anchos,filas:filasXLSX}],'Reprogramacion_CENABAST_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
-/* ══ 🔍 REVISAR CAMBIOS — sub-pestaña de Reprogramación masiva (a
+/* ══ 🔍 REVISAR CAMBIOS — sub-pestaña de Reprogramar todo (a
    pedido de Felipe, ago-2026) ══ Sobre el MISMO resultado ya calculado
    (sin volver a simular), arma una lista de SOLO los cambios reales
    (propuesto ≠ vigente), con: (1) razón corta de por qué cambió,
@@ -7190,7 +7201,7 @@ function _ajusteMesAMesLimpiar(ctx,art){
 /* Guarda un mes ajustado en "Ajuste mes a mes" como ajuste manual de
    la programación VIGENTE del artículo (a pedido de Felipe, ago-2026)
    -- reutiliza el mismo mecanismo (progOverride/lProgOverride +
-   overrideLog para "Delta aprende tu criterio") que ya usa la ficha
+   overrideLog para "Mis ajustes manuales") que ya usa la ficha
    individual, para no crear un segundo sistema de persistencia
    paralelo. */
 function _ajusteMesAMesGuardarComoVigente(ctx,art,anio,mesNombre,valor){
@@ -7220,7 +7231,7 @@ function _ajusteMesAMesGuardarComoVigente(ctx,art,anio,mesNombre,valor){
    antes de leer los números mes por mes. Dos formas de llenarla:
    1. 100% manual: se escribe cada celda a mano.
    2. "📋 Copiar desde Arsenal": rellena todo con el motor de
-      simulación de Reprogramación masiva -- después de copiar, cada
+      simulación de Reprogramar todo -- después de copiar, cada
       celda sigue siendo editable.
    Solo Arsenal (las etiquetas PM/CPU/FOFAR/IAAPS no existen en Modo
    Libre). No se persiste entre sesiones, igual que el resto de esta
@@ -7228,7 +7239,7 @@ function _ajusteMesAMesGuardarComoVigente(ctx,art,anio,mesNombre,valor){
 let _fofarFiltroEtiqueta='todos';
 let _fofarBusqueda='';
 let _fofarDesde=null; // {mes,anio} -- null = usa el mes/año actual por defecto
-let _fofarHasta=null; // {mes,anio} -- null = usa lo configurado en Reprogramación masiva
+let _fofarHasta=null; // {mes,anio} -- null = usa lo configurado en Reprogramar todo
 function renderFOFAROficial(ctx){
   const pre=ctx==='libre'?'l':'a';
   const el=document.getElementById(pre+'-masiva-tab-fofar');
@@ -7458,7 +7469,7 @@ function _fofarRefrescarFila(ctx,art,idxConocido){
    artículo (puede ser 24-36 meses) de una sola pasada síncrona cada
    vez que se edita cualquier celda -- eso bloqueaba el hilo del
    navegador mientras corría, sintiéndose como que "se congela".
-   Mismo principio que ya usa Reprogramación masiva (calcularMasiva)
+   Mismo principio que ya usa Reprogramar todo (calcularMasiva)
    para no trabar la interfaz: se cede el control al navegador con un
    setTimeout antes del cálculo pesado, y se muestra un aviso breve de
    "calculando…" en la celda mientras corre, en vez de dejar la
@@ -7499,7 +7510,7 @@ function _fofarEditarCelda(ctx,artSafe,art,claveMesOrNull,campo,valorStr){
   },0);
 }
 /* "Copiar desde Arsenal" (a pedido de Felipe, ago-2026): usa el mismo
-   motor de simulación de Reprogramación masiva, sobre los artículos
+   motor de simulación de Reprogramar todo, sobre los artículos
    visibles con el filtro/búsqueda actual, y llena EXACTAMENTE el rango
    de meses/años que está elegido en "Mostrar desde/hasta" -- ya no
    queda atado a un solo año calendario. Guarda además los parámetros
@@ -8219,7 +8230,7 @@ async function generarPDF(){
 /* Carga libre */
 const LSLOT_D={inv:{st:'lst-inv',txt:'Sin cargar'},cons:{st:'lst-cons',txt:'Sin cargar'},prog:{st:'lst-prog',txt:'Sin cargar'}};
 
-/* Panel modo libre */
+/* Panel Artículos fuera del arsenal */
 
 
 
@@ -8266,8 +8277,8 @@ function calcularRotacion(ctx){
           vencProx={dias,m:pv.m,y:pv.y,lote:l.lote,stock:Number(l.stock)};
       }catch(e){}
     });
-    // Proyección multianual (antes duplicada en el Dashboard: ahora se
-    // calcula una sola vez aquí y el Dashboard reutiliza este resultado).
+    // Proyección multianual (antes duplicada en el Resumen general: ahora se
+    // calcula una sola vez aquí y el Resumen general reutiliza este resultado).
     // Usar consumo real: FEFO consume los lotes más próximos primero,
     // lo que sobra al vencer es la merma proyectada real.
     let mermasDetalle=[], totalMerma=0, minCob=null, maxCob=null, errorCalculo=false;
@@ -8302,9 +8313,9 @@ function calcularRotacion(ctx){
       detalle=`Cobertura ${cobertura.toFixed(1)} m`;
     } else if(cons>0&&minCob!==null&&minCob<cobMin){
       // Hoy la cobertura está bien, pero la proyección multianual (misma
-      // simulación FEFO que antes calculaba el Dashboard por separado)
+      // simulación FEFO que antes calculaba el Resumen general por separado)
       // anticipa un quiebre futuro — antes esta señal solo existía en
-      // Dashboard y no aparecía en Rotación.
+      // Resumen general y no aparecía en Rotación.
       estado='quiebre-futuro';
       detalle=`Cobertura actual OK, pero cobertura proyectada cae a ${minCob.toFixed(1)} m dentro del horizonte simulado`;
     } else {
@@ -8316,7 +8327,7 @@ function calcularRotacion(ctx){
   });
   const nErrores=resultados.filter(r=>r.errorCalculo).length;
   window['_mermaDataRot_'+ctx]=mermaResGlobal;
-  window['_rotResultados_'+ctx]=resultados; // fuente única reutilizada por Dashboard
+  window['_rotResultados_'+ctx]=resultados; // fuente única reutilizada por Resumen general
   window['_rotErrores_'+ctx]=nErrores;
   renderRotacion(resultados,mermaResGlobal,ctx,mesesEst,cobMin,nErrores);
 }
@@ -8687,10 +8698,10 @@ function ajustarEnvase(){
   setTimeout(()=>notif.remove(),3000);
 }
 /* CORRECCIÓN (auditoría ago-2026): el botón "📦 Ajustar a envase" de
-   Modo libre llamaba a lAjustarEnvase(), que nunca se había definido —
+   Artículos fuera del arsenal llamaba a lAjustarEnvase(), que nunca se había definido —
    el botón no hacía nada al presionarlo. Se agrega ahora, mismo
    criterio que ajustarEnvase() (Arsenal), usando los nombres
-   correspondientes de Modo libre (lenvase, window._lLastRes, etc.). */
+   correspondientes de Artículos fuera del arsenal (lenvase, window._lLastRes, etc.). */
 function lAjustarEnvase(){
   const envase=parseInt(document.getElementById('lenvase')?.value)||0;
   if(!envase||envase<1){
@@ -8765,7 +8776,7 @@ function ssUsarDatosArsenal(){
     copiados++;
   }
   if(!copiados){
-    alert('No hay datos cargados todavía en Arsenal CESFAM (Inventario/Consumos/Programación). Cárgalos ahí primero, o sube los archivos directamente aquí.');
+    alert('No hay datos cargados todavía en Mi arsenal (Inventario/Consumos/Programación). Cárgalos ahí primero, o sube los archivos directamente aquí.');
     return;
   }
   ssBuildArts();
@@ -8969,9 +8980,9 @@ function ssCalcular(){
   const cmax=parseFloat(document.getElementById('ss-cmax')?.value)||4;
   const limite=parseFloat(document.getElementById('ss-limite')?.value)||0.30;
   // Fuente de consumo (a pedido de Felipe, ago-2026): mismo criterio que
-  // Reprogramación masiva. Servicio de Salud no tiene su propio archivo
+  // Reprogramar todo. Servicio de Salud no tiene su propio archivo
   // "mes a mes" separado, así que la ventana real usa el mismo
-  // cons_mensual ya cargado en Arsenal CESFAM — los artículos PM
+  // cons_mensual ya cargado en Mi arsenal — los artículos PM
   // gestionados aquí son, en general, los mismos artículos del arsenal.
   const fuenteSS=document.getElementById('ss-fuente')?.value||'promedio';
   const ventanaRealSS={real3:3,real6:6,real12:12}[fuenteSS]||null;
@@ -9039,7 +9050,7 @@ function ssCalcular(){
       // le pasaba envase ni capacidad máxima al motor -- se cortaba en
       // "mesReprog", dejando ambos como undefined sin importar lo que
       // el artículo tuviera guardado. Mismo criterio que ya usa
-      // Reprogramación masiva.
+      // Reprogramar todo.
       const envaseArtSS=envaseMap[art]||null;
       const capacidadMaximaSS=capacidadMap[art]||null;
 
@@ -9384,7 +9395,7 @@ tr:nth-child(even) td{background:#F8FBFF}
 </style><'+'/head><'+'body>
 <div class="header">
   <div><h1>${art}</h1>
-  <div style="font-size:9pt;color:#555">Modo libre · Pingüino Delta · ${hoy.toLocaleDateString('es-CL',{day:'2-digit',month:'long',year:'numeric'})}</div></div>
+  <div style="font-size:9pt;color:#555">Artículos fuera del arsenal · Pingüino Delta · ${hoy.toLocaleDateString('es-CL',{day:'2-digit',month:'long',year:'numeric'})}</div></div>
   <div style="text-align:right;font-size:9pt;color:#555">Consumo prom.: <strong>${fmt(cons)} uds/mes</strong><br>Cob. objetivo: ${cmin}–${cmax} m<br>${progVig?'Con prog. vigente':'Sin prog. vigente'}</div>
 </div>
 <div class="kpis">
@@ -9395,7 +9406,7 @@ tr:nth-child(even) td{background:#F8FBFF}
 </div>
 <table><thead><tr><th>Mes</th><th>Prog. vigente</th><th>Prog. ajustada</th><th>Diferencia</th><th>Cobertura</th></tr></thead>
 <tbody>${tablaRows}</tbody></table>
-<div class="footer"><span>Pingüino Delta · Calculadora de programaciones · Modo libre</span><span>Generado: ${hoy.toLocaleString('es-CL')}</span></div>
+<div class="footer"><span>Pingüino Delta · Calculadora de programaciones · Artículos fuera del arsenal</span><span>Generado: ${hoy.toLocaleString('es-CL')}</span></div>
 <!-- PANEL AYUDA -->
 <div id="print-ayuda-tmpl" style="display:none;height:calc(100vh - 100px);overflow-y:auto;padding:2rem 3rem;background:#fff;box-sizing:border-box">
   <div style="max-width:900px;margin:0 auto">
@@ -9405,7 +9416,7 @@ tr:nth-child(even) td{background:#F8FBFF}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
 
       <div style="background:#F0F6FD;border:1px solid #C8D8EE;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:.6rem">⚡ Arsenal CESFAM</div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:.6rem">⚡ Mi arsenal</div>
         <ol style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.9">
           <li>Carga <strong>Inventario</strong>, <strong>Consumos</strong> y <strong>Programación vigente</strong>.</li>
           <li>Selecciona un artículo en la lista lateral.</li>
@@ -9416,7 +9427,7 @@ tr:nth-child(even) td{background:#F8FBFF}
       </div>
 
       <div style="background:#EAF5EA;border:1px solid #A5D6A7;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#1B5E20;margin-bottom:.6rem">🔓 Modo libre</div>
+        <div style="font-size:14px;font-weight:700;color:#1B5E20;margin-bottom:.6rem">🔓 Artículos fuera del arsenal</div>
         <ol style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.9">
           <li>Carga opcionalmente inventario, consumos y programación.</li>
           <li>Busca el artículo — el stock total aparece junto al nombre (rojo si es 0).</li>
@@ -9427,7 +9438,7 @@ tr:nth-child(even) td{background:#F8FBFF}
       </div>
 
       <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#E65100;margin-bottom:.6rem">📊 Dashboard</div>
+        <div style="font-size:14px;font-weight:700;color:#E65100;margin-bottom:.6rem">📊 Resumen general</div>
         <p style="font-size:12px;color:var(--ink2);margin:0 0 .5rem">Análisis masivo de todos los artículos con el inventario cargado.</p>
         <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.9">
           <li>KPIs: quiebre, sobrestock, merma y sin alerta.</li>
@@ -9437,7 +9448,7 @@ tr:nth-child(even) td{background:#F8FBFF}
       </div>
 
       <div style="background:#F7EAF5;border:1px solid #CE93D8;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#7D1F73;margin-bottom:.6rem">⚙️ Reprogramación masiva</div>
+        <div style="font-size:14px;font-weight:700;color:#7D1F73;margin-bottom:.6rem">⚙️ Reprogramar todo</div>
         <ol style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.9">
           <li><em>Mes inicio (stock actual)</em> = mes del inventario actual.</li>
           <li><em>Mes inicio reprogramar</em> = primer mes con propuesta nueva.</li>
@@ -9453,12 +9464,12 @@ tr:nth-child(even) td{background:#F8FBFF}
           <li>💀 <strong>Vencido</strong>: lotes ya vencidos en el inventario.</li>
           <li>🟠 <strong>Vence pronto</strong>: vencimiento en menos de 90 días.</li>
           <li>🟡 <strong>Sin movimiento</strong>: stock sin consumo registrado.</li>
-          <li>📋 <strong>Merma detalle lotes</strong>: requiere calcular Dashboard primero.</li>
+          <li>📋 <strong>Merma detalle lotes</strong>: requiere calcular Resumen general primero.</li>
         </ul>
       </div>
 
       <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#92400E;margin-bottom:.6rem">📊 Visualizador</div>
+        <div style="font-size:14px;font-weight:700;color:#92400E;margin-bottom:.6rem">📊 Historial de consumo</div>
         <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.9">
           <li>Requiere el archivo <strong>📈 Consumo mes a mes</strong> cargado.</li>
           <li>Muestra <strong>comparativa anual</strong>, <strong>tendencia</strong> e <strong>índice estacional</strong> por artículo.</li>
@@ -9468,7 +9479,7 @@ tr:nth-child(even) td{background:#F8FBFF}
       </div>
 
       <div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:var(--rl2);padding:1.25rem">
-        <div style="font-size:14px;font-weight:700;color:#0D47A1;margin-bottom:.6rem">🏥 Servicio de Salud</div>
+        <div style="font-size:14px;font-weight:700;color:#0D47A1;margin-bottom:.6rem">🏥 Programación Ministerial (PM)</div>
         <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.9">
           <li><strong>Reprogramación PM:</strong> carga prog. ministerial y consumos. Genera comparativo vigente vs propuesta.</li>
           <li><strong>Compilar lotes SSVQ:</strong> carga reporte de inventario. Genera formato <code>/(Cant)-MM/YYYY/</code> para el SS.</li>
@@ -9477,6 +9488,7 @@ tr:nth-child(even) td{background:#F8FBFF}
 
       <div style="background:#FBE9E7;border:1px solid #FFAB91;border-radius:var(--rl2);padding:1.25rem;grid-column:1/-1">
         <div style="font-size:14px;font-weight:700;color:#BF360C;margin-bottom:.6rem">📈 Análisis</div>
+        <p style="font-size:12px;color:var(--ink2);margin:0 0 .7rem">Las pestañas están ordenadas en cinco grupos: <strong>📦 Abastecimiento</strong>, <strong>💰 Gasto y presupuesto</strong>, <strong>⚠️ Riesgo</strong>, <strong>📐 Clasificación</strong> y <strong>⚙️ Configuración y equipo</strong>. Elige el grupo y luego la pestaña.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:12px;color:var(--ink2)">
           <div><strong>📅 Calendario CENABAST:</strong> carga el Excel ICP de intermediación. Visualiza fechas de entrega mensualmente. Al imprimir: pág. 1 = grilla, pág. 2 = listado.</div>
           <div><strong>💰 Gasto y consumo:</strong> carga un Excel de gasto. Gráficos de serie de tiempo y comparativas entre años.</div>
@@ -9840,7 +9852,7 @@ function calLimpiar(evt){
   document.getElementById('cal-fi').value='';
   document.getElementById('cal-content').innerHTML='<div class="ph" style="min-height:40vh"><div class="ph-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><h2>Carga el Excel y presiona "Ver calendario"</h2><p>El archivo debe tener columnas Artículo y Fecha despacho.</p></div>';
   const cruceEl=document.getElementById('cal-cruce-content');
-  if(cruceEl)cruceEl.innerHTML='<div class="ph" style="min-height:15vh"><h2>Presiona "Cruzar con Rotación"</h2><p>Necesitas este calendario cargado y Rotación calculada en Arsenal CESFAM (Inventario + Consumos).</p></div>';
+  if(cruceEl)cruceEl.innerHTML='<div class="ph" style="min-height:15vh"><h2>Presiona "Cruzar con Rotación"</h2><p>Necesitas este calendario cargado y Rotación calculada en Mi arsenal (Inventario + Consumos).</p></div>';
 }
 
 /* ══ CRUCE CALENDARIO CENABAST × ROTACIÓN (implementación P3 de la
@@ -9861,7 +9873,7 @@ function cruzarCalendarioRotacion(){
   if(!window._rotResultados_arsenal) calcularRotacion('arsenal');
   const rot=window._rotResultados_arsenal||[];
   if(!rot.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos de Rotación</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos de Rotación</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   const hoy=new Date();hoy.setHours(0,0,0,0);
@@ -9988,7 +10000,7 @@ function riesgoPorOrigen(){
   if(!window._rotResultados_arsenal) calcularRotacion('arsenal');
   const rot=window._rotResultados_arsenal||[];
   if(!rot.length){
-    el.innerHTML='<div class="ph" style="min-height:12vh"><h2>Sin datos de Rotación</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:12vh"><h2>Sin datos de Rotación</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   const ESTADOS_RIESGO=['vencido','critico','quiebre-futuro','vence-pronto'];
@@ -10141,7 +10153,7 @@ let gastoData=[]; // [{art, via, mes, anio, qty, costo}]
 // CORRECCIÓN (auditoría ago-2026): antes había costoMap (Arsenal) y
 // lCostoMap (Libre) separados, pero NINGÚN punto de escritura (Excel,
 // listado, casilla de Arsenal) llegaba a escribir en lCostoMap — quedaba
-// muerto, y un artículo de Modo libre nunca podía recibir costo por
+// muerto, y un artículo de Artículos fuera del arsenal nunca podía recibir costo por
 // ninguna vía normal. Se unifica en un solo mapa, igual que ya se hizo
 // con costoIVA: el costo no depende de en qué catálogo esté el artículo.
 let costoMap={}; // avis -> costo unitario (carga aparte, ago-2026) — compartido Arsenal/Libre
@@ -10149,7 +10161,7 @@ let costoMap={}; // avis -> costo unitario (carga aparte, ago-2026) — comparti
 /* ══ BRUTO / CON IVA (Hallazgo 2, auditoría ago-2026) ══
    costoIVA: avis -> true (el valor guardado en costoMap/gastoData YA
    incluye IVA) | false o ausente (el valor está en bruto, sin IVA).
-   Es un mapa único compartido entre Arsenal y Modo libre — si un valor
+   Es un mapa único compartido entre Arsenal y Artículos fuera del arsenal — si un valor
    viene "con IVA", eso no depende de en qué catálogo esté el artículo.
    vistaGastoIVA: cómo se quiere VER el resultado ('bruto'|'con_iva'),
    independiente de cómo esté guardado cada costo — el ajuste se hace al
@@ -10177,7 +10189,7 @@ function setVistaGastoIVA(v){
    memoria persistente (IndexedDB), igual que inventario/consumo/prog.
    El parámetro ctx se mantiene por compatibilidad con quien ya llama a
    costoDe(art,ctx) en el resto del código, pero ya no afecta la
-   búsqueda — costoMap es único para Arsenal y Modo libre. */
+   búsqueda — costoMap es único para Arsenal y Artículos fuera del arsenal. */
 function costoDe(art,ctx){
   if(costoMap[art]>0)return costoMap[art];
   // Respaldo: si no hay costo cargado aparte, usar el que ya trae el
@@ -10262,7 +10274,7 @@ function costoLimpiar(){
 
 /* ══ LISTADO Y EDICIÓN MANUAL DE COSTOS (a pedido de Felipe, ago-2026) ══
    Tabla con TODOS los artículos conocidos (arsenal fijo + dinámicos +
-   Modo libre) donde se puede escribir el costo directamente, fila por
+   Artículos fuera del arsenal) donde se puede escribir el costo directamente, fila por
    fila, sin necesidad de Excel — útil para completar los que no
    vinieron en la carga masiva o corregir uno puntual. Cada fila también
    permite marcar si ese valor es bruto o con IVA (Hallazgo 2). Guarda en
@@ -10706,7 +10718,7 @@ function diferenciasCruzarABC(){
 /* ══ GENERAR GASTO DESDE DATOS YA CARGADOS (a pedido de Felipe, ago-2026) ══
    El panel de Gasto exigía su propio Excel exclusivo (Artículo · Vía ·
    Mes · Año · Cantidad · Costo). Ahora, si ya cargaste consumo (real
-   mensual o promedio) en Arsenal y/o Modo libre, esta función construye
+   mensual o promedio) en Arsenal y/o Artículos fuera del arsenal, esta función construye
    el mismo formato interno (gastoData) cruzando ese consumo con el Valor
    unitario (costoMap, cargado aparte) — sin pedir una planilla
    nueva. Prioriza el consumo mensual REAL (cons_mensual/lCons_mensual,
@@ -10720,7 +10732,7 @@ function generarGastoDesdeDatos(silencioso){
     if(!silencioso)alert('Primero carga el 💲 Valor unitario por artículo (arriba) — sin costo unitario no se puede cruzar el consumo con gasto.');
     return false;
   }
-  if(!silencioso&&gastoData.length&&!confirm('Ya hay datos de gasto cargados (desde un Excel o una generación previa). ¿Reemplazarlos con lo que hay actualmente en Arsenal/Modo libre?')){
+  if(!silencioso&&gastoData.length&&!confirm('Ya hay datos de gasto cargados (desde un Excel o una generación previa). ¿Reemplazarlos con lo que hay actualmente en Arsenal/Artículos fuera del arsenal?')){
     return false;
   }
   const nuevo=[];
@@ -10754,7 +10766,7 @@ function generarGastoDesdeDatos(silencioso){
   procesarContexto(lCons_mensual,lCons,'libre');
 
   if(!nuevo.length){
-    if(!silencioso)alert('No hay consumo cargado (ni real mensual ni promedio) en Arsenal ni en Modo libre para cruzar con el valor unitario.');
+    if(!silencioso)alert('No hay consumo cargado (ni real mensual ni promedio) en Arsenal ni en Artículos fuera del arsenal para cruzar con el valor unitario.');
     return false;
   }
   gastoData=nuevo;
@@ -10932,7 +10944,7 @@ function renderResumenGastoCompleto(){
 
 
 /* ══ VALORIZACIÓN DE MERMA (a pedido de Felipe, ago-2026) ══
-   Cruza la merma proyectada por Rotación (Arsenal y Modo libre — se
+   Cruza la merma proyectada por Rotación (Arsenal y Artículos fuera del arsenal — se
    calcula automáticamente si no se ha corrido en esta sesión) con el
    Valor unitario cargado, para ver cuánto representa en $ la merma
    esperada por artículo y en total — información que hoy nadie más
@@ -10967,7 +10979,7 @@ function verValorizacionMerma(){
   const nSinCosto=filas.filter(f=>!f.tieneCosto).length;
   let h='';
   if(!filas.length){
-    h='<div class="ph" style="min-height:15vh"><h2>Sin merma proyectada</h2><p>No hay artículos con merma proyectada en Rotación (Arsenal/Modo libre) con los datos actualmente cargados.</p></div>';
+    h='<div class="ph" style="min-height:15vh"><h2>Sin merma proyectada</h2><p>No hay artículos con merma proyectada en Rotación (Arsenal/Artículos fuera del arsenal) con los datos actualmente cargados.</p></div>';
     el.innerHTML=h;
     return;
   }
@@ -11468,7 +11480,7 @@ function verConsistenciaConsumo(){
   const relevantes=filas.filter(f=>Math.abs(f.diffPct)>=umbral);
   let h='';
   if(!filas.length){
-    h+='<div class="ph" style="min-height:15vh"><h2>No hay suficientes datos para comparar</h2><p>Necesitas tener cargado el Consumo promedio (Arsenal) Y el historial de Consumo mes a mes (Visualizador) para el mismo artículo.</p></div>';
+    h+='<div class="ph" style="min-height:15vh"><h2>No hay suficientes datos para comparar</h2><p>Necesitas tener cargado el Consumo promedio (Arsenal) Y el historial de Consumo mes a mes (Historial de consumo) para el mismo artículo.</p></div>';
     el.innerHTML=h;
     return;
   }
@@ -11507,7 +11519,7 @@ function verConsistenciaConsumo(){
 }
 
 /* ══ RESUMEN EJECUTIVO (a pedido de Felipe, ago-2026) ══
-   Consolidado de una página con los KPI ya calculados de Dashboard,
+   Consolidado de una página con los KPI ya calculados de Resumen general,
    Rotación y ABC — pensado para imprimir o guardar como PDF y llevar a
    una reunión, sin tener que abrir la herramienta. Usa window.print()
    sobre una ventana nueva (mismo patrón ya probado en imprimirInforme/
@@ -11563,7 +11575,7 @@ function generarResumenEjecutivo(){
     @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
   </style></head><body>
   <div class="header"><h1>Resumen ejecutivo — Pingüino Delta</h1><p>Generado ${hoy.toLocaleString('es-CL')} · Montos en ${vistaGastoIVA==='con_iva'?'CON IVA (19%)':'BRUTO (sin IVA)'}</p></div>
-  <div class="section"><h2>Rotación — estado del arsenal (Arsenal CESFAM)</h2>
+  <div class="section"><h2>Rotación — estado del arsenal (Mi arsenal)</h2>
     <div class="kpis">
       <div class="kpi" style="border-color:#7B0000"><div class="n">${nVencido}</div><div class="l">Vencido</div></div>
       <div class="kpi" style="border-color:#EB5A5E"><div class="n">${nCritico}</div><div class="l">Crítico</div></div>
@@ -11789,7 +11801,7 @@ function generarConsumoDesdeLog(){
     // CORRECCIÓN (auditoría ago-2026): antes esta línea reemplazaba el
     // AÑO COMPLETO con solo los meses que traía el log, borrando
     // silenciosamente cualquier otro mes de ese mismo año que viniera
-    // de otra fuente (ej. Excel de Visualizador). Ahora se fusiona
+    // de otra fuente (ej. Excel de Historial de consumo). Ahora se fusiona
     // mes a mes — solo se sobrescriben los meses que el log realmente
     // aporta, el resto del año queda intacto.
     Object.keys(nuevo[art]).forEach(anio=>{
@@ -11808,7 +11820,7 @@ function generarConsumoDesdeLog(){
   document.getElementById('slot-cons')?.classList.add('loaded');
   const stCons=document.getElementById('st-cons');
   if(stCons)stCons.textContent=`✓ ${Object.keys(cons_map).length} artículos — incluye ${artsActualizados.length} generado(s) desde el Log`+resumenHomologacion(homStats);
-  alert(`✓ Consumo mensual generado para ${artsActualizados.length} artículo(s) a partir del log${descartados?` (${descartados} registro(s) del log sin fecha/artículo válido se omitieron)`:''}.\n\nYa puedes verlo en Visualizador, Gasto y en la simulación.`);
+  alert(`✓ Consumo mensual generado para ${artsActualizados.length} artículo(s) a partir del log${descartados?` (${descartados} registro(s) del log sin fecha/artículo válido se omitieron)`:''}.\n\nYa puedes verlo en Historial de consumo, Gasto y en la simulación.`);
 }
 
 function pbcFiltrar(){
@@ -12097,7 +12109,7 @@ function actualizarAlertaEstacional(art){
 // VISUALIZADOR DE CONSUMO MENSUAL
 // ════════════════════════════════════════════════════════
 let _visArt='';
-let _visArtListIdx=-1; // FIX migración: índice del dropdown (Arsenal) — se perdió al renombrar Estacionalidad → Visualizador
+let _visArtListIdx=-1; // FIX migración: índice del dropdown (Arsenal) — se perdió al renombrar Estacionalidad → Historial de consumo
 
 
 /* ── Estacionalidad Libre ── */
@@ -12209,7 +12221,7 @@ function _visKeyNav(e,ctx,pfx){
   if(idx>=0) items[idx].scrollIntoView({block:'nearest'});
 }
 
-let _visProgAnio={arsenal:undefined,libre:undefined}; // año de programación seleccionado en el Visualizador, por contexto. undefined = nunca elegido (autodefault); null = "Ocultar" elegido explícitamente (corrección: antes null se confundía con "nunca elegido" y el select volvía a mostrar el año más reciente aunque el usuario hubiera elegido Ocultar)
+let _visProgAnio={arsenal:undefined,libre:undefined}; // año de programación seleccionado en el Historial de consumo, por contexto. undefined = nunca elegido (autodefault); null = "Ocultar" elegido explícitamente (corrección: antes null se confundía con "nunca elegido" y el select volvía a mostrar el año más reciente aunque el usuario hubiera elegido Ocultar)
 
 function visProgAnioChange(ctx,val){
   _visProgAnio[ctx]=val==='ninguno'?null:parseInt(val);
@@ -12245,7 +12257,7 @@ function _visRenderCtx(ctx, consM, estIdx, pfx){
   const idxE=estIdx[curArt]||null;
   const COLS=['#1CAFAA','#148F8B','#EE881C','#8B2FC9','#EB5A5E','#0891B2'];
 
-  // ══ Programación (a pedido de Felipe, ago-2026): el Visualizador solo
+  // ══ Programación (a pedido de Felipe, ago-2026): el Historial de consumo solo
   // mostraba consumo real. Ahora también puede superponer la programación
   // cargada (CENABAST/PM) del artículo seleccionado, eligiendo entre los
   // años que efectivamente tengan programación cargada para ese artículo. ══
@@ -12764,8 +12776,8 @@ function pdbMapaGlobal(k){
   if(k==='costoIVA')return costoIVA;
   if(k==='diferenciasInv')return diferenciasInv;
   // CORRECCIÓN (auditoría ago-2026): cons_mensual/lCons_mensual — el
-  // historial mensual real que alimenta Visualizador, estacionalidad,
-  // Consumo declarado vs. real, Gasto histórico, Túnel del tiempo y
+  // historial mensual real que alimenta Historial de consumo, estacionalidad,
+  // Consumo declarado vs. real, Gasto histórico, Arsenal mes a mes y
   // Monte Carlo — nunca estaba en esta lista. Se perdía cada vez que se
   // cerraba el navegador, a diferencia de todo lo demás, que sí persiste.
   if(k==='cons_mensual')return cons_mensual;
@@ -13004,7 +13016,7 @@ async function pdbRestaurar(){
   marcar('lslot-disp','lst-disp',Object.keys(lCons_mensual).length);
   // El índice estacional (_estIdx/lEstIdx) se deriva de cons_mensual —
   // si el historial se restauró, hay que recalcularlo también, o
-  // quedaría vacío hasta que el usuario abra el Visualizador a mano.
+  // quedaría vacío hasta que el usuario abra el Historial de consumo a mano.
   if(Object.keys(cons_mensual).length&&typeof calcEstacional==='function')calcEstacional();
   if(Object.keys(lCons_mensual).length&&typeof calcEstacional_libre==='function')calcEstacional_libre();
   if(Object.keys(prog).length){
@@ -13027,7 +13039,7 @@ async function pdbRestaurar(){
 }
 
 async function pdbBorrarTodo(){
-  if(!confirm('¿Borrar TODA la memoria guardada en este navegador (inventario, consumos y programación de Arsenal y Modo libre)?\\n\\nEsto no afecta los archivos originales en tu computador, solo lo que Delta guardó automáticamente. Los datos cargados en la sesión actual también se limpiarán.'))return;
+  if(!confirm('¿Borrar TODA la memoria guardada en este navegador (inventario, consumos y programación de Arsenal y Artículos fuera del arsenal)?\\n\\nEsto no afecta los archivos originales en tu computador, solo lo que Delta guardó automáticamente. Los datos cargados en la sesión actual también se limpiarán.'))return;
   await pdbClearAll();
   sapuCfg={};inv={};cons_map={};prog={};lInv={};lCons={};lProg={};envaseMap={};lEnvaseMap={};PM_MANUAL={};costoMap={};progOverride={};lProgOverride={};costoIVA={};vistaGastoIVA='bruto';diferenciasInv={};cons_mensual={};lCons_mensual={};_estIdx={};lEstIdx={};venMap={};CPU_TAGS={};FOFAR_TAGS={};IAAPS_TAGS={};cpuUsuarios={};cpuConsumoMensual={};adnHistorial=[];overrideLog=[];fotosProgramacion=[];presupuestoPrograma={pm:{techoAnual:0,pctTanda1:60},cpu:{techoAnual:0,pctTanda1:60},fofar:{techoAnual:0,pctTanda1:60},iaaps:{techoAnual:0,pctTanda1:60}};confirmacionesPresupuesto={};gruposGasto={};mermaHistorial=[];capacidadMap={};equivManual={cenabast:{},pm:{}};_equivPendientes=[];_equivSugerencias=[];_ultimosNoReconocidos=[];
   if(typeof pdbDelete==='function')pdbDelete('vistaGastoIVA');
@@ -13066,7 +13078,7 @@ async function pdbBorrarTodo(){
 /* ══ MES/AÑO ACTUAL POR DEFECTO EN REPROGRAMACIÓN MASIVA (a pedido de
    Felipe) ══
    Los selects de "Desde mes/año" y "Mes inicio reprogramar" en
-   Reprogramación masiva (Arsenal y Modo libre) tenían el mes de MAYO
+   Reprogramar todo (Arsenal y Artículos fuera del arsenal) tenían el mes de MAYO
    escrito a mano como "selected" en el HTML — quedó fijo desde que se
    construyó la base de la herramienta y nunca se actualizó, obligando a
    cambiarlo manualmente cada vez. Los años también tenían un rango fijo
@@ -13113,14 +13125,14 @@ document.addEventListener('DOMContentLoaded',pdbRestaurar);
 setFiltro('all');
 
 /* ══════════════════════════════════════════════════════════════════
-   ANÁLISIS AVANZADO — Simulador de crisis / Mapa del arsenal /
-   Priorización explicable (ago-2026)
+   ANÁLISIS AVANZADO — Simulador de atrasos y alzas / Mapa del arsenal /
+   Prioridad de compra (ago-2026)
    100% ADITIVO: ninguna línea de esta sección modifica una función ya
    existente. Solo LEE datos ya calculados (inv, cons_map, prog, ARTS,
    PM, esPM, costoDe, ajustarValorIVA, calcularClasificacionABC,
    window._rotResultados_arsenal) y llama a simularArticulo() tal como
    ya funciona. No escribe en inv/cons_map/prog/ni en ningún resultado
-   usado por Dashboard/Rotación/Masiva/Gasto — usa sus propios
+   usado por Resumen general/Rotación/Masiva/Gasto — usa sus propios
    contenedores (crisis-content, mapa-content, scoring-content).
 ══════════════════════════════════════════════════════════════════ */
 
@@ -13133,7 +13145,7 @@ function simularCrisis(){
   const horizonteMeses=Math.max(1,Math.min(18,parseInt(document.getElementById('crisis-horizonte').value)||6));
   const todos=[...new Set([...Object.keys(inv),...Object.keys(cons_map)])].filter(a=>cons_map[a]>0);
   if(!todos.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px">⏳ Simulando crisis sobre '+todos.length+' artículos…</div>';
@@ -13352,13 +13364,13 @@ function generarScoringExplicable(){
   }
   const artsConsiderados=[...new Set([...Object.keys(rotMap),...Object.keys(abcMap),...Object.keys(diferenciasInv)])];
   if(!artsConsiderados.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas al menos Rotación calculada (Inventario + Consumos en Arsenal CESFAM).</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas al menos Rotación calculada (Inventario + Consumos en Mi arsenal).</p></div>';
     return;
   }
   const ESTADO_PTS={vencido:12,critico:9,'quiebre-futuro':5,'vence-pronto':4,estancado:2,sobrestock:1,ok:0,'sin-dato':0};
   const ESTADO_LBL={vencido:'Vencido',critico:'Crítico','quiebre-futuro':'Quiebre futuro','vence-pronto':'Vence pronto',estancado:'Sin movimiento',sobrestock:'Sobrestock',ok:'Normal','sin-dato':'Sin dato'};
   const CLASE_PTS={A:6,B:3,C:1};
-  // XYZ integrado a Priorización explicable (extrapolación ago-2026):
+  // XYZ integrado a Prioridad de compra (extrapolación ago-2026):
   // un artículo errático (Z) es más urgente de revisar que uno estable
   // con el mismo estado/clase, porque es más difícil de anticipar su
   // próximo movimiento. Si no hay historial mensual suficiente, no
@@ -13421,7 +13433,7 @@ function generarResumenNarrativo(){
   if(!window._rotResultados_arsenal) calcularRotacion('arsenal');
   const rot=window._rotResultados_arsenal||[];
   if(!rot.length){
-    el.innerHTML='<div class="ph" style="min-height:12vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:12vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   const nVencido=rot.filter(r=>r.estado==='vencido').length;
@@ -13486,7 +13498,7 @@ function generarResumenNarrativo(){
 /* ── OPTIMIZADOR DE PRESUPUESTO (propuesta 1, ago-2026) ──
    100% aditivo: usa totalIngPeriodo() y calcularClasificacionABC() ya
    existentes. El puntaje se recalcula aquí con la misma fórmula de
-   "Priorización explicable" — duplicado pequeño y aislado a propósito,
+   "Prioridad de compra" — duplicado pequeño y aislado a propósito,
    para no modificar esa función. */
 function _necesidadArticulo(art){
   const masivaRes=window._masiva_res;
@@ -13517,7 +13529,7 @@ function optimizarPresupuesto(){
   }
   // Cobertura y fuente de consumo configurables (a pedido de Felipe,
   // ago-2026): antes la necesidad dependía de haber corrido
-  // Reprogramación masiva primero (o un cálculo de respaldo con cmin=2
+  // Reprogramar todo primero (o un cálculo de respaldo con cmin=2
   // fijo, siempre consumo promedio). Ahora se calcula directo aquí con
   // los mismos parámetros que el resto de la herramienta — cmin/cmax
   // propios y fuente de consumo (promedio o real 3/6/12 meses).
@@ -13691,7 +13703,7 @@ function resolverObjetivoCobertura(){
     return;
   }
   // Fuente de consumo y fluctuación mensual (a pedido de Felipe,
-  // ago-2026) — mismo criterio que ya existe en Reprogramación masiva,
+  // ago-2026) — mismo criterio que ya existe en Reprogramar todo,
   // Servicio de Salud y la ficha individual, para que "Objetivo de
   // cobertura" no sea la única vista que se quedó con el promedio fijo.
   const fuenteObj=document.getElementById('obj-fuente')?.value||'promedio';
@@ -13720,7 +13732,7 @@ function resolverObjetivoCobertura(){
     }
     try{
       // CORRECCIÓN (a pedido de Felipe, sep-2026 — mismo "Hallazgo 1" ya
-      // corregido en Reprogramación masiva y en la Planilla FOFAR, que
+      // corregido en Reprogramar todo y en la Planilla FOFAR, que
       // nunca se propagó hasta acá): antes esta función leía "prog" a
       // secas -- los ajustes manuales guardados en la ficha individual
       // del artículo (progOverride, ej. "CENABAST solo cumplió el 50%")
@@ -14323,7 +14335,7 @@ function _calcularPrediccionCompleta(art){
   if(_prediccionCache[art])return _prediccionCache[art];
   const serieOriginal=_seriePronostico(art);
   if(!serieOriginal){
-    const r={valido:false,art,motivo:'Sin historial de consumo mensual cargado para este artículo (Visualizador).'};
+    const r={valido:false,art,motivo:'Sin historial de consumo mensual cargado para este artículo (Historial de consumo).'};
     _prediccionCache[art]=r;
     return r;
   }
@@ -14580,12 +14592,12 @@ function prediccionRecalcularArticuloActual(){
 }
 /* ══ 📅 PLANILLA DE PROYECCIÓN (visión completa, a pedido de Felipe,
    sep-2026) ══ El equivalente, dentro de Predicción, a lo que la
-   Planilla de Reprogramación masiva ya ofrece para la programación:
+   Planilla de Reprogramar todo ya ofrece para la programación:
    una tabla con TODOS los artículos y el número mes a mes, en vez de
    tener que abrir cada artículo por separado. La diferencia es que
    acá cada celda es la PROYECCIÓN DE CONSUMO del modelo elegido para
    ese artículo (no una sugerencia de compra) -- calculada bajo
-   demanda, igual que el Dashboard, para no recalcular todo el arsenal
+   demanda, igual que el Resumen general, para no recalcular todo el arsenal
    cada vez que se cambia de pestaña. */
 function calcularTablaPrediccion(){
   const el=document.getElementById('pred-tabla-content');
@@ -14620,7 +14632,7 @@ function _renderTablaPrediccion(resultados,horizonte,sinSuficiente){
   const el=document.getElementById('pred-tabla-content');
   if(!el)return;
   if(!resultados.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos con proyección disponible</h2><p>Revisa el filtro/búsqueda, o carga historial de consumo mensual (Visualizador) para más artículos.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos con proyección disponible</h2><p>Revisa el filtro/búsqueda, o carga historial de consumo mensual (Historial de consumo) para más artículos.</p></div>';
     return;
   }
   let h=`<div style="font-size:11px;color:var(--ink3);margin-bottom:.8rem">${resultados.length} artículo(s) con proyección disponible${sinSuficiente?` · ${sinSuficiente} con historial insuficiente (no se muestran, ver 📋 Por artículo para el motivo exacto de cada uno)`:''}.</div>`;
@@ -14801,7 +14813,7 @@ function _serieConsumo(art){
    HOY. Esta función da el promedio solo del año más reciente cargado
    (el nivel actual), sin diluirlo con años anteriores — que siguen
    disponibles íntegros en cons_mensual para ver tendencia (ej. Tendencia
-   XYZ, Túnel del tiempo), solo que no se mezclan en este número puntual. */
+   XYZ, Arsenal mes a mes), solo que no se mezclan en este número puntual. */
 function _promedioAnioMasReciente(art){
   const hist=cons_mensual[art];
   if(!hist)return null;
@@ -14813,7 +14825,7 @@ function _promedioAnioMasReciente(art){
   return{promedio:valores.reduce((a,b)=>a+b,0)/valores.length,anio:anioReciente,nMeses:valores.length};
 }
 /* Promedio de los últimos N meses reales (a pedido de Felipe, ago-2026,
-   punto 1 — reconectar "Consumo mes a mes" en Reprogramación masiva).
+   punto 1 — reconectar "Consumo mes a mes" en Reprogramar todo).
    CORRECCIÓN FINAL (a pregunta de Felipe, ago-2026): se probaron dos
    enfoques y ninguno "informado por clave" funciona bien en la
    práctica — una planilla de consumo genérica trae las 12 columnas de
@@ -14897,7 +14909,7 @@ function _promedioPonderado(art,histMap){
 }
 /* Botones "Usar" del selector de ventana real, ficha individual (a
    pedido de Felipe, ago-2026) — mismo criterio (_promedioUltimosMeses)
-   que ya usa Reprogramación masiva, para que el número calculado sea
+   que ya usa Reprogramar todo, para que el número calculado sea
    consistente sin importar desde qué pantalla se pida. Si el artículo
    no tiene suficiente historial dentro de la ventana elegida, avisa
    claramente y no toca el campo — nunca inventa un número. */
@@ -14947,7 +14959,7 @@ function detectarCorrelaciones(){
   if(!el)return;
   const arts=Object.keys(cons_mensual).filter(a=>{const s=_serieConsumo(a);return s&&s.some(v=>v>0);});
   if(arts.length<2){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial suficiente</h2><p>Necesitas el historial de Consumo mes a mes cargado (Visualizador) para al menos 2 artículos.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial suficiente</h2><p>Necesitas el historial de Consumo mes a mes cargado (Historial de consumo) para al menos 2 artículos.</p></div>';
     return;
   }
   el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px">⏳ Comparando '+arts.length+' artículos…</div>';
@@ -15035,7 +15047,7 @@ function detectarClustersRiesgo(){
   if(!el)return;
   const arts=Object.keys(cons_mensual).filter(a=>{const s=_serieConsumo(a);return s&&s.some(v=>v>0);});
   if(arts.length<2){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial suficiente</h2><p>Necesitas el historial de Consumo mes a mes cargado (Visualizador) para al menos 2 artículos.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial suficiente</h2><p>Necesitas el historial de Consumo mes a mes cargado (Historial de consumo) para al menos 2 artículos.</p></div>';
     return;
   }
   el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px">🔗 Buscando clusters de riesgo…</div>';
@@ -15251,7 +15263,7 @@ function generarPatronesDemanda(){
     if(p)filas.push({art,...p});
   });
   if(!filas.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos Y/Z con historial suficiente</h2><p>Necesitas consumo mes a mes cargado (Visualizador) para artículos que clasifiquen como Y o Z en XYZ.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos Y/Z con historial suficiente</h2><p>Necesitas consumo mes a mes cargado (Historial de consumo) para artículos que clasifiquen como Y o Z en XYZ.</p></div>';
     return;
   }
   filas.sort((a,b)=>b.cv-a.cv);
@@ -15407,7 +15419,7 @@ function cruzarVitalErratico(){
     return;
   }
   if(!Object.keys(cons_mensual).length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial de consumo mensual</h2><p>Necesitas el historial cargado en Visualizador para calcular la clase XYZ de cada artículo Vital.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial de consumo mensual</h2><p>Necesitas el historial cargado en Historial de consumo para calcular la clase XYZ de cada artículo Vital.</p></div>';
     return;
   }
   const filas=vitales.map(art=>{
@@ -15487,7 +15499,7 @@ function renderPanelCPU(){
   if(!el)return;
   const arts=Object.keys(CPU_TAGS).filter(a=>CPU_TAGS[a]).sort((a,b)=>a.localeCompare(b,'es'));
   if(!arts.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos marcados como CPU</h2><p>Marca al menos uno con el ícono Ⓒ en la lista de Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos marcados como CPU</h2><p>Marca al menos uno con el ícono Ⓒ en la lista de Mi arsenal.</p></div>';
     return;
   }
   let h=`<div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);overflow:hidden">
@@ -15542,7 +15554,7 @@ function calcularAbastecimientoCPU(){
   if(!el)return;
   const arts=Object.keys(CPU_TAGS).filter(a=>CPU_TAGS[a]);
   if(!arts.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos marcados como CPU</h2><p>Marca al menos uno con el ícono Ⓒ en la lista de Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin artículos marcados como CPU</h2><p>Marca al menos uno con el ícono Ⓒ en la lista de Mi arsenal.</p></div>';
     return;
   }
   const hoy=new Date();
@@ -15608,7 +15620,7 @@ function calcularADNArsenal(){
   if(!window._rotResultados_arsenal) calcularRotacion('arsenal');
   const rot=window._rotResultados_arsenal||[];
   if(!rot.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   const componentes=[];
@@ -15862,7 +15874,7 @@ function _renderADNHistorialSVG(){
    su PROPIO comportamiento histórico. 4 chequeos independientes, cada
    uno se salta solo si no hay datos suficientes para ese chequeo
    específico (nunca inventa una anomalía por falta de dato). */
-/* Núcleo reutilizable del Detective de anomalías (a pedido de Felipe,
+/* Núcleo reutilizable del Consumos fuera de patrón (a pedido de Felipe,
    ago-2026): antes vivía todo dentro de detectarAnomaliasCompleto() sin
    forma de acotarlo — ahora acepta una lista opcional de artículos
    (filtroArts). Si es null, revisa TODO el arsenal (comportamiento
@@ -16262,7 +16274,7 @@ function ejecutarComparadorPoliticas(){
   politicas.forEach(pol=>{pol.cmax=Math.max(pol.cmin,pol.cmax);});
   const todos=[...new Set([...Object.keys(inv),...Object.keys(cons_map)])].filter(a=>cons_map[a]>0);
   if(!todos.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   el.innerHTML=`<div style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px">⚖️ Comparando ${politicas.length} política(s) sobre ${todos.length} artículo(s)…</div>`;
@@ -16787,7 +16799,7 @@ function renderGruposGasto(){
    -- y viceversa si salió más alto. Se propone (nunca se aplica solo)
    un consumo recalibrado por artículo, con el usuario decidiendo caso
    a caso o en bloque si lo adopta. Queda registrado en overrideLog
-   (mismo mecanismo de "Delta aprende tu criterio"), no un sistema
+   (mismo mecanismo de "Mis ajustes manuales"), no un sistema
    aparte. */
 let _recalibracionAplicadas=new Set();
 function recalibrarConsumoPorConteo(){
@@ -16896,7 +16908,7 @@ function diferenciasCruzarXYZ(){
     return;
   }
   if(!Object.keys(cons_mensual).length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial de consumo mensual</h2><p>Necesitas el historial cargado en Visualizador para calcular la clase XYZ de cada artículo.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial de consumo mensual</h2><p>Necesitas el historial cargado en Historial de consumo para calcular la clase XYZ de cada artículo.</p></div>';
     return;
   }
   const porClase={X:{n:0,sumaAbs:0},Y:{n:0,sumaAbs:0},Z:{n:0,sumaAbs:0}};
@@ -16930,7 +16942,7 @@ function diferenciasCruzarXYZ(){
    renderRotacion() ni calcularRotacion(). Solo agrega un <span> a la
    primera celda de cada fila ya renderizada, buscando las filas por su
    atributo data-art-row (ya existente para el botón "Ver →" de
-   Dashboard). Si se presiona dos veces, no duplica el badge. */
+   Resumen general). Si se presiona dos veces, no duplica el badge. */
 function mostrarBadgesXYZenRotacion(ctx){
   ctx=ctx||'arsenal';
   if(!window._rotResultados_arsenal) calcularRotacion('arsenal');
@@ -16941,7 +16953,7 @@ function mostrarBadgesXYZenRotacion(ctx){
   if(!filas.length){alert('Primero presiona "Analizar rotación".');return;}
   const histMap=ctx==='libre'?lCons_mensual:cons_mensual;
   if(!Object.keys(histMap).length){
-    alert('Ningún artículo tiene historial de consumo mensual cargado (Visualizador) — no hay con qué calcular la clase XYZ.');
+    alert('Ningún artículo tiene historial de consumo mensual cargado (Historial de consumo) — no hay con qué calcular la clase XYZ.');
     return;
   }
   let nConDato=0;
@@ -16976,7 +16988,7 @@ function generarMatrizABCXYZ(){
   }
   const arts=Object.keys(cons_mensual);
   if(!arts.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial de consumo mensual</h2><p>Necesitas el historial cargado en Visualizador para calcular variabilidad (XYZ).</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin historial de consumo mensual</h2><p>Necesitas el historial cargado en Historial de consumo para calcular variabilidad (XYZ).</p></div>';
     window._abcxyzDetalleCache=null;
     return;
   }
@@ -17112,7 +17124,7 @@ function exportarMatrizABCXYZ(){
    rotación es capital potencialmente dormido que merece revisión) y se
    promedia ponderado. Si a un artículo le falta Rotación (sin stock
    cargado), se renormaliza el peso entre los 3 criterios restantes —
-   mismo criterio de "ADN del Arsenal": nunca se inventa un valor para
+   mismo criterio de "Puntaje global del arsenal": nunca se inventa un valor para
    el que falta. */
 const VALOR_MULTI_ABC={A:100,B:60,C:20};
 const VALOR_MULTI_VEN={V:100,E:60,N:20};
@@ -17148,7 +17160,7 @@ function calcularABCMulticriterio(){
     return;
   }
   if(!Object.keys(cons_mensual).length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Falta el historial mensual</h2><p>Necesitas el historial cargado en Visualizador para calcular variabilidad (XYZ).</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Falta el historial mensual</h2><p>Necesitas el historial cargado en Historial de consumo para calcular variabilidad (XYZ).</p></div>';
     return;
   }
   const{filas:abcFilas}=calcularClasificacionABC();
@@ -17431,7 +17443,7 @@ function simularMonteCarlo(){
   const horizonteMeses=Math.max(1,Math.min(12,parseInt(document.getElementById('mc-horizonte').value)||6));
   const todos=[...new Set([...Object.keys(inv),...Object.keys(cons_map)])].filter(a=>cons_map[a]>0);
   if(!todos.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   el.innerHTML=`<div style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px">⏳ Corriendo ${runs} simulaciones × ${todos.length} artículos…</div>`;
@@ -17573,7 +17585,7 @@ function generarTunelTiempo(){
   const LIMITE_ITEMS=50;
   items=items.filter(it=>it.valor>0&&cons_map[it.art]>0).sort((a,b)=>b.valor-a.valor).slice(0,LIMITE_ITEMS);
   if(!items.length){
-    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Arsenal CESFAM.</p></div>';
+    el.innerHTML='<div class="ph" style="min-height:15vh"><h2>Sin datos suficientes</h2><p>Necesitas Inventario y Consumos cargados en Mi arsenal.</p></div>';
     return;
   }
   el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--ink3);font-size:13px">⏳ Preparando el túnel del tiempo…</div>';
@@ -17791,7 +17803,7 @@ function tunelSliderChange(val){
   if(wrap){
     let h='<div style="max-height:560px;overflow-y:auto" id="tunel-lista">';
     filas.forEach(f=>{
-      h+=`<div class="tunel-fila" data-art="${f.art.replace(/"/g,'&quot;').toLowerCase()}" onclick="_tunelIrAFicha('${f.art.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:10px;padding:5px 4px;border-bottom:1px solid var(--bdr2);cursor:pointer" title="Clic para abrir la ficha de este artículo en Arsenal CESFAM">
+      h+=`<div class="tunel-fila" data-art="${f.art.replace(/"/g,'&quot;').toLowerCase()}" onclick="_tunelIrAFicha('${f.art.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:10px;padding:5px 4px;border-bottom:1px solid var(--bdr2);cursor:pointer" title="Clic para abrir la ficha de este artículo en Mi arsenal">
         <div style="width:9px;height:9px;border-radius:50%;background:${f.color};flex-shrink:0"></div>
         <div style="flex:1;font-size:12px;color:var(--ink1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.art.replace(/"/g,'&quot;')}">${f.art}</div>
         ${f.patron&&f.patron.patron==='intermitente'?'<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:12px;background:#F7EAF5;color:#A12895;white-space:nowrap" title="Demanda intermitente — esta proyección reparte el consumo en partes iguales mes a mes, pero la demanda real de este artículo llega en eventos puntuales, no de forma continua">⚠ intermitente</span>':''}
@@ -17864,7 +17876,7 @@ const SAPU_ARSENAL_BASE=[["Propofol","Solución inyectable 1%","Ampolla 20 ml.",
 const SAPU_REF_BASE={nombre:"SAPU demo (datos ficticios)",periodo:"01 ene – 31 jul 2026",meses:7,items:[["ACIDO ORTOFOSFÓRICO 37%",1,0.1429,3337],["Acido Tranexamico 1000 mg/10 ml Solucion Inyectable , ampolla",21,3.0,520],["Adenosina 6 mg/2ml Solucion Inyectable , ampolla",5,0.7143,1226],["ADHESIVO DENTAL TIPO UNIVERSAL UD",1,0.1429,25398],["Aerocámara Valvulada Adulto",335,47.8571,1],["Aerocámara Valvulada Infantil",135,19.2857,1],["Agua Bidestilada 5 ml ampolla",574,82.0,123],["Agua Bidestilada 500 ml",80,11.4286,737],["AGUJA 19 G X 1",1004,143.4286,51],["AGUJA 21 G X 1",324,46.2857,13],["Aguja 23x1,5 H.D. Deshechable",602,86.0,18],["Aguja Desechable 25 GX1",510,72.8571,37],["AGUJA HIPODERMICA 19G X 1 1/2",652,93.1429,10],["AGUJA HIPODERMICA 21 G 1 1/2",4920,702.8571,12],["AGUJA HIPODERMICA 23G X 1",193,27.5714,13],["AGUJA PARA CARPULE CORTA 30G UD",373,53.2857,68],["AGUJA PARA CARPULE LARGA 27G UD",517,73.8571,106],["Aguja Scalp Vein Mariposa 23G",2005,286.4286,37],["ALCOHOL 70% 1 LT",97,13.8571,1221],["Algodón Hidrofilo Prensado",7,1.0,6126],["Amiodarona Clorhidrato 150mg/3ml Solucion Inyectable, ampolla",6,0.8571,343],["Amoxicilina 500 mg Capsulas",97,13.8571,37],["Amoxicilina 500 mg/5 ml Polvo Para Suspension Oral , frasco 60 ml",126,18.0,495],["Amoxicilina 875 mg/Acido Clavulanico 125 mg , Comprimidos",2045,292.1429,88],["Anestesia c/vaso constrictor 4% UD.",121,17.2857,965],["Aposito Adhesivo Transparente 6 x 7 cms.",299,42.7143,71],["Baja Lengua Desechables Caja de 100 U.",93,13.2857,5326],["Bajada De Suero Macrogoteo (Equipo De Fleboclisis)",2777,396.7143,117],["Bencilpenicilina Benzatina 1.200.000 U.I. Polvo para Suspension Inyectable , frasco ampolla",720,102.8571,227],["Bencilpenicilina Sodica 2.000.000 U.I. Polvo para Solucion Inyectable, frasco ampolla",63,9.0,188],["Betametasona Fosfato 4 mg/1 ml Solucion Inyectable",4862,694.5714,42],["Bicarbonato De Sodio 8,4% Solucion Inyectable, ampolla",3,0.4286,487],["BOLSA RECOLECTORA ORINA ADULTO UROL. 2 L. UD",31,4.4286,664],["BOLSA RECOLECTORA ORINA PED. 100 ML EST. UD",29,4.1429,361],["Bránula 18G",257,36.7143,120],["Bránula 20G",2119,302.7143,73],["Bránula 22G",1231,175.8571,87],["Bránula 24G",844,120.5714,132],["Bromuro de Ipratropio 0.25 mg/Fenoterol Bromhidrato 0.5 mg en 1 ml Solucion Para Inhalacion por Nebulizador, frasco de 20 ml (1 ml = 20 gotas ) (Prescribe por gotas)",74,10.5714,3733],["Bromuro De Ipratropio 20 mcg/dosis Aerosol Para Inhalacion , 200 dosis (prescribe dosis)",2,0.2857,1],["CANULA MAYO GUEDEL N°00",3,0.4286,423],["Canula Mayo Guedel N°2",2,0.2857,217],["Canula Mayo Guedel N°3",5,0.7143,235],["Canula Mayo Guedel N°4",9,1.2857,242],["Canula Mayo Guedel N°5",5,0.7143,343],["CANULA NASAL ( NARICERA ) ADULTO UD",111,15.8571,123],["CANULA NASAL ( NARICERA ) PEDIATRICA UD",26,3.7143,290],["Captopril 25 mg Comprimidos",90,12.8571,21],["CATGUT CROMADO 3-0 C/A 1/2 CIRCULAR ATRAUMATICA",17,2.4286,2255],["CATGUT CROMADO N°2/0",10,1.4286,1652],["Cemento Temp. Obt. Fermin 40 grs.",2,0.2857,8699],["CINTAS GLICEMIA X 50 UD.",50,7.1429,7620],["Clopidogrel 75 mg Comprimidos",60,8.5714,30],["Cloranfenicol 0,5% Solucion Oftalmica, frasco 10 ml (1 ml= 20 gotas) (prescribe gotas)",30,4.2857,307],["Clorfenamina Maleato 10 mg/1 ml Solucion Inyectable , ampolla",4142,591.7143,66],["Clorfenamina Maleato 4 mg Comprimidos",294,42.0,6],["Clorhexidina 2% frasco 500 mL",14,2.0,11271],["Clorpromazina Clorhidrato 25 mg/2 ml Solucion Inyectable , ampolla",169,24.1429,44],["Cloruro De Sodio 0,9 % Solucion Inyectable , ampolla 10 ml",3218,459.7143,47],["Cloruro De Sodio 0,9 % Solucion Inyectable , ampolla 20 ml",1386,198.0,108],["Cloruro De Sodio 0,9 % Solucion Inyectable , matraz 500 ml",2712,387.4286,783],["Desloratadina 2,5 mg/5 ml Jarabe, frasco 120 ml",240,34.2857,1225],["Detergente enzimatico 5 Litros",8,1.1429,11037],["Diclofenaco Sodico 50 mg Comprimidos",844,120.5714,12],["Diclofenaco Sodico 75 mg/3 ml Solucion Inyectable , ampolla",2322,331.7143,154],["Domperidona 10 mg/1 ml Suspension para Gotas Orales , frasco 15 ml (1ml=24 gotas= 10 mg)",108,15.4286,792],["ELECTRODO PARA MONITORIZACION UNIVERSAL UD",468,66.8571,48],["Epinefrina 1 mg/1 ml Solucion Inyectable , ampolla",391,55.8571,507],["Equipo de Hemoglucotest",1,0.1429,29284],["Escopolamina N-Butil Bromuro 20 mg/1 ml Solucion Inyectable , ampolla",720,102.8571,255],["ESPEJO DENTAL Nº 5",14,2.0,692],["ESPONJA HEMOSTATICA",2,0.2857,6237],["ESTUCHE TERMICO",4,0.5714,500],["Extractor Pulpar amarillo",17,2.4286,3103],["Extractor Pulpar rojo",13,1.8571,3044],["EYECTOR SALIVA",13,1.8571,1774],["Férula Digital 2 x 30 cm Adulto",124,17.7143,550],["Flumazenil 0,5 mg/5 ml Solucion Inyectable, ampolla",4,0.5714,809],["FRESA CARBIDE BAJA VELOCIDAD REDONDA 016 400354",6,0.8571,1900],["FRESA CARBIDE BAJA VELOCIDAD REDONDA TAMAÑO 0.14",9,1.2857,1369],["Furosemida 20 mg/1 ml Solucion Inyectable , ampolla",100,14.2857,118],["GASA ESTERIL 10 X 10 CM SOBRE POR 2 UNIDADES",4561,651.5714,43],["GASA ESTERIL 5 X 5 CM SOBRE POR 2 UNIDADES",1285,183.5714,11],["GASA ESTERIL 7 X 7 CM SOBRE POR 2 UNIDADES",1189,169.8571,31],["GASA HIDRÓFILA ROLLO",10,1.4286,13831],["GASA PARAFINADA 10X10 CM",78,11.1429,77],["GEL REFRIGERANTE INSULINA",3,0.4286,117],["Gentamicina 80 mg/2 ml Solucion Inyectable ampolla",121,17.2857,143],["Gluconato De Calcio 10% Solucion Inyectable, ampolla",1,0.1429,134],["Glucosa 10% Solucion Inyectable , matraz 500 ml",17,2.4286,365],["Glucosa 30% amp. 20ml",31,4.4286,614],["GUANTE ESTERIL 6.5 PAR",121,17.2857,139],["GUANTE ESTERIL 7.0 PAR",115,16.4286,158],["GUANTE ESTERIL 7.5 PAR",47,6.7143,289],["Guante latex L caja",6,0.8571,1164],["Guante latex M caja",4,0.5714,1263],["Guante latex S caja",5,0.7143,1121],["Guante latex XS caja",1,0.1429,3489],["GUANTE NITRILO L CAJA X 100 UDS",80,11.4286,2375],["GUANTE NITRILO M CAJA X 100 UDS",234,33.4286,1738],["GUANTE NITRILO S CAJA X 100 UDS",74,10.5714,1952],["GUANTE NITRILO XS CAJA X 100 UDS",47,6.7143,3121],["Haloperidol 5 mg/1 ml Solucion Inyectable , ampolla",26,3.7143,96],["Hidrocortisona 100 mg Polvo Liofilizado para Solucion Inyectable , frasco ampolla",1910,272.8571,286],["HOJA BISTURI N°15",198,28.2857,51],["Hoja Bisturi Nº 11",348,49.7143,42],["HOJA BISTURÍ Nº 21",98,14.0,37],["Ibuprofeno 100 mg/5 ml Suspension Oral , frasco 100 ml",366,52.2857,669],["Insulina Cristalina 100 U.I/ml,frasco ampolla 10 ml",3,0.4286,1],["JERINGA 10 CC C/AG 21 G X 1.5\" LUER LOCK UD",3619,517.0,30],["JERINGA 3 CC C/A LUER LOCK UD",4130,590.0,18],["JERINGA 5 CC C/AG 21 G X 1.5\" LUER LOCK UD",10042,1434.5714,39],["JERINGA 50-60 CC PUNTA CATETER UD",22,3.1429,145],["Jeringa Insulina 100UI/1mL",271,38.7143,1],["JERINGAS 20 CC C/A 21 G X 1 1/2 LUER LOCK",1304,186.2857,60],["Ketoprofeno 100MG/2ml Solución Inyectable Endovenosa, ampolla",4098,585.4286,113],["Lancetas x unidad",1529,218.4286,33],["Levonorgestrel 0,75 mg Comprimidos , blister",4,0.5714,1],["Levonorgestrel 1,5mg Comprimido",5,0.7143,1],["Lidocaina Clorhidrato 2% Solucion Inyectable , ampolla 5 ml",566,80.8571,177],["Lidocaina Clorhidrato 2%/Epinefrina 1:100.000 Solucion Inyectable , ampolla",2784,397.7143,408],["LLAVE TRES PASOS CON ALARGADOR UD",273,39.0,229],["LLAVE TRES PASOS ROTACION 360 GRADOS UD",1379,197.0,85],["Loratadina 10 mg Comprimidos",353,50.4286,8],["MANGA 25 CM C/FUELLE",1,0.1429,17492],["Mascarilla con Venturi Adulto ud.",21,3.0,612],["MASCARILLA CON NEBULIZADOR ADULTO UD",588,84.0,586],["MASCARILLA CON NEBULIZADOR PEDIATRICA UD",122,17.4286,558],["MASCARILLA DESECH. HIPOALERG. C/FILTRO CON ELASTICOS UD",3947,563.8571,1],["Mascarilla Oxigeno con reservorio Adulto, alto flujo",47,6.7143,710],["Metamizol Sodico Monohidrato 1 g/2 ml Solucion Inyectable , ampolla",7080,1011.4286,217],["Metoclopramida Clorhidrato 10 mg/2 ml Solucion Inyectable , ampolla",1935,276.4286,62],["Naloxona Clorhidrato 0,4 mg/1 ml Solucion Inyectable , ampolla",2,0.2857,5702],["Nitroglicerina 50 mg/10 ml Solucion Inyectable , ampolla",3,0.4286,2396],["Nylon Simple 3/0",29,4.1429,744],["Oseltamivir 12 mg/1 ml Polvo Para Suspension Oral , frasco 75 ml",1,0.1429,1],["Oseltamivir 75 mg Capsulas",27,3.8571,1],["Paracetamol 100 mg/1 ml Solucion para gotas Orales, frasco 15 ml (1ml=20 gotas=100 mg)",156,22.2857,426],["Paracetamol 125mg Supositorios",7,1.0,90],["Paracetamol 500 mg Comprimidos",1150,164.2857,6],["PARCHE TERAPIA OCULAR, SUAVE, ADHESIVO, HIPOALERGÉNICO, TAMAÑO GRANDE",62,8.8571,183],["Pargeverina Clorhidrato 5 mg/1 ml Solucion Inyectable , ampolla",1683,240.4286,222],["Prednisona 20 mg Comprimidos",439,62.7143,21],["Prednisona 20 mg/5 ml Suspension Oral , frasco 60 ml",236,33.7143,1],["Proparacaina 0,5% Solucion Oftalmica , frasco 15 ml (prescribe frasco)",1,0.1429,5403],["Ranitidina 50 mg/2 ml Solucion Inyectable , ampolla",1375,196.4286,136],["Ringer Lactato Solucion Inyectable, matraz 500 ml",172,24.5714,469],["Salbutamol 100 mcg/dosis Aerosol Para Inhalacion, 200 dosis (prescribe frasco)",460,65.7143,601],["Sales Para Rehidratacion Oral-60 Polvo Para Solucion oral, sobre",249,35.5714,129],["Sales Para Rehidratacion Oral-90 Polvo Para Solucion oral, sobre",81,11.5714,219],["Seda Dental Adulto 60 años",2,0.2857,1],["SONDA ASPIRACIÓN Nº 16",4,0.5714,66],["Sonda Foley Nº 14",6,0.8571,1227],["Sonda Foley Nº 16",4,0.5714,381],["Sonda Foley Nº 18",18,2.5714,1250],["Sonda Foley Nº 20",11,1.5714,179],["Sonda Foley Nº 22",6,0.8571,1050],["SONDA NASOGASTRICA 14",7,1.0,297],["SONDA NELATON N° 12",7,1.0,79],["SONDA NELATON N° 14",10,1.4286,133],["SONDA NELATON N° 16",3,0.4286,147],["Steri - Strip 6mm X 75mm",146,20.8571,280],["Sulfato De Magnesio 25% Solucion Inyectable , ampolla",2,0.2857,113],["SUTURA SEDA NEGRA 3.0",26,3.7143,763],["SUTURA SEDA NEGRA TRENZADA 3/0 TRIANGULAR",190,27.1429,521],["Suxametonio cloruro 100 mg liofilizado, frasco",2,0.2857,1],["Tapa Roja",167,23.8571,8],["TAPON LUER AMARILLO",181,25.8571,206],["TEJIDO TUBULAR 10 CM ANCHO 25 M RO",1,0.1429,8978],["TEJIDO TUBULAR 15 CM ANCHO 25 M RO",1,0.1429,13948],["TELA ADH. PAPEL MICROP 2,5 CM X 9,1 M UD",367,52.4286,273],["TELA ADH. PAPEL MICROP 5,0 CM X 9,1 M UD",43,6.1429,558],["Tela adhesiva elasticada de gasa no tejida 10 cm x 10 mts",13,1.8571,775],["Tira nervio Blanco",12,1.7143,2142],["TORULA DENTAL",2049,292.7143,6],["Torulas de Algodón",14784,2112.0,8],["TUBO ENDOTRAQUEAL C/BALON 3.0 MM",4,0.5714,732],["TUBO ENDOTRAQUEAL C/BALON 8,0 MM",2,0.2857,727],["Vaselina esteril 10 ML ampolla",103,14.7143,1065],["VASOS DESECHABLES",628,89.7143,22],["VENDA GASA ELASTICA 10 X 4 MTS",187,26.7143,78],["VENDA SEMIELASTICADA 8cm x 4mts",475,67.8571,107],["VENDA TUBULAR 20 CM",1,0.1429,11105],["VENDA YESO 15 CM",11,1.5714,1596],["Venda yeso 20cm",19,2.7143,1086],["Vendas Tubular 5 Cm Rollo",1,0.1429,4649],["VIDRIO IONOMERO RESTAURACION AUTOPOLIMERIZACION (KETAC MOLAR), CAJA",4,0.5714,16099]]};
 /* ══════════════════════════════════════════════════════════════
    🚑 MÓDULO SAPU (a pedido de Felipe, oct-2026)
-   Lee inv / cons_map / prog / progOverride / costoMap de Arsenal CESFAM.
+   Lee inv / cons_map / prog / progOverride / costoMap de Mi arsenal.
    Estado propio persistente: sapuCfg (declarado junto a equivManual,
    incluido en PDB_KEYS y en el respaldo .json).
 ══════════════════════════════════════════════════════════════ */
@@ -18177,7 +18189,7 @@ function sapuRenderImpacto(){
   const maxX=Math.min(H,24);
   const pos=v=>Math.min(100,v/maxX*100);
   const dbEl=document.getElementById('sp-dumbbell');
-  if(!db.length){dbEl.innerHTML=`<div class="ph" style="min-height:10vh"><h2>Sin datos para comparar</h2><p>Carga Inventario de lotes y Consumos promedio en Arsenal CESFAM para ver la cobertura que se pierde.</p></div>`;}
+  if(!db.length){dbEl.innerHTML=`<div class="ph" style="min-height:10vh"><h2>Sin datos para comparar</h2><p>Carga Inventario de lotes y Consumos promedio en Mi arsenal para ver la cobertura que se pierde.</p></div>`;}
   else{
     dbEl.innerHTML=`<div style="display:grid;grid-template-columns:280px 1fr 150px;gap:10px;font-size:10px;color:var(--ink3);padding-bottom:4px;border-bottom:1px solid var(--bdr2)"><span></span><span style="display:flex;justify-content:space-between"><span>hoy</span><span>${_sapuLblMes(Math.round(maxX/2))}</span><span>${_sapuLblMes(maxX)}+</span></span><span style="text-align:right">meses: sin → con · consumo</span></div>`+
     db.slice(0,25).map(d=>{
@@ -18916,6 +18928,53 @@ function descargarEjemploDelta(pre){
   a.download=d.nombre;document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
 }
+</script>
+<script>
+/* ══ ANÁLISIS AGRUPADO (oct-2026) ══ Las 26 pestañas se ordenan en 5
+   grupos; ninguna se elimina: solo se muestran las del grupo elegido.
+   Una pestaña oculta a propósito (Log) sigue oculta. */
+const AN_GRUPOS=[
+  {id:'abast',nombre:'📦 Abastecimiento',tabs:['calendario','prediccion','objetivo','calest','tunel','comparador','sesgo','cpu']},
+  {id:'gasto',nombre:'💰 Gasto y presupuesto',tabs:['gasto','presupuesto','presupuesto-prog','scoring']},
+  {id:'riesgo',nombre:'⚠️ Riesgo',tabs:['crisis','montecarlo','mapa','clusters','detective','adn']},
+  {id:'clasif',nombre:'📐 Clasificación',tabs:['abcxyz','multicriterio','ven','patrones','correlaciones']},
+  {id:'config',nombre:'⚙️ Configuración y equipo',tabs:['equiv','turnos','log']}
+];
+function _anGrupoDe(panel){const g=AN_GRUPOS.find(g=>g.tabs.includes(panel));return g?g.id:'abast';}
+function _anVisible(b){return b&&b.style.display!=='none';}
+function anFiltrarGrupo(gid){
+  const g=AN_GRUPOS.find(x=>x.id===gid)||AN_GRUPOS[0];
+  document.querySelectorAll('#an-tabs-bar .an-tab').forEach(b=>{
+    const dentro=g.tabs.includes(b.dataset.an);
+    b.classList.toggle('an-fuera-grupo',!dentro);
+  });
+  document.querySelectorAll('#an-grupos .an-grupo').forEach(b=>{const on=b.dataset.grupo===g.id;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});
+  return g;
+}
+function anGrupo(gid){
+  const g=anFiltrarGrupo(gid);
+  const actual=document.querySelector('#an-tabs-bar .an-tab.an-on');
+  if(!actual||!g.tabs.includes(actual.dataset.an)){
+    const primero=g.tabs.map(t=>document.querySelector('#an-tabs-bar .an-tab[data-an="'+t+'"]')).find(_anVisible);
+    if(primero)anSwitch(primero.dataset.an);
+  }
+}
+(function(){
+  const bar=document.getElementById('an-grupos'),tabs=document.getElementById('an-tabs-bar');
+  if(!bar||!tabs)return;
+  // Ordenar los botones dentro de la barra según el grupo (sin quitar ninguno)
+  AN_GRUPOS.forEach(g=>g.tabs.forEach(t=>{const b=tabs.querySelector('.an-tab[data-an="'+t+'"]');if(b)tabs.appendChild(b);}));
+  bar.innerHTML=AN_GRUPOS.map(g=>{
+    const n=g.tabs.filter(t=>_anVisible(tabs.querySelector('.an-tab[data-an="'+t+'"]'))).length;
+    return `<button type="button" class="an-grupo" role="tab" data-grupo="${g.id}" onclick="anGrupo('${g.id}')">${g.nombre}<span class="n">${n}</span></button>`;
+  }).join('');
+  const base=window.anSwitch;
+  if(typeof base==='function'){
+    window.anSwitch=anSwitch=function(panel){const r=base.apply(this,arguments);anFiltrarGrupo(_anGrupoDe(panel));return r;};
+  }
+  const act=tabs.querySelector('.an-tab.an-on');
+  anFiltrarGrupo(_anGrupoDe(act?act.dataset.an:'calendario'));
+})();
 </script>
 </body>
 </html>
