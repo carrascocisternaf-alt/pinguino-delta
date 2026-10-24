@@ -60,6 +60,15 @@ async def main():
         ok(c=={'ok':24,'critico':5,'sobrestock':6,'vence-pronto':5},f'Botón → Rotación: {c}')
         errs=[e for e in errs if not e.startswith('DIALOGO: Se cargarán los datos FICTICIOS')]
         ok(not errs,f'Botón → sin errores JS ni alertas: {errs}')
+        # ── Escenario D: buscador de la Ayuda ──
+        pg,errs=await nueva(b)
+        await pg.evaluate("switchMode('ayuda')")
+        r=await pg.evaluate("(ayudaBuscar('respaldo'),document.querySelector('#ay-res .ay-t')?.textContent)")
+        ok(r=='Exportar e importar respaldo',f'Buscador → «respaldo»: {r}')
+        r=await pg.evaluate("(ayudaBuscar('monte carlo'),[...document.querySelectorAll('#ay-res .ay-t')].map(e=>e.textContent))")
+        ok(r==['Probabilidad de quiebre'],f'Buscador → «monte carlo»: {r}')
+        n=await pg.evaluate("(()=>{let f=0;AYUDA_CATALOGO.filter(e=>e.go).forEach(e=>{try{ayudaIr(e.go)}catch(x){f++}});return f})()")
+        ok(n==0 and not errs,f'Buscador → todos los «Ir →» sin errores ({errs})')
         await b.close()
     print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')
     sys.exit(1 if fallas else 0)
