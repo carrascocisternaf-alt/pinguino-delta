@@ -508,6 +508,19 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 #view-sapu .sd-leyenda i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 #view-sapu .sd-bar:hover rect:last-child{opacity:.75}
 </style>
+<style id="sapu-pasos-css">
+#view-sapu .sp-pasos{display:flex;flex-wrap:wrap;gap:6px;width:100%;margin-bottom:4px}
+#view-sapu .sp-paso{padding:7px 15px;border:1.5px solid var(--bdr2);border-radius:20px;background:#fff;color:var(--ink2);cursor:pointer;font:700 12.5px 'DM Sans',sans-serif}
+#view-sapu .sp-paso small{display:block;font-weight:400;font-size:10.5px;color:var(--ink3)}
+#view-sapu .sp-paso.on{background:var(--navy);border-color:var(--navy);color:#fff}
+#view-sapu .sp-paso.on small{color:rgba(255,255,255,.8)}
+#view-sapu .sp-tab.sp-fuera{display:none}
+#view-sapu .sp-pregunta{font-size:14.5px;font-weight:700;color:var(--navy);margin:0 0 .7rem;padding-left:10px;border-left:4px solid var(--teal)}
+#view-sapu .sp-mini{display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--ink2);margin-bottom:.5rem}
+#view-sapu .sp-mini input[type=month]{margin-left:6px;padding:6px 8px;border:1.5px solid var(--bdr);border-radius:var(--r);font-size:12.5px}
+#view-sapu .sp-avanz{margin-top:.6rem}
+#view-sapu .sp-avanz summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(--teal)}
+</style>
 </head>
 <body>
 
@@ -2337,33 +2350,35 @@ function visSwitchSubTab(sub){
 </style>
 <div id="view-sapu" style="display:none;height:calc(100vh - 100px);overflow-y:auto;background:var(--bg);box-sizing:border-box">
   <div style="background:var(--surf);border-bottom:1px solid var(--bdr2);padding:.5rem 1.75rem;display:flex;flex-wrap:wrap;gap:4px;align-items:center;position:sticky;top:0;z-index:10">
-    <button class="sp-tab sp-on" data-sp="impacto" onclick="sapuSwitch('impacto')">📋 Cruce e impacto</button>
-    <button class="sp-tab" data-sp="articulo" onclick="sapuSwitch('articulo')">🔍 Por artículo</button>
+    <div id="sp-pasos" class="sp-pasos" role="tablist" aria-label="Pasos SAPU"></div>
+    <button class="sp-tab sp-on" data-sp="impacto" onclick="sapuSwitch('impacto')">📋 Impacto y compra</button>
+    <button class="sp-tab" data-sp="articulo" onclick="sapuSwitch('articulo')">🔍 Detalle por artículo</button>
     <button class="sp-tab" data-sp="dotacion" onclick="sapuSwitch('dotacion')">🧰 Dotación inicial</button>
     <button class="sp-tab" data-sp="repo" onclick="sapuSwitch('repo')">🔁 Reposición SAPU</button>
     <button class="sp-tab" data-sp="diario" onclick="sapuSwitch('diario')">📈 Consumo real SAPU</button>
-    <button class="sp-tab" data-sp="homolog" onclick="sapuSwitch('homolog')">🔗 Homologación de consumo</button>
+    <button class="sp-tab" data-sp="homolog" onclick="sapuSwitch('homolog')">🔗 Asociar con la referencia</button>
     <button class="sp-tab" data-sp="fuentes" onclick="sapuSwitch('fuentes')">⚙️ Fuentes y método</button>
     <button class="sp-btn" onclick="sapuExportarExcel()" style="margin-left:auto">⬇ Exportar planilla de gestión (.xlsx)</button>
   </div>
 
-  <div style="padding:1.25rem 1.75rem 0">
+  <div style="padding:1.25rem 1.75rem 0" id="sp-cabecera">
     <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:.8rem">
-      <h2 style="font-size:18px;font-weight:600;color:var(--navy)">🚑 Apertura SAPU — impacto sobre el stock CESFAM</h2>
-      <span class="sp-note">El SAPU se abastece del mismo stock que hoy tiene Mi arsenal: su consumo se suma al del CESFAM desde el mes de apertura.</span>
+      <h2 style="font-size:18px;font-weight:600;color:var(--navy)" id="sp-cab-titulo">🚑 Preparar la apertura del SAPU</h2>
+      <span class="sp-note" id="sp-cab-nota">El SAPU se abastece del mismo stock que hoy tiene Mi arsenal: su consumo se suma al del CESFAM desde el mes de apertura.</span>
     </div>
     <div class="sp-box" style="margin-bottom:0">
+      <div class="sp-mini" id="sp-cab-mini" style="display:none"><label>🗓 SAPU abierto desde <input type="month" id="sp-apertura-op" onchange="sapuParam('apertura',this.value)"></label><label class="sp-chk"><input type="checkbox" id="sp-cesfam-op" onchange="sapuParam('usarCesfam',this.checked)" style="accent-color:var(--teal)"> Descontar el consumo del CESFAM en farmacia</label></div>
       <div class="sp-params">
         <div class="fld"><label>Mes de apertura SAPU</label><input type="month" id="sp-apertura" onchange="sapuParam('apertura',this.value)"></div>
-        <div class="fld"><label title="Escala el consumo de la referencia a la demanda esperada del SAPU propio. 100% = igual a la referencia.">Escala vs. referencia (%)</label><input type="number" id="sp-escala" min="1" max="500" step="5" onchange="sapuParam('escala',this.value)"></div>
-        <div class="fld"><label title="Meses de cobertura que quieres asegurar DESPUÉS de la apertura. La compra anticipada cubre desde hoy hasta ese punto.">Cobertura post-apertura (meses)</label><input type="number" id="sp-obj" min="1" max="12" onchange="sapuParam('mesesObj',this.value)"></div>
-        <div class="fld"><label title="Meses que demora en llegar una compra/pedido. 'Pedir antes de' = mes de quiebre − este plazo.">Plazo de reposición (meses)</label><input type="number" id="sp-lead" min="0" max="6" step="0.5" onchange="sapuParam('leadTime',this.value)"></div>
+        <div class="fld"><label title="Qué tanto consumirá tu SAPU comparado con el SAPU de referencia. 100% = igual; 50% = la mitad.">Demanda vs. SAPU de referencia (%)</label><input type="number" id="sp-escala" min="1" max="500" step="5" onchange="sapuParam('escala',this.value)"></div>
+        <div class="fld"><label title="Meses que quieres tener cubiertos después de abrir. La compra necesaria cubre desde hoy hasta ese punto.">Meses a cubrir después de abrir</label><input type="number" id="sp-obj" min="1" max="12" onchange="sapuParam('mesesObj',this.value)"></div>
+        <div class="fld"><label title="Meses que tarda en llegar un pedido. 'Pedir antes de' = mes en que se acaba − este plazo.">Meses que tarda un pedido</label><input type="number" id="sp-lead" min="0" max="6" step="0.5" onchange="sapuParam('leadTime',this.value)"></div>
         <div class="fld" style="display:flex;flex-direction:column;gap:6px">
-          <label class="sp-chk"><input type="checkbox" id="sp-prog" onchange="sapuParam('usarProg',this.checked)" style="accent-color:var(--teal)"> Sumar entregas programadas</label>
+          <label class="sp-chk"><input type="checkbox" id="sp-prog" onchange="sapuParam('usarProg',this.checked)" style="accent-color:var(--teal)"> Contar lo que ya viene programado</label>
           <label class="sp-chk"><input type="checkbox" id="sp-cesfam" onchange="sapuParam('usarCesfam',this.checked)" style="accent-color:var(--teal)"> Incluir consumo CESFAM</label>
         </div>
         <div class="fld">
-          <label>Escala por atenciones (opcional)</label>
+          <label title="Calcula la demanda (%) a partir de las atenciones mensuales: tu SAPU ÷ referencia.">Calcular demanda por atenciones (opcional)</label>
           <div style="display:flex;gap:4px">
             <input type="number" id="sp-at-ref" placeholder="Ref./mes" title="Atenciones mensuales del SAPU de referencia" style="padding:7px 6px">
             <input type="number" id="sp-at-pro" placeholder="Propio/mes" title="Atenciones mensuales esperadas del SAPU propio" style="padding:7px 6px">
@@ -2377,6 +2392,7 @@ function visSwitchSubTab(sub){
 
   <!-- ═══ PANEL: CRUCE E IMPACTO ═══ -->
   <div class="sp-panel" id="sp-impacto" style="display:block">
+    <div class="sp-pregunta">¿Cuánto del stock del CESFAM se lleva el SAPU y qué hay que comprar para abrirlo?</div>
     <div class="kpis" id="sp-kpis"></div>
     <div class="sp-box">
       <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:.6rem">
@@ -2399,6 +2415,7 @@ function visSwitchSubTab(sub){
 
   <!-- ═══ PANEL: POR ARTÍCULO ═══ -->
   <div class="sp-panel" id="sp-articulo">
+    <div class="sp-pregunta">¿Cómo evoluciona mes a mes un artículo, con y sin el SAPU?</div>
     <div class="sp-box">
       <div class="sw" style="max-width:640px">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -2406,11 +2423,12 @@ function visSwitchSubTab(sub){
       </div>
       <datalist id="sp-dl-items"></datalist>
     </div>
-    <div id="sp-art-content"><div class="ph" style="min-height:20vh"><h2>Elige un ítem</h2><p>O haz clic en un nombre en la tabla de Cruce e impacto.</p></div></div>
+    <div id="sp-art-content"><div class="ph" style="min-height:20vh"><h2>Elige un ítem</h2><p>O haz clic en un nombre en la tabla de Impacto y compra.</p></div></div>
   </div>
 
   <!-- ═══ PANEL: DOTACIÓN INICIAL ═══ -->
   <div class="sp-panel" id="sp-dotacion">
+    <div class="sp-pregunta">¿Cuántas unidades quedan instaladas en botiquín, carro de paro y maletín el día de la apertura?</div>
     <div class="sp-info">Unidades fijas que deben quedar instaladas en cada ubicación el día de la apertura (no es consumo: es stock inmovilizado). Se descuentan del stock CESFAM en el mes de apertura y entran en la compra anticipada. Solo aparecen los ítems marcados con X en cada ubicación del arsenal SAPU.</div>
     <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
       <input type="text" id="sp-dot-q" placeholder="Filtrar…" oninput="sapuRenderDotacion()" style="padding:7px 10px;border:1.5px solid var(--bdr);border-radius:var(--r);font-size:13px;min-width:240px">
@@ -2421,6 +2439,7 @@ function visSwitchSubTab(sub){
 
   <!-- ═══ PANEL: HOMOLOGACIÓN ═══ -->
   <div class="sp-panel" id="sp-homolog">
+    <div class="sp-pregunta">¿A qué producto del SAPU de referencia corresponde cada ítem del arsenal SAPU? (de ahí sale el consumo estimado)</div>
     <div class="sp-info">Cada ítem del arsenal SAPU se asocia automáticamente (1 a 1, por principio activo + concentración + forma farmacéutica) a un producto del informe de referencia. Puedes corregir la asociación, aceptar una sugerencia de menor confianza, escribir un consumo manual (prima sobre la referencia, ej. <b>clonixinato</b>, que no aparece en la referencia demo) o cambiar el artículo de stock Delta con el que se cruza.</div>
     <div class="sp-fil">
       <input type="text" id="sp-hom-q" placeholder="Filtrar…" oninput="sapuRenderHomolog()" style="padding:6px 10px;border:1.5px solid var(--bdr);border-radius:var(--r);font-size:12.5px;min-width:220px">
@@ -2443,6 +2462,7 @@ function visSwitchSubTab(sub){
 
   <!-- ═══ PANEL: REPOSICIÓN SAPU (nov-2026) ═══ -->
   <div class="sp-panel" id="sp-repo">
+    <div class="sp-pregunta">¿Qué hay que mandar al SAPU esta semana (o este mes), desde qué bodega y de qué lote?</div>
     <div class="sp-info">Calcula cuánto reponer al SAPU por semana o por mes. Primero se despacha desde la <b>bodega central</b> y lo que falte desde <b>farmacia</b> (inventario de Mi arsenal), siempre el lote que vence antes. Lo programado por CENABAST o SSVQP llega a <b>bodega central</b> si el artículo es <b>exclusivo SAPU</b>, y a <b>farmacia</b> si también lo usa el CESFAM (desde ahí pasa a bodega central para el SAPU). Usa la programación vigente, el inventario y el consumo de Mi arsenal, y el mes de apertura de arriba.</div>
     <div class="repo-cargas">
       <div class="sp-box">
@@ -2460,6 +2480,9 @@ function visSwitchSubTab(sub){
         <div class="fld"><label>Ver</label><select id="repo-vista" onchange="repoParam('vista',this.value)"><option value="semana">Una semana</option><option value="mes">Un mes</option></select></div>
         <div class="fld" id="repo-fecha-wrap"><label>Semana que contiene el día</label><input type="date" id="repo-fecha" onchange="repoParam('fecha',this.value)"></div>
         <div class="fld" id="repo-mes-wrap" style="display:none"><label>Mes</label><input type="month" id="repo-mes" onchange="repoParam('mes',this.value)"></div>
+      </div>
+      <details class="sp-avanz"><summary>⚙️ Opciones avanzadas (reserva de farmacia, llegada de lo programado, fuente del consumo…)</summary>
+      <div class="repo-params" style="margin-top:.7rem">
         <div class="fld"><label title="Meses de consumo CESFAM que farmacia no entrega al SAPU (no aplica a exclusivos SAPU).">Reserva de farmacia (meses)</label><input type="number" id="repo-reserva" min="0" max="6" step="0.5" onchange="repoParam('reserva',this.value)"></div>
         <div class="fld"><label title="Día del mes en que se asume la llegada de lo programado, si el artículo no aparece en el Calendario CENABAST.">Día de llegada de lo programado</label><input type="number" id="repo-dia" min="1" max="28" onchange="repoParam('dia',this.value)"></div>
         <div class="fld"><label title="Automático: consumo real diario (≥7 días) → real mensual SAPU → columna del Excel de mínimos y máximos → estimado del módulo SAPU.">Consumo SAPU a usar</label><select id="repo-fuente" onchange="repoParam('fuenteCons',this.value)"><option value="auto">Automático (real primero)</option><option value="excel">Excel de mín/máx</option><option value="modulo">Estimado del módulo SAPU</option></select></div>
@@ -2469,12 +2492,14 @@ function visSwitchSubTab(sub){
           <label class="sp-chk"><input type="checkbox" id="repo-solomov" onchange="repoParam('soloMov',this.checked)" style="accent-color:var(--teal)"> Solo artículos con movimiento</label>
         </div>
       </div>
+      </details>
     </div>
     <div id="repo-content"></div>
   </div>
   <!-- ═══ PANEL: CONSUMO REAL SAPU (diario y mensual, nov-2026) ═══ -->
   <div class="sp-panel" id="sp-diario">
-    <div class="sp-info">Mide cómo consume realmente el SAPU, día a día, sobre todo durante la puesta en marcha. Sube el consumo diario cuando quieras (cada día o cada semana): los días nuevos se agregan y los repetidos se reemplazan. El consumo mensual del SAPU también puede venir en el <b>archivo único</b> con filas de Origen <b>«Consumo SAPU 2026»</b>. Con al menos 7 días informados, el consumo real reemplaza al estimado en 🔁 Reposición SAPU y en 📋 Cruce e impacto.</div>
+    <div class="sp-pregunta">¿Cuánto consume realmente el SAPU y cómo va cambiando?</div>
+    <div class="sp-info">Mide cómo consume realmente el SAPU, día a día, sobre todo durante la puesta en marcha. Sube el consumo diario cuando quieras (cada día o cada semana): los días nuevos se agregan y los repetidos se reemplazan. El consumo mensual del SAPU también puede venir en el <b>archivo único</b> con filas de Origen <b>«Consumo SAPU 2026»</b>. Con al menos 7 días informados, el consumo real reemplaza al estimado en 🔁 Reposición SAPU y en 📋 Impacto y compra.</div>
     <div class="repo-cargas">
       <div class="sp-box">
         <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.5rem">📅 Consumo diario SAPU</div>
@@ -2493,6 +2518,7 @@ function visSwitchSubTab(sub){
   </div>
   <!-- ═══ PANEL: FUENTES ═══ -->
   <div class="sp-panel" id="sp-fuentes">
+    <div class="sp-pregunta">¿De dónde salen los datos y cómo se calcula?</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="sp-box">
         <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.5rem">Arsenal SAPU</div>
@@ -2515,7 +2541,7 @@ function visSwitchSubTab(sub){
       <div class="sp-note" style="font-size:12.5px;color:var(--ink2);max-width:80ch">
         <p style="margin-bottom:.5rem"><b>Stock inicial</b> = lotes cargados en Mi arsenal → Inventario de lotes para el artículo asociado. <b>Consumo CESFAM</b> = Consumos promedio de Mi arsenal. <b>Consumo SAPU</b> = consumo promedio mensual de la referencia × escala (o el valor manual que escribas).</p>
         <p style="margin-bottom:.5rem">Se proyecta mes a mes desde el mes actual, consumiendo los lotes en orden FEFO; un lote que llega a su mes de vencimiento sin consumirse cuenta como merma. Desde el mes de apertura la demanda pasa a ser CESFAM + SAPU, y ese mes se retira además la dotación inicial. Si activas "Sumar entregas programadas", la Programación vigente (con tus ajustes manuales) entra como ingreso al inicio de cada mes.</p>
-        <p style="margin-bottom:.5rem"><b>Compra anticipada</b> = demanda que el stock no alcanza a cubrir desde hoy hasta (apertura + cobertura post-apertura). <b>Extra por SAPU</b> = esa compra menos la que igual habría que hacer sin SAPU. <b>Pedir antes de</b> = mes de quiebre con SAPU − plazo de reposición.</p>
+        <p style="margin-bottom:.5rem"><b>Compra necesaria</b> = demanda que el stock no alcanza a cubrir desde hoy hasta (apertura + cobertura post-apertura). <b>De esa compra, por el SAPU</b> = esa compra menos la que igual habría que hacer sin SAPU. <b>Pedir antes de</b> = mes de quiebre con SAPU − plazo de reposición.</p>
         <p><b>Precio</b>: valor unitario cargado en Delta (Análisis → Gasto); si no hay, el NETO de la referencia. Valores sin IVA.</p>
       </div>
     </div>
@@ -18349,7 +18375,7 @@ function _sapuLineaFuentes(){
   el.innerHTML=`<span>🧾 Arsenal SAPU <b>${its.length}</b> ítems${_sapuCfg().arsenal?' (cargado)':''}</span><span>🏥 Referencia <b>${_sapuEsc(ref.nombre)}</b> · ${_sapuEsc(ref.periodo||'')}</span><span>${ok(nInv,'Inventario CESFAM')}</span><span>${ok(nCons,'Consumos CESFAM')}</span><span>${ok(nProg,'Programación')}</span><span>${ok(nCosto,'Valor unitario')}</span><span>Apertura en <b>${_sapuK0()}</b> mes(es)</span>`;
 }
 
-/* ── Panel: Cruce e impacto ── */
+/* ── Panel: Impacto y compra ── */
 let _sapuFiltro={loc:'todos',est:'todos',q:''};
 let _sapuOrden={col:'estado',dir:1};
 const SAPU_EST={critico:{t:'🔴 Crítico',o:0},nuevo:{t:'🆕 Adquirir',o:1},comprar:{t:'🟠 Comprar',o:2},sindato:{t:'⚪ Sin dato',o:3},ok:{t:'🟢 Cubierto',o:4}};
@@ -18370,10 +18396,10 @@ function sapuRenderImpacto(){
   const sinPrecio=G.filter(g=>g.compraCon>0&&!g.precio.v).length;
   document.getElementById('sp-kpis').innerHTML=`
     <div class="kc"><div class="kc-lbl">Arsenal SAPU</div><div class="kc-val kv-b">${nItems}</div><div class="kc-sub">${nConStock} con stock hoy en CESFAM</div></div>
-    <div class="kc"><div class="kc-lbl">Críticos / comprar</div><div class="kc-val kv-r">${nCrit} <span style="color:var(--amber);font-size:17px">/ ${nComp}</span></div><div class="kc-sub">+ ${nNuevo} a adquirir (sin stock CESFAM)</div></div>
-    <div class="kc"><div class="kc-lbl">Compra anticipada</div><div class="kc-val kv-a">${_sapuMoney(valCompra)}</div><div class="kc-sub">neto · hasta ${_sapuLblMes(W)}${sinPrecio?` · ${sinPrecio} sin precio`:''}</div></div>
-    <div class="kc"><div class="kc-lbl">Extra atribuible al SAPU</div><div class="kc-val kv-r">${_sapuMoney(valExtra)}</div><div class="kc-sub">${_sapuMoney(valExtra*1.19)} con IVA</div></div>
-    <div class="kc"><div class="kc-lbl">Gasto SAPU estimado</div><div class="kc-val kv-g">${_sapuMoney(gastoMes)}</div><div class="kc-sub">/mes neto · ${_sapuMoney(gastoMes*12)}/año · ${nSinDato} ítems sin consumo</div></div>`;
+    <div class="kc"><div class="kc-lbl" title="Crítico: se acaba antes de que alcance a llegar un pedido. Comprar: falta stock para cubrir hasta después de abrir.">Críticos / por comprar</div><div class="kc-val kv-r">${nCrit} <span style="color:var(--amber);font-size:17px">/ ${nComp}</span></div><div class="kc-sub">+ ${nNuevo} a adquirir (sin stock CESFAM)</div></div>
+    <div class="kc"><div class="kc-lbl" title="Lo que el stock no alcanza a cubrir desde hoy hasta los meses a cubrir después de abrir.">Compra necesaria</div><div class="kc-val kv-a">${_sapuMoney(valCompra)}</div><div class="kc-sub">neto · hasta ${_sapuLblMes(W)}${sinPrecio?` · ${sinPrecio} sin precio`:''}</div></div>
+    <div class="kc"><div class="kc-lbl" title="Parte de la compra necesaria que no existiría sin el SAPU.">De esa compra, por el SAPU</div><div class="kc-val kv-r">${_sapuMoney(valExtra)}</div><div class="kc-sub">${_sapuMoney(valExtra*1.19)} con IVA</div></div>
+    <div class="kc"><div class="kc-lbl">Gasto mensual del SAPU</div><div class="kc-val kv-g">${_sapuMoney(gastoMes)}</div><div class="kc-sub">/mes neto · ${_sapuMoney(gastoMes*12)}/año · ${nSinDato} ítems sin consumo</div></div>`;
   // Dumbbell: ítems con stock CESFAM y consumo SAPU > 0
   const lead=U.lead,obj=k0+(+_sapuCfg().mesesObj||3);
   let db=Object.values(resG).filter(g=>g.art&&g.sin.stockIni>0&&g.cS>0).map(g=>{
@@ -18452,7 +18478,7 @@ function sapuRenderArticulo(){
   const cont=document.getElementById('sp-art-content');
   const U=_sapuUltimo||sapuCalcular();
   const f=U.filas.find(x=>x.it.key===_sapuSel);
-  if(!f){cont.innerHTML=`<div class="ph" style="min-height:20vh"><h2>Elige un ítem</h2><p>O haz clic en un nombre en la tabla de Cruce e impacto.</p></div>`;return;}
+  if(!f){cont.innerHTML=`<div class="ph" style="min-height:20vh"><h2>Elige un ítem</h2><p>O haz clic en un nombre en la tabla de Impacto y compra.</p></div>`;return;}
   const q=document.getElementById('sp-art-q');if(q&&document.activeElement!==q)q.value=f.it.nombre;
   const R=f.R,it=f.it,H=U.H,k0=U.k0,W=U.W,c=_sapuCfg();
   const ref=f.ref.j!==null?sapuRef().items[f.ref.j]:null;
@@ -18497,7 +18523,7 @@ function sapuRenderArticulo(){
     <div class="kc"><div class="kc-lbl">Consumo/mes</div><div class="kc-val">${_sapuN(R.cC,0)} <span style="font-size:14px;color:var(--red)">+${_sapuN(R.cS,0)}</span></div><div class="kc-sub">CESFAM + SAPU${R.cC>0&&R.cS>0?' (+'+_sapuN(R.cS/R.cC*100,0)+'%)':''}</div></div>
     <div class="kc"><div class="kc-lbl">Cobertura</div><div class="kc-val">${_sapuCob(R.cobSin,H)} → <span style="color:var(--red)">${_sapuCob(R.cobCon,H)}</span></div><div class="kc-sub">meses sin → con SAPU</div></div>
     <div class="kc"><div class="kc-lbl">Pedir antes de</div><div class="kc-val ${R.pedirT!==null&&R.pedirT<1?'kv-r':''}">${R.pedirT===null?'—':R.pedirT<1?'¡Ya!':_sapuLblMes(Math.floor(R.pedirT))}</div><div class="kc-sub">quiebre ${R.con.quiebre===null?'fuera de horizonte':_sapuLblMes(Math.floor(R.con.quiebre))}</div></div>
-    <div class="kc"><div class="kc-lbl">Compra anticipada</div><div class="kc-val kv-a">${_sapuN(Math.ceil(R.compraCon),0)}</div><div class="kc-sub">${_sapuN(Math.ceil(R.extra),0)} extra por SAPU · ${R.precio.v?_sapuMoney(Math.ceil(R.compraCon)*R.precio.v):'sin precio'}</div></div>
+    <div class="kc"><div class="kc-lbl" title="Lo que el stock no alcanza a cubrir desde hoy hasta los meses a cubrir después de abrir.">Compra necesaria</div><div class="kc-val kv-a">${_sapuN(Math.ceil(R.compraCon),0)}</div><div class="kc-sub">${_sapuN(Math.ceil(R.extra),0)} extra por SAPU · ${R.precio.v?_sapuMoney(Math.ceil(R.compraCon)*R.precio.v):'sin precio'}</div></div>
     <div class="kc"><div class="kc-lbl">Merma proyectada</div><div class="kc-val">${_sapuN(R.con.mermaTot,0)}</div><div class="kc-sub">sin SAPU: ${_sapuN(R.sin.mermaTot,0)}</div></div>
   </div>
   <div class="sp-box">
@@ -19248,13 +19274,13 @@ const AYUDA_CATALOGO=[
  c:'Carga programación PM, consumos e inventario (o cópialos desde Mi arsenal con «🔗 Copiar desde Arsenal»), homologa los nombres y calcula la propuesta; se exporta a Excel.',n:'Programación PM, consumos e inventario.'},
 {t:'Consumo real del SAPU (diario y mensual)',k:'consumo diario sapu dia a dia puesta en marcha real tendencia mensual consumo sapu 2026 archivo unico origen',d:'Urgencia (SAPU) → Consumo real SAPU',go:'sapu|diario',
  q:'Registra el consumo del SAPU día a día y mes a mes para ver cómo cambia, sobre todo durante la puesta en marcha.',
- c:'Acumula los archivos diarios (los días nuevos se agregan y los repetidos se reemplazan) y muestra el total por día con su promedio móvil de 7 días, la tendencia de cada artículo (últimos 7 días vs. los 7 anteriores), la proyección mensual y la comparación con lo estimado. Un día informado cuenta como 0 para los artículos sin registro; los días no informados no se cuentan. El consumo mensual del SAPU viene en el archivo único con Origen «Consumo SAPU 2026» y no se suma al botiquín. Con al menos 7 días informados, el consumo real reemplaza al estimado en Reposición SAPU y en Cruce e impacto.',n:'Excel de consumo diario (Fecha · Artículo · Cantidad) y/o filas «Consumo SAPU AAAA» en el archivo único.'},
+ c:'Acumula los archivos diarios (los días nuevos se agregan y los repetidos se reemplazan) y muestra el total por día con su promedio móvil de 7 días, la tendencia de cada artículo (últimos 7 días vs. los 7 anteriores), la proyección mensual y la comparación con lo estimado. Un día informado cuenta como 0 para los artículos sin registro; los días no informados no se cuentan. El consumo mensual del SAPU viene en el archivo único con Origen «Consumo SAPU 2026» y no se suma al botiquín. Con al menos 7 días informados, el consumo real reemplaza al estimado en Reposición SAPU y en Impacto y compra.',n:'Excel de consumo diario (Fecha · Artículo · Cantidad) y/o filas «Consumo SAPU AAAA» en el archivo único.'},
 {t:'Reposición SAPU',k:'reposicion sapu bodega central semana mes minimos maximos exclusivo despacho picking lote farmacia abastecer reponer',d:'Urgencia (SAPU) → Reposición SAPU',go:'sapu|repo',
  q:'Calcula cuánto reponer al SAPU por semana o por mes, desde qué bodega y de qué lotes.',
  c:'Avanza semana a semana desde hoy: suma lo programado (a bodega central si el artículo es exclusivo SAPU, a farmacia si no), descuenta el consumo del CESFAM y del SAPU, y en cada revisión repone hasta el máximo si el SAPU quedaría bajo el mínimo. Despacha primero desde bodega central y luego desde farmacia, siempre el lote que vence antes, respetando la reserva de farmacia para el CESFAM. Exporta una guía con el picking por lote.',n:'Mínimos y máximos SAPU y stock de bodega central (Excel); inventario, consumo y programación de Mi arsenal.'},
 {t:'Urgencia (SAPU)',k:'sapu urgencia apertura dotacion inicial botiquin carro maletin',d:'Urgencia (SAPU)',go:'sapu|impacto',
  q:'Estima el impacto de abrir un SAPU sobre el stock del CESFAM y la dotación inicial que necesita.',
- c:'Suma al consumo del CESFAM, desde el mes de apertura, el consumo de un SAPU de referencia escalado según el porcentaje o las atenciones que indiques. Tiene pestañas para el cruce e impacto, el detalle por artículo, la dotación inicial, la homologación de consumo y las fuentes y método.',n:'Inventario y consumos en Mi arsenal.'},
+ c:'Suma al consumo del CESFAM, desde el mes de apertura, el consumo de un SAPU de referencia escalado según el porcentaje o las atenciones que indiques. Está ordenado en tres pasos: 1 · Preparar la apertura (impacto y compra, dotación, detalle por artículo), 2 · Operar el SAPU (reposición y consumo real) y ⚙️ Configurar (asociar con la referencia, fuentes y método).',n:'Inventario y consumos en Mi arsenal.'},
 // ── Análisis: Abastecimiento ──
 {t:'Calendario CENABAST',k:'despachos entregas fechas calendario cenabast intermediacion',d:'Análisis → 📦 Abastecimiento → Calendario CENABAST',go:'an|calendario',
  q:'Muestra en una grilla mensual imprimible los despachos programados, con un semáforo según cuántos llegan cada día.',
@@ -20389,7 +20415,7 @@ function sapuRenderDiario(){
   <div class="sp-tw"><table class="sp-t"><thead><tr><th class="l">Artículo</th><th class="c">Últimos ${Math.min(28,dias.length)} días</th><th>Días con consumo</th><th>Total</th><th>Promedio diario<br>(${N} días)</th><th>Proyección<br>mensual</th><th>Cambio últimos<br>7 vs 7 días</th><th>Estimado previo<br>(mensual)</th><th>Real vs.<br>estimado</th></tr></thead><tbody>
   ${filas.map(f=>`<tr><td class="l" style="font-weight:600">${_sapuEsc(f.art)}</td><td class="c">${_sdSpark(f.s.slice(-28))}</td><td>${f.diasCon}/${dias.length}</td><td>${fmt(f.tot)}</td><td>${fmt1(f.prom)}</td><td><b>${fmt(f.mes)}</b></td><td>${flecha(f.camb)}</td><td>${f.est?fmt(f.est.v)+'<div class="sp-note">'+_sapuEsc(f.est.f)+'</div>':'<span class="sp-note">—</span>'}</td><td>${f.ratio!=null?`<b style="color:${f.ratio>1.3||f.ratio<0.7?'#B4530A':'var(--ink2)'}">${Math.round(f.ratio*100)}%</b>`:'<span class="sp-note">—</span>'}</td></tr>`).join('')}
   </tbody></table></div>
-  <p class="sp-note" style="margin-top:.6rem">Un día que aparece en el archivo cuenta como 0 para los artículos sin registro ese día; los días que no aparecen no se cuentan (no se asume consumo cero). «Real vs. estimado» compara la proyección mensual real con lo que se había estimado: sirve para ajustar la escala o los mínimos y máximos durante la puesta en marcha. ${c.usarReal!==false?'Este consumo real se usa en 🔁 Reposición SAPU y en 📋 Cruce e impacto cuando hay al menos 7 días informados.':'El uso del consumo real en los cálculos está desactivado.'}</p>`;
+  <p class="sp-note" style="margin-top:.6rem">Un día que aparece en el archivo cuenta como 0 para los artículos sin registro ese día; los días que no aparecen no se cuentan (no se asume consumo cero). «Real vs. estimado» compara la proyección mensual real con lo que se había estimado: sirve para ajustar la escala o los mínimos y máximos durante la puesta en marcha. ${c.usarReal!==false?'Este consumo real se usa en 🔁 Reposición SAPU y en 📋 Impacto y compra cuando hay al menos 7 días informados.':'El uso del consumo real en los cálculos está desactivado.'}</p>`;
 }
 function sapuExportarDiario(){
   if(!_sdUltimo||typeof XLSX==='undefined')return;
@@ -20402,6 +20428,38 @@ function sapuExportarDiario(){
   XLSX.writeFile(wb,'Consumo_diario_SAPU.xlsx');
 }
 
+</script>
+<script>
+/* ══ SAPU EN 3 PASOS (nov-2026): solo navegación y textos, los cálculos no cambian ══ */
+const SAPU_PASOS=[
+  {id:'abrir',n:'1 · Preparar la apertura',d:'impacto, compra y dotación',tabs:['impacto','dotacion','articulo'],titulo:'🚑 Preparar la apertura del SAPU',nota:'El SAPU se abastece del mismo stock que hoy tiene Mi arsenal: su consumo se suma al del CESFAM desde el mes de apertura.'},
+  {id:'operar',n:'2 · Operar el SAPU',d:'reposición y consumo real',tabs:['repo','diario'],titulo:'🚑 Operar el SAPU',nota:'Reposición semanal o mensual desde bodega central y farmacia, y seguimiento del consumo real.'},
+  {id:'config',n:'⚙️ Configurar',d:'arsenal, referencia y asociaciones',tabs:['homolog','fuentes'],titulo:'⚙️ Configurar el SAPU',nota:'Arsenal SAPU, SAPU de referencia y cómo se asocian sus productos.'}
+];
+function _sapuPasoDe(p){return(SAPU_PASOS.find(x=>x.tabs.includes(p))||SAPU_PASOS[0]);}
+function sapuPaso(id){const P=SAPU_PASOS.find(x=>x.id===id)||SAPU_PASOS[0];sapuSwitch(P.tabs.includes(_sapuPanel)?_sapuPanel:P.tabs[0]);}
+function _sapuSyncPaso(p){
+  const P=_sapuPasoDe(p);
+  document.querySelectorAll('#sp-pasos .sp-paso').forEach(b=>b.classList.toggle('on',b.dataset.paso===P.id));
+  document.querySelectorAll('#view-sapu .sp-tab').forEach(b=>b.classList.toggle('sp-fuera',!P.tabs.includes(b.dataset.sp)));
+  const t=document.getElementById('sp-cab-titulo'),n=document.getElementById('sp-cab-nota');if(t)t.textContent=P.titulo;if(n)n.textContent=P.nota;
+  const prm=document.querySelector('#sp-cabecera .sp-params'),mini=document.getElementById('sp-cab-mini');
+  if(prm)prm.style.display=P.id==='abrir'?'':'none';if(mini)mini.style.display=P.id==='operar'?'':'none';
+  const c=_sapuCfg();const ap=document.getElementById('sp-apertura-op');if(ap&&document.activeElement!==ap)ap.value=c.apertura||'';
+  const ce=document.getElementById('sp-cesfam-op');if(ce)ce.checked=!!c.usarCesfam;
+}
+(function(){
+  const bar=document.getElementById('sp-pasos');
+  if(bar)bar.innerHTML=SAPU_PASOS.map(P=>`<button type="button" class="sp-paso" data-paso="${P.id}" onclick="sapuPaso('${P.id}')">${P.n}<small>${P.d}</small></button>`).join('');
+  const base=window.sapuSwitch;
+  if(typeof base==='function')window.sapuSwitch=sapuSwitch=function(p){const r=base.apply(this,arguments);_sapuSyncPaso(p);return r;};
+  // Al entrar por primera vez: si el SAPU ya abrió, directo a operarlo (se decide al entrar, cuando la memoria ya se restauró)
+  let primera=true;const baseMode=window.switchMode;
+  if(typeof baseMode==='function')window.switchMode=switchMode=function(mo){
+    if(mo==='sapu'&&primera){primera=false;try{const c=_sapuCfg();const [y,m]=String(c.apertura||'').split('-').map(Number);const h=new Date();if(y&&m&&(y*12+m-1)<=(h.getFullYear()*12+h.getMonth()))_sapuPanel='repo';}catch(e){}}
+    return baseMode.apply(this,arguments);};
+  _sapuSyncPaso(_sapuPanel);
+})();
 </script>
 </body>
 </html>
