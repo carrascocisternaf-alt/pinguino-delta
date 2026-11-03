@@ -414,7 +414,7 @@ body{background:var(--bg);color:var(--ink)}
 </style>
 
 
-<style id="ayuda-archivos">
+<style id="ayuda-archivos-css">
 .arch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:1rem}
 .arch-card{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:.85rem .9rem;min-width:0}
 .arch-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:.2rem}
@@ -570,24 +570,6 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="q" placeholder="Buscar artículo..." oninput="renderLista()" autocomplete="off" spellcheck="false">
         <button class="clr-btn" title="Limpiar">×</button>
-        <div class="arch-card">
-          <div class="arch-h"><span>🏬 Stock de bodega central (SAPU)</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('10')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>🚑 Urgencia (SAPU) → 🔁 Reposición SAPU</b></div>
-          <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Lote</td><td>Vencimiento</td><td>Stock</td></tr><tr><th class="xr">2</th><td>ATROPINA 1 MG/ML SOLU…</td><td>BC-AT01</td><td>30/03/2027</td><td class="xn">30</td></tr><tr><th class="xr">3</th><td>ATROPINA 1 MG/ML SOLU…</td><td>BC-AT02</td><td>28/09/2027</td><td class="xn">40</td></tr></tbody></table></div>
-          <div class="arch-nota">Mismo formato que el inventario: <b>Artículo</b> y <b>Stock</b> obligatorios; <b>Lote</b> y <b>Vencimiento</b> para despachar el lote que vence antes. Es el stock de la bodega que abastece al SAPU, separado de farmacia.</div>
-        </div>
-        <div class="arch-card">
-          <div class="arch-h"><span>📏 Mínimos y máximos del SAPU</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('11')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>🚑 Urgencia (SAPU) → 🔁 Reposición SAPU</b></div>
-          <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Mínimo</td><td>Máximo</td><td>Exclusivo SAPU</td><td>Stock SAPU</td><td>Consumo mensual SAPU</td></tr><tr><th class="xr">2</th><td>PARACETAMOL 500 MG CO…</td><td class="xn">300</td><td class="xn">600</td><td>No</td><td class="xn">250</td><td class="xn">1100</td></tr><tr><th class="xr">3</th><td>IBUPROFENO 400 MG COM…</td><td class="xn">200</td><td class="xn">400</td><td>No</td><td class="xn">380</td><td class="xn">700</td></tr></tbody></table></div>
-          <div class="arch-nota"><b>Artículo</b>, <b>Mínimo</b> y <b>Máximo</b> (unidades en el SAPU). Opcionales: <b>Exclusivo SAPU</b> (Sí/No: lo programado llega a bodega central), <b>Stock SAPU</b> actual y <b>Consumo mensual SAPU</b> (si no viene, se usa el estimado del módulo SAPU).</div>
-        </div>
-        <div class="arch-card">
-          <div class="arch-h"><span>📅 Consumo diario del SAPU</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('12')">⬇ Ejemplo</button></div>
-          <div class="arch-donde">Se carga en: <b>🚑 Urgencia (SAPU) → 📈 Consumo real SAPU</b></div>
-          <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Fecha</td><td>Artículo</td><td>Cantidad</td></tr><tr><th class="xr">2</th><td>01/10/2026</td><td>PARACETAMOL 500 MG CO…</td><td class="xn">43</td></tr><tr><th class="xr">3</th><td>01/10/2026</td><td>IBUPROFENO 400 MG COM…</td><td class="xn">13</td></tr></tbody></table></div>
-          <div class="arch-nota"><b>Fecha</b>, <b>Artículo</b> y <b>Cantidad</b>, una fila por artículo y día. También acepta el formato ancho: <b>Artículo</b> y una columna por fecha. Se acumula: cada carga agrega días y reemplaza los repetidos.</div>
-        </div>
       </div>
     </div>
     <div class="sb-flt">
@@ -2630,6 +2612,25 @@ function visSwitchSubTab(sub){
           <div class="arch-donde">Se carga en: <b>📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Excel externo</b></div>
           <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Mes</td><td>Año</td><td>Cantidad</td><td>Costo unitario</td></tr><tr><th class="xr">2</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">1</td><td class="xn">2025</td><td class="xn">24.428</td><td class="xn">9</td></tr><tr><th class="xr">3</th><td>LOSARTAN (POTASICO) 5…</td><td class="xn">2</td><td class="xn">2025</td><td class="xn">23.518</td><td class="xn">9</td></tr></tbody></table></div>
           <div class="arch-nota"><b>Artículo</b>, <b>Mes</b> (1–12), <b>Año</b>, <b>Cantidad</b> y <b>Costo unitario</b>. Solo si tienes un reporte de otro sistema.</div>
+        </div>
+      
+        <div class="arch-card">
+          <div class="arch-h"><span>🏬 Stock de bodega central (SAPU)</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('10')">⬇ Ejemplo</button></div>
+          <div class="arch-donde">Se carga en: <b>🚑 Urgencia (SAPU) → 🔁 Reposición SAPU</b></div>
+          <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Lote</td><td>Vencimiento</td><td>Stock</td></tr><tr><th class="xr">2</th><td>ATROPINA 1 MG/ML SOLU…</td><td>BC-AT01</td><td>30/03/2027</td><td class="xn">30</td></tr><tr><th class="xr">3</th><td>ATROPINA 1 MG/ML SOLU…</td><td>BC-AT02</td><td>28/09/2027</td><td class="xn">40</td></tr></tbody></table></div>
+          <div class="arch-nota">Mismo formato que el inventario: <b>Artículo</b> y <b>Stock</b> obligatorios; <b>Lote</b> y <b>Vencimiento</b> para despachar el lote que vence antes. Es el stock de la bodega que abastece al SAPU, separado de farmacia.</div>
+        </div>
+        <div class="arch-card">
+          <div class="arch-h"><span>📏 Mínimos y máximos del SAPU</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('11')">⬇ Ejemplo</button></div>
+          <div class="arch-donde">Se carga en: <b>🚑 Urgencia (SAPU) → 🔁 Reposición SAPU</b></div>
+          <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Artículo</td><td>Mínimo</td><td>Máximo</td><td>Exclusivo SAPU</td><td>Stock SAPU</td><td>Consumo mensual SAPU</td></tr><tr><th class="xr">2</th><td>PARACETAMOL 500 MG CO…</td><td class="xn">300</td><td class="xn">600</td><td>No</td><td class="xn">250</td><td class="xn">1100</td></tr><tr><th class="xr">3</th><td>IBUPROFENO 400 MG COM…</td><td class="xn">200</td><td class="xn">400</td><td>No</td><td class="xn">380</td><td class="xn">700</td></tr></tbody></table></div>
+          <div class="arch-nota"><b>Artículo</b>, <b>Mínimo</b> y <b>Máximo</b> (unidades en el SAPU). Opcionales: <b>Exclusivo SAPU</b> (Sí/No: lo programado llega a bodega central), <b>Stock SAPU</b> actual y <b>Consumo mensual SAPU</b> (si no viene, se usa el estimado del módulo SAPU).</div>
+        </div>
+        <div class="arch-card">
+          <div class="arch-h"><span>📅 Consumo diario del SAPU</span><button type="button" class="arch-dl" onclick="descargarEjemploDelta('12')">⬇ Ejemplo</button></div>
+          <div class="arch-donde">Se carga en: <b>🚑 Urgencia (SAPU) → 📈 Consumo real SAPU</b></div>
+          <div class="xls-wrap"><table class="xls"><thead><tr><th class="xr"></th><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr class="xh"><th class="xr">1</th><td>Fecha</td><td>Artículo</td><td>Cantidad</td></tr><tr><th class="xr">2</th><td>01/10/2026</td><td>PARACETAMOL 500 MG CO…</td><td class="xn">43</td></tr><tr><th class="xr">3</th><td>01/10/2026</td><td>IBUPROFENO 400 MG COM…</td><td class="xn">13</td></tr></tbody></table></div>
+          <div class="arch-nota"><b>Fecha</b>, <b>Artículo</b> y <b>Cantidad</b>, una fila por artículo y día. También acepta el formato ancho: <b>Artículo</b> y una columna por fecha. Se acumula: cada carga agrega días y reemplaza los repetidos.</div>
         </div>
       </div>
     </div>

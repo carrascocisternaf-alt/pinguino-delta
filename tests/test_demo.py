@@ -87,6 +87,8 @@ async def main():
         # ── Escenario D: buscador de la Ayuda ──
         pg,errs=await nueva(b)
         await pg.evaluate("switchMode('ayuda')")
+        r=await pg.evaluate("({fuera:document.querySelectorAll('.arch-card:not(#view-ayuda .arch-card)').length,dentro:document.querySelectorAll('#view-ayuda .arch-grid > .arch-card').length,ids:[...document.querySelectorAll('[id]')].map(e=>e.id).filter((x,i,a)=>a.indexOf(x)!==i)})")
+        ok(r['fuera']==0 and r['dentro']==12 and not r['ids'],f'Ayuda: las 12 fichas de archivos están solo en la Ayuda y no hay ids duplicados ({r})')
         r=await pg.evaluate("(ayudaBuscar('respaldo'),document.querySelector('#ay-res .ay-t')?.textContent)")
         ok(r=='Exportar e importar respaldo',f'Buscador → «respaldo»: {r}')
         r=await pg.evaluate("(ayudaBuscar('monte carlo'),[...document.querySelectorAll('#ay-res .ay-t')].map(e=>e.textContent))")
