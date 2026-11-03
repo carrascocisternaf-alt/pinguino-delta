@@ -8032,6 +8032,13 @@ function ajustesRenderSubTab(ctx,sub){
    · Se calcula para dos coberturas: objetivo (2 m) y mínima (1 m).
    · Crítico: cobertura al cierre < umbral (0,5 m) en algún mes de la
      ventana SIN pedidos especiales (solo programación vigente). */
+// Stock disponible en la bodega central (cargado en Urgencia SAPU → Reposición): lotes no vencidos hoy
+function _bodCentralDisp(art){
+  try{const R=typeof _repoCfg==='function'?_repoCfg():null;if(!R||!R.bodega||!Object.keys(R.bodega).length)return null;
+    const hoy=new Date();const ls=(R.bodega[art]||[]).filter(l=>_repoFinVenc(l.venc)>=hoy&&(+l.stock||0)>0);
+    return{q:ls.reduce((a,l)=>a+(+l.stock||0),0),lotes:ls.slice().sort((a,b)=>_repoFinVenc(a.venc)-_repoFinVenc(b.venc)),excl:!!(R.excl&&R.excl[art])};
+  }catch(e){return null;}
+}
 let _pedEspParams={arsenal:{n:3,obj:2,min:1,crit:0.5,vista:'obj',soloCrit:false},libre:{n:3,obj:2,min:1,crit:0.5,vista:'obj',soloCrit:false}};
 function _pedEspCalcular(ctx){
   const P=_pedEspParams[ctx];
@@ -8068,11 +8075,12 @@ function _pedEspCalcular(ctx){
       porMes.forEach((x,k)=>{if(x.cob!==null&&x.cob<cobMin){cobMin=x.cob;mesMin=k;}});
       const critico=cobMin<P.crit;
       if(O.tot>0)nObj++;if(M.tot>0)nMin++;if(critico)nCrit++;
-      if(O.tot>0||critico)filas.push({art:r.art,consBase:q.cons,stock:q.lots.reduce((s,l)=>s+(l.q||0),0),envase:q.envaseArt||null,porMes,O,M,cobMin:isFinite(cobMin)?cobMin:null,mesMin,critico});
+      if(O.tot>0||critico)filas.push({art:r.art,consBase:q.cons,stock:q.lots.reduce((s,l)=>s+(l.q||0),0),envase:q.envaseArt||null,porMes,O,M,cobMin:isFinite(cobMin)?cobMin:null,mesMin,critico,bod:_bodCentralDisp(r.art)});
     }catch(e){errores++;}
   });
   filas.sort((a,b)=>(b.critico-a.critico)||((a.cobMin??999)-(b.cobMin??999)));
-  return{meses,filas,nObj,nMin,nCrit,errores,P:{...P}};
+  const hayBod=!!_bodCentralDisp('');
+  return{meses,filas,nObj,nMin,nCrit,errores,hayBod,P:{...P}};
 }
 function _pedEspParam(ctx,campo,valor){
   const P=_pedEspParams[ctx];
@@ -8101,7 +8109,8 @@ function _pedEspRender(ctx,el){
     Ventana: <strong>${ven}</strong>, con la programación vigente tal cual (independiente del mes de inicio de reprogramación), stock por lotes, merma por vencimiento y consumo de la corrida.
     "Pedir" = lo necesario para cerrar cada mes con al menos la cobertura elegida (stock final ÷ consumo del mes); cada pedido entra en el stock de los meses siguientes, así que cada mes muestra solo lo adicional.
     "Cob. s/pedido" = cobertura al cierre solo con la programación vigente. <strong>Crítico</strong>: algún mes de la ventana cae bajo ${fmt1(P.crit)} m sin pedido especial.
-    · ${PE.nObj} artículo(s) requieren pedido para ${fmt1(P.obj)} m · ${PE.nMin} para ${fmt1(P.min)} m · ${PE.nCrit} crítico(s)${PE.errores?` · ⚠ ${PE.errores} sin simular por error de datos`:''}.</div>`;
+    · ${PE.nObj} artículo(s) requieren pedido para ${fmt1(P.obj)} m · ${PE.nMin} para ${fmt1(P.min)} m · ${PE.nCrit} crítico(s)${PE.errores?` · ⚠ ${PE.errores} sin simular por error de datos`:''}.
+    ${PE.hayBod?(()=>{const V0=P.vista==='min'?'M':'O';const fs=PE.filas.filter(f=>f[V0].tot>0&&f.bod&&f.bod.q>0);const tot=fs.filter(f=>f.bod.q>=f[V0].tot).length;return `<br>🏬 <strong>Bodega central:</strong> ${fs.length?`${fs.length} artículo(s) tienen stock ahí — ${tot} se cubren completos y ${fs.length-tot} en parte, antes de pedir afuera.`:'ningún artículo con pedido tiene stock en bodega central.'} <span style="color:var(--ink3)">(Stock cargado en Urgencia (SAPU) → Reposición SAPU, lotes no vencidos. Esa bodega también abastece al SAPU.)</span>`;})():`<br>🏬 Para ver si la bodega central puede cubrir estos pedidos, carga su stock en <a href="#" onclick="event.preventDefault();switchMode('sapu');sapuSwitch&&sapuSwitch('repo')">Urgencia (SAPU) → Reposición SAPU</a>.`}</div>`;
   const filas=PE.filas.filter(f=>!P.soloCrit||f.critico);
   if(!filas.length){el.innerHTML=h+'<div style="padding:1.2rem;color:var(--ink3);font-size:12.5px;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2)">Ningún artículo requiere pedido especial en la ventana con estos parámetros.</div>';return;}
   const V=P.vista==='min'?'M':'O';
@@ -8109,7 +8118,7 @@ function _pedEspRender(ctx,el){
   h+=`<div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);overflow:hidden"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead>
     <tr style="background:var(--navy)"><th rowspan="2" style="${th};text-align:left">Artículo</th><th rowspan="2" style="${th}">Consumo/mes</th><th rowspan="2" style="${th}">Stock inicial</th>
     ${PE.meses.map(x=>`<th colspan="3" style="${th};text-align:center;border-left:1px solid rgba(255,255,255,.25)">${MN[x.mn-1]} ${x.an}</th>`).join('')}
-    <th rowspan="2" style="${th};border-left:1px solid rgba(255,255,255,.25)">Total a pedir</th><th rowspan="2" style="${th}">Cob. mín. s/pedido</th></tr>
+    <th rowspan="2" style="${th};border-left:1px solid rgba(255,255,255,.25)">Total a pedir</th>${PE.hayBod?`<th rowspan="2" style="${th};text-align:left" title="Stock no vencido en la bodega central (cargado en Urgencia SAPU → Reposición SAPU)">🏬 En bodega central</th><th rowspan="2" style="${th}" title="Lo que falta pedir afuera después de usar la bodega central">Pedir afuera</th>`:''}<th rowspan="2" style="${th}">Cob. mín. s/pedido</th></tr>
     <tr style="background:var(--navy)">${PE.meses.map(()=>`<th style="${th};border-left:1px solid rgba(255,255,255,.25)">Prog.</th><th style="${th}">Cob. s/pedido</th><th style="${th}">Pedir</th>`).join('')}</tr></thead><tbody>`;
   filas.forEach((f,i)=>{
     const bg=f.critico?'#FFF4F3':(i%2===0?'var(--bg)':'#fff');
@@ -8123,7 +8132,9 @@ function _pedEspRender(ctx,el){
         <td style="text-align:right;padding:.4rem .6rem;font-family:DM Mono,monospace;font-weight:700;color:${col}">${fmt1(c)}</td>
         <td style="text-align:right;padding:.4rem .6rem;font-family:DM Mono,monospace;font-weight:700;color:var(--navy)">${R.qs[k]?fmt(R.qs[k]):'—'}</td>`;
     });
-    h+=`<td style="text-align:right;padding:.4rem .6rem;font-family:DM Mono,monospace;font-weight:700;color:var(--red);border-left:1px solid var(--bdr2)">${R.tot?fmt(R.tot):'—'}</td>
+    const B=f.bod,bq=B?B.q:0,cubre=R.tot>0&&bq>=R.tot;
+    const bodCell=!PE.hayBod?'':`<td style="padding:.4rem .6rem;font-size:11.5px;white-space:nowrap" title="${B&&B.lotes.length?B.lotes.map(l=>l.lote+' · '+l.venc+': '+fmt(l.stock)).join('\n').replace(/"/g,'&quot;'):''}">${bq>0?`<span style="font-family:DM Mono,monospace;font-weight:700">${fmt(bq)}</span> ${R.tot>0?(cubre?'<span style="color:var(--ok,#0D6E4E);font-weight:700">✓ hay stock para cubrir</span>':`<span style="color:#B4720A;font-weight:700">cubre ${fmt(bq)} de ${fmt(R.tot)}</span>`):''}${B.excl?' <span style="color:#A12895;font-size:10.5px" title="Marcado como exclusivo SAPU">· exclusivo SAPU</span>':''}${B.lotes.length?`<div style="font-size:10px;color:var(--ink3)">FEFO: ${B.lotes[0].lote} · ${B.lotes[0].venc}${B.lotes.length>1?` (+${B.lotes.length-1} lote${B.lotes.length>2?'s':''})`:''}</div>`:''}`:'<span style="color:var(--ink3)">—</span>'}</td><td style="text-align:right;padding:.4rem .6rem;font-family:DM Mono,monospace;font-weight:700;color:var(--red)">${R.tot?(Math.max(0,R.tot-bq)?fmt(Math.max(0,R.tot-bq)):'0'):'—'}</td>`;
+    h+=`<td style="text-align:right;padding:.4rem .6rem;font-family:DM Mono,monospace;font-weight:700;color:var(--red);border-left:1px solid var(--bdr2)">${R.tot?fmt(R.tot):'—'}</td>${bodCell}
       <td style="text-align:right;padding:.4rem .6rem;font-family:DM Mono,monospace;font-weight:700;color:${f.critico?'var(--red)':'var(--ink2)'}">${fmt1(f.cobMin)}${f.mesMin!==null?` <span style="font-size:10px;font-weight:500;color:var(--ink3)">${MC[PE.meses[f.mesMin].mn-1]}</span>`:''}</td></tr>`;
   });
   h+='</tbody></table></div></div>';
@@ -8135,11 +8146,13 @@ function _pedEspExportar(ctx){
   const hdr=['Artículo','Crítico','Consumo/mes base','Stock inicial'];
   PE.meses.forEach(x=>{const m=MC[x.mn-1]+' '+x.an;hdr.push(`${m} Prog. vigente`,`${m} Consumo`,`${m} Cob. s/pedido`,`${m} Pedir (${P.obj} m)`,`${m} Pedir (${P.min} m)`);});
   hdr.push(`Total pedir (${P.obj} m)`,`Total pedir (${P.min} m)`,'Cob. mín. s/pedido','Mes cob. mín.');
+  if(PE.hayBod)hdr.push('Stock bodega central (no vencido)','Lotes bodega central (FEFO)',`Cubre con bodega (${P.obj} m)`,`Pedir afuera (${P.obj} m)`,`Pedir afuera (${P.min} m)`,'Exclusivo SAPU');
   const aoa=[hdr];
   PE.filas.forEach(f=>{
     const row=[f.art,f.critico?'SÍ':'',f.consBase,f.stock];
     f.porMes.forEach((x,k)=>row.push(x.ing||0,x.cons,r2(x.cob),f.O.qs[k],f.M.qs[k]));
     row.push(f.O.tot,f.M.tot,r2(f.cobMin),f.mesMin!==null?MN[PE.meses[f.mesMin].mn-1]+' '+PE.meses[f.mesMin].an:'');
+    if(PE.hayBod){const bq=f.bod?f.bod.q:0;row.push(bq,f.bod?f.bod.lotes.map(l=>l.lote+' '+l.venc+': '+l.stock).join(' | '):'',f.O.tot>0?(bq>=f.O.tot?'SÍ':bq>0?'PARCIAL':'NO'):'',Math.max(0,f.O.tot-bq),Math.max(0,f.M.tot-bq),f.bod&&f.bod.excl?'SÍ':'');}
     aoa.push(row);
   });
   const ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:45},{wch:8},{wch:12},{wch:12},...Array(hdr.length-4).fill({wch:12})];
@@ -19291,7 +19304,7 @@ const AYUDA_CATALOGO=[
 {t:'Reprogramar todo',k:'reprogramacion masiva todos los articulos programar sugerida exportar',d:'Mi arsenal → Reprogramar todo',go:'arsenal|masiva',
  q:'Calcula la programación sugerida para todos los artículos a la vez.',
  c:'Aplica a cada artículo la misma simulación de «Simular un artículo», con su envase y la fluctuación estacional si están disponibles. Marca cada celda: ▲ más que lo vigente, ▼ menos, ★ sin programación previa, ⚠ riesgo de quiebre antes de reprogramar, 🗑 mes con merma. Los ajustes que hagas a mano quedan registrados.',n:'Inventario, consumo y programación vigente.'},
-{t:'Bajar a cero y pedido especial',k:'evaluacion ajustes cancelar sobrestock pedido especial urgente riesgo quiebre',d:'Mi arsenal → Reprogramar todo → Evaluación de ajustes',go:'arsenal|masiva',
+{t:'Bajar a cero y pedido especial',k:'evaluacion ajustes cancelar sobrestock pedido especial urgente riesgo quiebre bodega central stock cubrir',d:'Mi arsenal → Reprogramar todo → Evaluación de ajustes',go:'arsenal|masiva',
  q:'Detecta meses donde conviene cancelar la programación (sobrestock) y meses en riesgo de quiebre que requieren un pedido especial.',
  c:'Compara la proyección de cada mes con la cobertura máxima (bajar a cero) y con el stock que habrá antes de que la reprogramación normal llegue (pedido especial).',n:'Haber calculado Reprogramar todo.'},
 {t:'Proyección de gasto y comparar escenarios',k:'gasto proyectado costo presupuesto escenario a b comparar corridas',d:'Mi arsenal → Reprogramar todo → pestañas inferiores',go:'arsenal|masiva',

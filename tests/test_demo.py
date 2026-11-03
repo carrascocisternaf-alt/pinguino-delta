@@ -88,6 +88,10 @@ async def main():
           const th=[...document.querySelectorAll('#repo-tabla th')].map(t=>t.textContent).find(t=>t.startsWith('Stock SAPU'));
           return{nf,okf,kf:F.filter(a=>a.falt>0).length,nr,kr:F.filter(a=>a.env>0).length,sigue,todos,n:F.length,th}})()""")
         ok(r['nf']==r['kf'] and r['okf'] and r['nr']==r['kr'] and r['sigue']==r['nr'] and r['todos']==r['n'] and r['th']=='Stock SAPUactual',f'Reposición SAPU: clic en tarjetas filtra (faltante / a reponer), se mantiene al recalcular y «Stock SAPU actual» ({r})')
+        r=await pg.evaluate("""(()=>{const R=_repoCfg();const a='SALBUTAMOL AEROSOL 100 MCG/DOSIS INHALADOR';const bak=JSON.stringify(R.bodega[a]||[]);
+          R.bodega[a]=[{lote:'V',venc:'09/2026',stock:50},{lote:'B',venc:'03/2027',stock:7},{lote:'A',venc:'12/2026',stock:5}];const d=_bodCentralDisp(a);R.bodega[a]=JSON.parse(bak);
+          return{q:d.q,fefo:d.lotes.map(l=>l.lote)}})()""")
+        ok(r=={'q':12,'fefo':['A','B']},f'Pedido especial: stock de bodega central sin lotes vencidos y en orden FEFO ({r})')
         # ── Escenario G: consumo real del SAPU (mensual en archivo único y diario) ──
         r=await pg.evaluate("""(()=>{const c=_sapuCfg();return{dias:c.diarioDias.length,real:_sapuConsReal('PARACETAMOL 500 MG COMPRIMIDO'),fuente:(sapuSwitch('repo'),_repoUltimo.filas.find(a=>a.art==='PARACETAMOL 500 MG COMPRIMIDO').P.cons.f)}})()""")
         ok(r['dias']==15 and r['real']['tipo']=='diario' and r['fuente'].startswith('Real diario'),f"Consumo real SAPU: 15 días informados y Reposición usa el real diario ({r['fuente']})")
