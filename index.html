@@ -18817,6 +18817,14 @@ body{background:radial-gradient(1200px 600px at 100% -10%,rgba(28,175,170,.06),t
 .lb:hover,.kc:hover{box-shadow:var(--sh-md)}
 .lb,.kc{transition:box-shadow .2s ease}
 .kpi{border-radius:var(--r-item)!important}
+#repo-content .kpi{border:1px solid #D5E3E3;border-radius:10px;padding:8px 12px;background:#fff}
+.repo-kf{cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.repo-kf:hover{box-shadow:0 0 0 2px #1CAFAA55}
+.repo-kf.on{border-color:#1CAFAA!important;box-shadow:0 0 0 2px #1CAFAA;background:#E6F7F6}
+.repo-kf:focus-visible{outline:2px solid #1CAFAA;outline-offset:2px}
+.repo-kf-ic{font-size:11px;opacity:.6}
+.repo-chip{display:inline-flex;gap:6px;align-items:center;background:#E6F7F6;border:1px solid #1CAFAA;color:#0E6E6B;border-radius:999px;padding:2px 10px;font-weight:600}
+.repo-chip a{color:inherit;text-decoration:none}
 /* botones */
 .btn-calc,.sp-btn{position:relative;overflow:hidden;background:var(--metal-teal)!important;border:1px solid #117D79!important;color:#fff!important;border-radius:var(--r-control)!important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 4px 12px rgba(7,87,83,.2);transition:transform .14s var(--fx-ease),box-shadow .2s ease,filter .2s ease;font-weight:700}
@@ -19205,7 +19213,7 @@ function anFiltrarGrupo(gid){
     const dentro=g.tabs.includes(b.dataset.an);
     b.classList.toggle('an-fuera-grupo',!dentro);
   });
-  document.querySelectorAll('#an-grupos .an-grupo').forEach(b=>{const on=b.dataset.grupo===g.id;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});
+  document.querySelectorAll('#an-grupos .an-grupo').forEach(b=>{const on=b.dataset.grupo===g.id;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.setAttribute('aria-selected',on);});
   return g;
 }
 function anGrupo(gid){
@@ -20243,10 +20251,19 @@ function _repoPeriodo(){
 let _repoUltimo=null;
 let _repoQ='';
 // Buscador de la tabla de Reposición SAPU: filtra filas sin recalcular (todas las palabras, sin tildes)
+let _repoFiltro='';
+const _REPO_FILTROS={rep:'Artículos a reponer',bod:'Se reponen desde bodega central',farm:'Se reponen desde farmacia',falt:'Sin stock para reponer',venc:'Con lotes que vencen en el SAPU'};
+// Filtro por tarjeta (clic en el KPI) + buscador; no recalcula, solo muestra/oculta filas
+function repoFiltrar(k){
+  _repoFiltro=(_repoFiltro===k||!k)?'':k;
+  document.querySelectorAll('.repo-kf').forEach(b=>{const on=b.dataset.k===_repoFiltro;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);const ic=b.querySelector('.repo-kf-ic');if(ic)ic.textContent=on?'✕':'▾';b.title=on?'Clic para ver todos':'Clic para ver solo estos artículos';});
+  repoBuscar(_repoQ);
+}
 function repoBuscar(q){
   _repoQ=q||'';const t=normArt(_repoQ).split(' ').filter(Boolean);let n=0,tot=0;
-  document.querySelectorAll('#repo-tabla tbody tr[data-art]').forEach(tr=>{tot++;const ok=t.every(w=>tr.dataset.art.includes(w));tr.style.display=ok?'':'none';if(ok)n++;});
-  const el=document.getElementById('repo-buscar-n');if(el)el.textContent=t.length?(n?`${n} de ${tot}`:'Sin coincidencias en este período'):'';
+  document.querySelectorAll('#repo-tabla tbody tr[data-art]').forEach(tr=>{tot++;const ok=t.every(w=>tr.dataset.art.includes(w))&&(!_repoFiltro||(' '+tr.dataset.f+' ').includes(' '+_repoFiltro+' '));tr.style.display=ok?'':'none';if(ok)n++;});
+  const el=document.getElementById('repo-buscar-n');
+  if(el)el.innerHTML=(_repoFiltro?`<span class="repo-chip">${_REPO_FILTROS[_repoFiltro]} <a href="#" onclick="event.preventDefault();repoFiltrar('')" title="Ver todos">✕</a></span> `:'')+((t.length||_repoFiltro)?(n?`${n} de ${tot} artículos`:'Ningún artículo cumple el filtro en este período'):'');
 }
 function repoRender(){
   const el=document.getElementById('repo-content');if(!el)return;
@@ -20283,6 +20300,13 @@ function repoRender(){
   const totB=filas.reduce((s,a)=>s+a.picks.filter(p=>p.origen==='Bodega central').reduce((t,p)=>t+p.cant,0),0);
   const totF=filas.reduce((s,a)=>s+a.picks.filter(p=>p.origen==='Farmacia').reduce((t,p)=>t+p.cant,0),0);
   const nRep=filas.filter(a=>a.env>0).length,nFalt=filas.filter(a=>a.falt>0).length;
+  const _tieneO=(a,o)=>a.picks.some(p=>p.origen===o&&p.cant>0);
+  const _venceS=a=>{if((a.vencSapu||[]).length||a.mermaS>0)return true;const lim=new Date(per.fin);lim.setDate(lim.getDate()+60);return(a.P.sapuLotes||[]).some(l=>{const v=_repoFinVenc(l.venc);return v.getFullYear()<9999&&v<=lim&&(+l.stock||0)>0;});};
+  const nBod=filas.filter(a=>_tieneO(a,'Bodega central')).length,nFarm=filas.filter(a=>_tieneO(a,'Farmacia')).length,nVenc=filas.filter(_venceS).length;
+  const kf=(k,lbl,val,nota,col)=>`<div role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" aria-pressed="${_repoFiltro===k}" class="kpi repo-kf${_repoFiltro===k?' on':''}" data-k="${k}" onclick="repoFiltrar('${k}')" title="${_repoFiltro===k?'Clic para ver todos':'Clic para ver solo estos artículos'}"><div class="kpi-lbl">${lbl} <span class="repo-kf-ic">${_repoFiltro===k?'✕':'▾'}</span></div><div class="kpi-val"${col?` style="color:${col}"`:''}>${val}</div><div class="sp-note" style="margin-top:2px">${nota}</div></div>`;
+  const lunesHoy=_repoLunes(_repoHoy()),ini0=semP.length?semP[0]:per.ini;
+  const esActual=ini0.getTime()<=lunesHoy.getTime();
+  const lblStock=esActual?'Stock SAPU<br>actual':'Stock SAPU<br>proyectado al '+_repoFechaCorta(ini0);
   const noAbre=!sim.semanas.filter(per.incluye).some(ws=>{const we=new Date(ws);we.setDate(we.getDate()+7);return we>sim.apertura;});
   const vencePronto=p=>{const v=_repoFinVenc(p.venc);return p.sem&&v.getFullYear()<9999&&(v-p.sem)/86400000<45;};
   const lotesTxt=ps=>ps.map(p=>`${_sapuEsc(p.lote)}${p.venc&&p.venc!=='—'?' · '+p.venc:''}: <b>${_repoN(p.cant)}</b>${vencePronto(p)?' <span title="Este lote vence en menos de 45 días desde el despacho: priorizar su uso en el SAPU" style="color:#B4530A;font-weight:700">⚠ vence pronto</span>':''}`).join('<br>');
@@ -20291,19 +20315,20 @@ function repoRender(){
   ${noAbre?`<div class="sp-info">El SAPU abre en ${_sapuEsc(_sapuCfg().apertura)}: en este período todavía no hay consumo ni reposición. La primera reposición llenará el SAPU hasta su máximo (ver también 🧰 Dotación inicial).</div>`:''}
   <div class="kpis" style="margin-bottom:.8rem">
     <div class="kpi"><div class="kpi-lbl">Período</div><div class="kpi-val" style="font-size:15px">${_sapuEsc(per.etq)}</div><div class="sp-note" style="margin-top:2px">Reposición ${R.frec==='semanal'?'semanal':'mensual'}${per.tipo==='mes'?` · ${semP.length} semana(s) que comienzan en el mes`:''}${R.frec==='mensual'&&per.tipo==='semana'?' · con reposición mensual solo la primera semana de cada mes tiene despacho':''}</div></div>
-    <div class="kpi"><div class="kpi-lbl">Artículos a reponer</div><div class="kpi-val">${nRep}</div><div class="sp-note" style="margin-top:2px">${_repoN(totB+totF)} unidades en total</div></div>
-    <div class="kpi"><div class="kpi-lbl">Desde bodega central</div><div class="kpi-val">${_repoN(totB)}</div><div class="sp-note" style="margin-top:2px">unidades</div></div>
-    <div class="kpi"><div class="kpi-lbl">Desde farmacia</div><div class="kpi-val">${_repoN(totF)}</div><div class="sp-note" style="margin-top:2px">unidades</div></div>
-    <div class="kpi"><div class="kpi-lbl">Sin stock para reponer</div><div class="kpi-val" style="color:${nFalt?'var(--red)':'var(--green)'}">${nFalt}</div><div class="sp-note" style="margin-top:2px">artículo(s) con faltante</div></div>
+    ${kf('rep','Artículos a reponer',nRep,`${_repoN(totB+totF)} unidades en total`)}
+    ${kf('bod','Desde bodega central',_repoN(totB),`unidades · ${nBod} artículo(s)`)}
+    ${kf('farm','Desde farmacia',_repoN(totF),`unidades · ${nFarm} artículo(s)`)}
+    ${kf('falt','Sin stock para reponer',nFalt,'artículo(s) con faltante',nFalt?'var(--red)':'var(--green)')}
+    ${kf('venc','Vence en el SAPU',nVenc,'artículo(s) con lotes que vencen o vencerán pronto',nVenc?'#B4530A':'var(--green)')}
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:.6rem"><input type="search" id="repo-buscar" placeholder="🔍 Buscar medicamento (nombre, principio activo, dosis…)" value="${_sapuEsc(_repoQ)}" oninput="repoBuscar(this.value)" style="flex:1 1 280px;min-width:0;max-width:460px;padding:7px 10px;border:1px solid var(--border,#d0dada);border-radius:8px;font:inherit"><span class="sp-note" id="repo-buscar-n"></span><button class="sp-btn" onclick="repoExportar()">⬇ Exportar guía de reposición (.xlsx)</button></div>
   <div class="sp-tw"><table class="sp-t repo-t" id="repo-tabla"><thead><tr>
-    <th class="l">Artículo</th><th class="c" title="Exclusivo SAPU: lo programado llega a bodega central. Clic para cambiar.">Exclusivo SAPU</th><th>Stock SAPU<br>al inicio</th><th>Mín–Máx</th><th>Consumo SAPU<br>del período</th>
+    <th class="l">Artículo</th><th class="c" title="Exclusivo SAPU: lo programado llega a bodega central. Clic para cambiar.">Exclusivo SAPU</th><th title="${esActual?'Stock con que parte la semana actual: el de la toma AVIS cargada (o el Excel de mín/máx).':'Stock que tendría el SAPU al comenzar el período, simulando consumo, vencimientos y reposiciones desde hoy.'}">${lblStock}</th><th>Mín–Máx</th><th>Consumo SAPU<br>del período</th>
     ${multi?semP.map(w=>`<th>Sem. ${_repoFechaCorta(w)}</th>`).join(''):''}
     <th>A reponer</th><th class="l">Desde bodega central (lote · vence: cant.)</th><th class="l">Desde farmacia (lote · vence: cant.)</th><th>Faltante</th><th class="l">Llegadas programadas</th><th>Queda en bodega / farmacia</th>
   </tr></thead><tbody>
   ${filas.length?filas.map((a,i)=>{const _ag=x=>{const m=new Map();x.forEach(p=>{const k=p.origen+'|'+p.lote+'|'+p.venc;const g=m.get(k);if(g)g.cant+=p.cant;else m.set(k,Object.assign({},p));});return[...m.values()];};const pb=_ag(a.picks.filter(p=>p.origen==='Bodega central')),pf=_ag(a.picks.filter(p=>p.origen==='Farmacia'));
-    return `<tr data-art="${_sapuEsc(normArt(a.art))}">
+    return `<tr data-art="${_sapuEsc(normArt(a.art))}" data-f="${[a.env>0?'rep':'',_tieneO(a,'Bodega central')?'bod':'',_tieneO(a,'Farmacia')?'farm':'',a.falt>0?'falt':'',_venceS(a)?'venc':''].filter(Boolean).join(' ')}">
     <td class="l" style="font-weight:600;min-width:220px">${_sapuEsc(a.art)}<div class="sp-note" style="font-weight:400">Consumo: ${_sapuEsc(a.P.cons.f)} · Mín/Máx: ${_sapuEsc(a.P.fmm)}</div></td>
     <td class="c"><button class="repo-excl ${a.P.excl?'on':''}" title="${_sapuAttr(a.P.fEx)}" onclick="repoToggleExclIdx(${i})">${a.P.excl?'Sí':'No'}</button></td>
     <td class="n">${a.abierto?_repoN(a.sIni):'—'}${a.P.fStock.startsWith('Supuesto')&&a.abierto?'<span class="sp-note" title="Sin stock SAPU (ni AVIS ni Excel): se supone lleno (en el máximo) al iniciar"> *</span>':''}<div class="sp-note" style="font-family:'DM Sans',sans-serif">${_sapuEsc(a.P.fStock)}</div>${a.vencSapu.length?`<div class="sp-note" style="color:#B4530A;font-family:'DM Sans',sans-serif;white-space:normal" title="Unidades que vencen dentro del SAPU antes de usarse">⚠ Vencen en el SAPU: ${a.vencSapu.map(v=>_repoN(v.q)+' u. lote '+_sapuEsc(v.lote)+' ('+v.venc+')').join('; ')}</div>`:''}${(()=>{const pr=(a.P.sapuLotes||[]).filter(l=>{const v=_repoFinVenc(l.venc);const d=(v-per.fin)/86400000;return v.getFullYear()<9999&&d>=0&&d<60;});return pr.length?`<div class="sp-note" style="color:#B4530A;font-family:'DM Sans',sans-serif;white-space:normal">⚠ Por vencer en el SAPU: ${pr.map(l=>_repoN(l.stock)+' u. lote '+_sapuEsc(l.lote)+' ('+l.venc+')').join('; ')}</div>`:''})()}</td>
@@ -20319,7 +20344,7 @@ function repoRender(){
   </tr>`;}).join(''):`<tr><td colspan="12" style="text-align:center;padding:1.2rem;color:var(--ink3)">Sin artículos con reposición en este período. Carga los mínimos y máximos o el stock de bodega central, o desmarca «Solo artículos con movimiento».</td></tr>`}
   </tbody></table></div>
   <p class="sp-note" style="margin-top:.6rem">Regla: en cada revisión (${R.frec==='semanal'?'cada lunes':'la primera semana de cada mes'}), si el stock del SAPU quedaría bajo el mínimo antes de la próxima reposición, se repone hasta el máximo. Se despacha primero de bodega central y luego de farmacia, siempre el lote que vence antes; farmacia conserva ${_sapuEsc(String(R.reserva))} mes(es) de consumo CESFAM como reserva (si el CESFAM no consume el artículo, no hay reserva). El stock del SAPU se toma de AVIS por lote si lo cargaste (un artículo que no aparece en AVIS tiene 0); el SAPU consume primero el lote que vence antes y lo que vence dentro del SAPU se descuenta y se avisa. El cálculo avanza semana a semana desde hoy, descontando el consumo del CESFAM y del SAPU y sumando lo programado en la semana en que llega. * Sin stock SAPU informado: se supone lleno al iniciar.</p>`;
-  if(_repoQ)repoBuscar(_repoQ);
+  if(_repoQ||_repoFiltro)repoBuscar(_repoQ);
 }
 
 /* ── Exportar ── */

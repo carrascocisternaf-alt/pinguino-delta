@@ -82,6 +82,12 @@ async def main():
           repoParam('vista','semana');const sigue=[...document.querySelectorAll('#repo-tabla tbody tr[data-art]')].filter(t=>t.style.display!=='none').length;repoBuscar('');
           return{tot,vis,sigue,q:document.getElementById('repo-buscar').value}})()""")
         ok(r['tot']>1 and r['vis'] and all('PARACETAMOL' in v for v in r['vis']) and r['sigue']==len(r['vis']),f'Reposición SAPU: buscador filtra y se mantiene al recalcular ({r})')
+        r=await pg.evaluate("""(()=>{sapuSwitch('repo');repoParam('vista','semana');const vis=()=>[...document.querySelectorAll('#repo-tabla tbody tr[data-art]')].filter(t=>t.style.display!=='none');
+          const F=_repoUltimo.filas;repoFiltrar('falt');const nf=vis().length;const okf=vis().every(t=>F.find(a=>normArt(a.art)===t.dataset.art).falt>0);
+          repoFiltrar('rep');const nr=vis().length;repoParam('vista','semana');const sigue=vis().length;repoFiltrar('rep');const todos=vis().length;
+          const th=[...document.querySelectorAll('#repo-tabla th')].map(t=>t.textContent).find(t=>t.startsWith('Stock SAPU'));
+          return{nf,okf,kf:F.filter(a=>a.falt>0).length,nr,kr:F.filter(a=>a.env>0).length,sigue,todos,n:F.length,th}})()""")
+        ok(r['nf']==r['kf'] and r['okf'] and r['nr']==r['kr'] and r['sigue']==r['nr'] and r['todos']==r['n'] and r['th']=='Stock SAPUactual',f'Reposición SAPU: clic en tarjetas filtra (faltante / a reponer), se mantiene al recalcular y «Stock SAPU actual» ({r})')
         # ── Escenario G: consumo real del SAPU (mensual en archivo único y diario) ──
         r=await pg.evaluate("""(()=>{const c=_sapuCfg();return{dias:c.diarioDias.length,real:_sapuConsReal('PARACETAMOL 500 MG COMPRIMIDO'),fuente:(sapuSwitch('repo'),_repoUltimo.filas.find(a=>a.art==='PARACETAMOL 500 MG COMPRIMIDO').P.cons.f)}})()""")
         ok(r['dias']==15 and r['real']['tipo']=='diario' and r['fuente'].startswith('Real diario'),f"Consumo real SAPU: 15 días informados y Reposición usa el real diario ({r['fuente']})")
