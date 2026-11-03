@@ -232,3 +232,34 @@ for d in range(1,16):
         if q>0: dia.append([f,a,q])
 guardar("12_Consumo_diario_SAPU_DEMO.xlsx",["Fecha","Artículo","Cantidad"],dia,widths=[12,62,10],datecols=(0,),titulo="Consumo diario")
 print('05 con Consumo SAPU y 12 diario generados')
+
+# ── 13: stock actual del SAPU, formato «Toma de inventario» de AVIS ──
+SAPU_AVIS=[ # artículo, lote, meses hasta vencer, stock
+("PARACETAMOL 500 MG COMPRIMIDO","SP-PA1",4,180),("PARACETAMOL 500 MG COMPRIMIDO","SP-PA2",9,60),
+("IBUPROFENO 400 MG COMPRIMIDO","SP-IB1",6,350),
+("SALBUTAMOL AEROSOL 100 MCG/DOSIS INHALADOR","SP-SA1",8,5),
+("PREDNISONA 20 MG COMPRIMIDO","SP-PR1",10,95),
+("AMOXICILINA 500 MG COMPRIMIDO","SP-AM1",7,80),
+("AMOXICILINA + ACIDO CLAVULANICO 875 MG/125 MG COMPRIMIDO","SP-AC1",5,65),
+("AZITROMICINA 500 MG COMPRIMIDO RECUBIERTO","SP-AZ1",12,18),
+("SALES DE REHIDRATACION ORAL 60 MEQ DE SODIO/LITRO","SP-SR1",14,10),
+("ACIDO ACETILSALICILICO 100 MG COMPRIMIDO","SP-AS1",9,45),
+("ATROPINA 1 MG/ML SOLUCIÓN INYECTABLE AMPOLLA","SP-AT1",2,4),("ATROPINA 1 MG/ML SOLUCIÓN INYECTABLE AMPOLLA","SP-AT2",11,5),
+("METOCLOPRAMIDA 10 MG/2 ML SOLUCIÓN INYECTABLE AMPOLLA","SP-MC1",6,9),
+("MORFINA 10 MG/ML SOLUCIÓN INYECTABLE AMPOLLA","SP-MO1",9,3),
+("LIDOCAINA 2 % SOLUCIÓN INYECTABLE AMPOLLA","SP-LI1",1,8),("LIDOCAINA 2 % SOLUCIÓN INYECTABLE AMPOLLA","SP-LI2",7,6),
+("METAMIZOL (SODICO) 1 GR/2 ML SOLUCIÓN INYECTABLE AMPOLLA","SP-MT1",5,18),
+("KETOPROFENO 100 MG SOLUCIÓN INYECTABLE AMPOLLA","SP-KE1",8,22),
+]
+from collections import defaultdict
+tot=defaultdict(int)
+for a,l,m,q in SAPU_AVIS: tot[a]+=q
+wb=Workbook(); ws=wb.active; ws.title='Toma de inventario'
+ws.append(['Toma de inventario — Bodega SAPU (DEMO, datos ficticios)']); ws.append(['Fecha: 16/10/2026']); ws.append([])
+ws.append(["Nombre Artículo","Vencimiento","Lote","Stock Sist.","Último Precio","Stock Total"])
+for c in ws[4]: c.font=hdrF; c.fill=hdrP
+for a,l,m,q in SAPU_AVIS:
+    ws.append([a,venc(m),l,q,None,tot[a]]); ws.cell(ws.max_row,2).number_format="DD/MM/YYYY"
+for col,w in zip('ABCDEF',[62,14,10,11,13,12]): ws.column_dimensions[col].width=w
+wb.save(os.path.join(BASE,'..','demo','13_Stock_SAPU_AVIS_DEMO.xlsx'))
+print('13 AVIS SAPU generado')

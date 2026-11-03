@@ -27,6 +27,11 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 | 9 | `10_Bodega_central_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 🔁 Reposición SAPU → Stock bodega central |
 | 10 | `11_Minimos_maximos_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 🔁 Reposición SAPU → Mínimos y máximos SAPU |
 | 11 | `12_Consumo_diario_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 📈 Consumo real SAPU |
+| 12 | `13_Stock_SAPU_AVIS_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 🔁 Reposición SAPU → Stock actual del SAPU (AVIS) |
+
+**Excel tal como sale de AVIS:** Delta busca la fila de títulos en las primeras 30 filas, así que acepta los reportes con título, fecha y funcionario arriba (por ejemplo *Toma de inventario*), números como texto («3.00», «1.234,00») y fechas dd/mm/aaaa. En el stock del SAPU usa la fecha del reporte («Fecha : dd/mm/aaaa»).
+
+**Consumo diario sin fechas:** también acepta columnas «Consumo Día 1 (Sábado)», «Día 2 (Domingo)»… Delta deduce la fecha del Día 1 con los días de la semana (el más reciente que calce, sin pasar de hoy) y se puede corregir en pantalla; las columnas de días aún vacías no cuentan como informadas.
 
 `00_Guion_escenarios_DEMO.xlsx` indica qué debe mostrar Delta para cada artículo.
 

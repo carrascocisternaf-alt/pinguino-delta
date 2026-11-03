@@ -52,7 +52,7 @@ async def main():
         # ── Escenario C: botón "Cargar datos de prueba" (datos embebidos) ──
         pg,errs=await nueva(b)
         await pg.click('#demo-bar button'); await pg.wait_for_timeout(5500)
-        ok('11 archivos de prueba cargados' in await st(pg,'demo-st'),'Botón → '+(await st(pg,'demo-st'))[:60])
+        ok('12 archivos de prueba cargados' in await st(pg,'demo-st'),'Botón → '+(await st(pg,'demo-st'))[:60])
         for sid,txt in [('st-inv','✓ 40 artículos'),('st-prog','doble programación'),('st-disp','años: 2024, 2025, 2026'),('cal-st','✓ 223 despachos'),('difinv-st','✓ 14 artículo(s)'),('gasto-st','✓ 840 registros')]:
             ok(txt in await st(pg,sid),f'Botón → {sid}')
         await pg.evaluate("calcularRotacion('arsenal')")
@@ -74,6 +74,9 @@ async def main():
         r=await pg.evaluate("""(()=>{repoParam('mes','2026-11');const a='ATROPINA 1 MG/ML SOLUCIÓN INYECTABLE AMPOLLA';prog[a]={origen:'CENABAST',años:{2026:{diciembre:50}},origenPorAño:{2026:'CENABAST'},desglose:{}};repoParam('mes','2026-12');
           return _repoUltimo.filas.find(x=>x.art===a).lleg.map(l=>l.q+'|'+l.destino)})()""")
         ok(r==['50|Bodega central'],f'Reposición SAPU: lo programado de un exclusivo llega a bodega central ({r})')
+        r=await pg.evaluate("""(()=>{sapuSwitch('repo');repoParam('vista','semana');repoParam('frec','semanal');const F=_repoUltimo.filas;const by=n=>F.find(a=>a.art.startsWith(n));
+          return{fuente:by('PARACETAMOL 500').P.fStock,stock:by('PARACETAMOL 500').P.stockSapu,col:_repoCfg().sapuStockArchivo.includes('Stock Sist.')}})()""")
+        ok(r['fuente'].startswith('AVIS') and r['stock']==240 and r['col'],f'Stock SAPU (AVIS): usa «Stock Sist.» por lote, no «Stock Total» ({r})')
         # ── Escenario G: consumo real del SAPU (mensual en archivo único y diario) ──
         r=await pg.evaluate("""(()=>{const c=_sapuCfg();return{dias:c.diarioDias.length,real:_sapuConsReal('PARACETAMOL 500 MG COMPRIMIDO'),fuente:(sapuSwitch('repo'),_repoUltimo.filas.find(a=>a.art==='PARACETAMOL 500 MG COMPRIMIDO').P.cons.f)}})()""")
         ok(r['dias']==15 and r['real']['tipo']=='diario' and r['fuente'].startswith('Real diario'),f"Consumo real SAPU: 15 días informados y Reposición usa el real diario ({r['fuente']})")
@@ -88,7 +91,7 @@ async def main():
         pg,errs=await nueva(b)
         await pg.evaluate("switchMode('ayuda')")
         r=await pg.evaluate("({fuera:document.querySelectorAll('.arch-card:not(#view-ayuda .arch-card)').length,dentro:document.querySelectorAll('#view-ayuda .arch-grid > .arch-card').length,ids:[...document.querySelectorAll('[id]')].map(e=>e.id).filter((x,i,a)=>a.indexOf(x)!==i)})")
-        ok(r['fuera']==0 and r['dentro']==12 and not r['ids'],f'Ayuda: las 12 fichas de archivos están solo en la Ayuda y no hay ids duplicados ({r})')
+        ok(r['fuera']==0 and r['dentro']==13 and not r['ids'],f'Ayuda: las 13 fichas de archivos están solo en la Ayuda y no hay ids duplicados ({r})')
         r=await pg.evaluate("(ayudaBuscar('respaldo'),document.querySelector('#ay-res .ay-t')?.textContent)")
         ok(r=='Exportar e importar respaldo',f'Buscador → «respaldo»: {r}')
         r=await pg.evaluate("(ayudaBuscar('monte carlo'),[...document.querySelectorAll('#ay-res .ay-t')].map(e=>e.textContent))")
@@ -122,6 +125,31 @@ async def main():
         ok(3<=r['k']<=6 and r['n']==40 and r['unicos'],f'Grupos: {r}')
         errs=[e for e in errs if not e.startswith('DIALOGO: Se cargarán los datos FICTICIOS')]
         ok(not errs,f'IA local sin errores JS ({errs})')
+        # ── Escenario I: Excel tal como los entrega AVIS (filas extra arriba) y consumo diario «Día N (día semana)» ──
+        pg,errs=await nueva(b)
+        SUBIR="""(id,aoa,nombre)=>{const ws=XLSX.utils.aoa_to_sheet(aoa),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Export');
+          const buf=XLSX.write(wb,{type:'array',bookType:'xlsx'});const dt=new DataTransfer();dt.items.add(new File([buf],nombre));
+          const el=document.getElementById(id);el.files=dt.files;el.dispatchEvent(new Event('change',{bubbles:true}));}"""
+        toma=[[],['TOMA DE INVENTARIO'],[],['Fecha',':','10/10/2026'],['Funcionario',':','(1-9) PERSONA DE PRUEBA'],[' '],[],[],
+              ['Grupo','Familia','Código','Nombre Artículo','Ubicación','Vencimiento','Lote','Stock Sist.','Último Precio\nIngresado','Stock Valorizado'],
+              ['MED','MED','1','PARACETAMOL 500 MG COMPRIMIDO','UNICO','13/02/2028','L1','1.234,00','0.00','0.00'],
+              ['MED','MED','1','PARACETAMOL 500 MG COMPRIMIDO','UNICO','01/11/2027','L2','3.00','0.00','0.00']]
+        await pg.evaluate(f"({SUBIR})('fi-inv',{toma!r},'toma.xlsx')".replace('None','null')); await pg.wait_for_timeout(700)
+        r=await pg.evaluate("JSON.stringify(inv['PARACETAMOL 500 MG COMPRIMIDO'])")
+        ok(r=='[{"lote":"L1","venc":"02/2028","stock":1234},{"lote":"L2","venc":"11/2027","stock":3}]',f'AVIS con 8 filas de título: Mi arsenal lee el inventario y los números en texto ({r})')
+        await pg.evaluate("switchMode('sapu')"); await pg.wait_for_timeout(400)
+        await pg.evaluate(f"({SUBIR})('sp-sst-fi',{toma!r},'toma.xlsx')".replace('None','null')); await pg.wait_for_timeout(700)
+        r=await pg.evaluate("_repoCfg().sapuStockFecha")
+        ok(r=='2026-10-10',f'Stock SAPU: toma la fecha del reporte AVIS ({r})')
+        dia=[['ARTICULO','CONSUMO DIA 1 (LUNES) ','CONSUMO DIA 2 (MARTES)','CONSUMO DIA 3 (MIERCOLES)','CONSUMO DIA 4 (JUEVES)','CONSUMO DIA 5 (VIERNES)'],
+             ['PARACETAMOL 500 MG COMPRIMIDO',4,0,2,6,None],['IBUPROFENO 400 MG COMPRIMIDO',1,1,0,0,None]]
+        await pg.evaluate(f"({SUBIR})('sp-dia-fi',{dia!r},'consumo.xlsx')".replace('None','null')); await pg.wait_for_timeout(700)
+        r=await pg.evaluate("(()=>{const c=_sdCfg();return{ini:c.diarioRel&&c.diarioRel.inicio,dias:c.diarioDias,p:c.diario['PARACETAMOL 500 MG COMPRIMIDO']}})()")
+        ok(r['ini']=='2026-10-12' and r['dias']==['2026-10-12','2026-10-13','2026-10-14','2026-10-15'] and r['p']['2026-10-15']==6,
+           f'Consumo diario «Día N (día)»: Día 1 = lunes 12/10, columna vacía no cuenta ({r})')
+        r=await pg.evaluate("(()=>{sapuCambiarInicioRel('2026-10-05');const c=_sdCfg();return{dias:c.diarioDias,p:c.diario['PARACETAMOL 500 MG COMPRIMIDO']}})()")
+        ok(r['dias']==['2026-10-05','2026-10-06','2026-10-07','2026-10-08'] and r['p']=={'2026-10-05':4,'2026-10-06':0,'2026-10-07':2,'2026-10-08':6},f'Consumo diario: cambiar «Día 1» re-fecha sin duplicar ({r})')
+        ok(not errs,f'Escenario AVIS / diario relativo sin errores ({errs})')
         await b.close()
     print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')
     sys.exit(1 if fallas else 0)
