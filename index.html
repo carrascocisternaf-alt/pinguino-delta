@@ -3676,7 +3676,7 @@ function renderEquivPendientes(){
   cnt.textContent=_equivPendientes.length;
   card.style.display=_equivPendientes.length?'block':'none';
   tbody.innerHTML=_equivPendientes.map((f,i)=>`<tr style="border-bottom:1px solid var(--bdr2)">
-    <td style="padding:.4rem .8rem">${f.articuloDelta}</td>
+    <td style="padding:.4rem .8rem">${_eqEsc(f.articuloDelta)}</td>
     <td style="padding:.4rem .8rem">${equivBadgeFuente(f.fuente)}</td>
     <td style="padding:.4rem .8rem">${_eqEsc(f.nombreExterno)}</td>
     <td style="padding:.4rem .8rem"><span style="font-size:10.5px;color:var(--ink3)">${f.origen}</span></td>
@@ -3716,9 +3716,9 @@ function renderEquivSugerencias(){
   if(st)st.textContent=`${_equivSugerencias.length} sugerencia(s) — revisa antes de confirmar.`;
   wrap.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="background:var(--navy)"><th style="text-align:left;padding:.5rem .8rem;color:#fff;font-size:10.5px">Nombre no reconocido</th><th style="text-align:left;padding:.5rem .8rem;color:rgba(255,255,255,.85);font-size:10.5px">Archivo</th><th style="text-align:left;padding:.5rem .8rem;color:rgba(255,255,255,.85);font-size:10.5px">Artículo Delta sugerido</th><th style="text-align:center;padding:.5rem .8rem;color:rgba(255,255,255,.85);font-size:10.5px">Similitud</th><th></th></tr></thead>
     <tbody>${_equivSugerencias.map((s,i)=>`<tr style="border-bottom:1px solid var(--bdr2)">
-      <td style="padding:.4rem .8rem">${s.nombreExterno}</td>
-      <td style="padding:.4rem .8rem;font-size:11px;color:var(--ink3)">${s.fuenteArchivo}</td>
-      <td style="padding:.4rem .8rem">${s.articuloDelta}</td>
+      <td style="padding:.4rem .8rem">${_eqEsc(s.nombreExterno)}</td>
+      <td style="padding:.4rem .8rem;font-size:11px;color:var(--ink3)">${_eqEsc(s.fuenteArchivo)}</td>
+      <td style="padding:.4rem .8rem">${_eqEsc(s.articuloDelta)}</td>
       <td style="text-align:center;padding:.4rem .8rem"><span style="font-weight:700;color:${s.score>=0.75?'var(--teal)':s.score>=0.6?'#EE881C':'var(--ink3)'}">${Math.round(s.score*100)}%</span></td>
       <td style="white-space:nowrap;padding:.4rem .8rem">
         <select id="equiv-sug-fuente-${i}" style="font-size:11px;padding:2px 4px;margin-right:4px">${equivOpcionesFuente('cenabast')}</select>
@@ -20060,7 +20060,9 @@ function _repoFechaDespacho(art,y,mi){
 function _repoTomarFEFO(lotes,cant,desde,origen,limite){
   const picks=[];let rest=Math.min(cant,limite==null?Infinity:Math.max(0,limite));
   lotes.sort((a,b)=>a.v-b.v);
-  for(const l of lotes){if(rest<=1e-9)break;if(l.v<desde||l.q<=1e-9)continue;const u=Math.min(l.q,rest);l.q-=u;rest-=u;picks.push({origen,lote:l.lote,venc:l.venc,cant:u});}
+  rest=Math.floor(rest+1e-9);
+  // Solo unidades enteras de cada lote (el consumo semanal del CESFAM deja fracciones en los lotes)
+  for(const l of lotes){if(rest<=0)break;if(l.v<desde)continue;const disp=Math.floor(l.q+1e-9);if(disp<=0)continue;const u=Math.min(disp,rest);l.q-=u;rest-=u;picks.push({origen,lote:l.lote,venc:l.venc,cant:u});}
   return picks;
 }
 function _repoVencer(lotes,fecha){let m=0;for(let i=lotes.length-1;i>=0;i--){if(lotes[i].v<fecha){m+=lotes[i].q;lotes.splice(i,1);}else if(lotes[i].q<=1e-9)lotes.splice(i,1);}return m;}
@@ -20103,17 +20105,18 @@ function repoSimular(hasta){
       const mesW=ws.getMonth();
       const tocaRevision=abierto&&(R.frec==='semanal'||mesW!==mesPrev||wi===0);
       if(abierto&&R.frec==='mensual'&&mesW!==mesPrev)mesPrev=mesW;
-      const sIni=s;let need=0,picks=[],falt=0;
+      const sIni=s;let need=0,picks=[],falt=0,farmPostPick;
       if(tocaRevision&&P.max>0){
         const cPer=R.frec==='mensual'?P.cons.v:cSw;
         if(s-cPer<P.min||s<P.min)need=Math.max(0,Math.ceil(P.max-s));
         if(need>0){
           picks=_repoTomarFEFO(bod,need,ws,'Bodega central');
           const yaB=picks.reduce((a,p)=>a+p.cant,0);
-          const reserva=P.excl?0:(+R.reserva||0)*(c.usarCesfam?P.cC:0);
+          // La reserva protege el consumo del CESFAM: depende de si el CESFAM lo consume, no de la etiqueta «exclusivo»
+          const reserva=(+R.reserva||0)*(c.usarCesfam?P.cC:0);
           const dispF=_repoSum(farm.filter(l=>l.v>=ws))-reserva;
           picks=picks.concat(_repoTomarFEFO(farm,need-yaB,ws,'Farmacia',dispF));
-          const env=picks.reduce((a,p)=>a+p.cant,0);falt=Math.max(0,need-env);s+=env;
+          const env=picks.reduce((a,p)=>a+p.cant,0);falt=Math.max(0,need-env);s+=env;farmPostPick=_repoSum(farm.filter(l=>l.v>=ws));
         }
       }
       // 4) consumo CESFAM desde farmacia
@@ -20122,7 +20125,7 @@ function repoSimular(hasta){
       // 5) consumo SAPU
       let quiebreSapu=0;if(abierto){s-=cSw;if(s<0){quiebreSapu=-s;s=0;}}
       const env=picks.reduce((a,p)=>a+p.cant,0);
-      filas.push({ws,we,abierto,revision:tocaRevision,sIni,need,env,picks,falt,lleg,mermaB,mermaF,cons:abierto?cSw:0,sFin:s,bodFin:_repoSum(bod),farmFin:_repoSum(farm),quiebreSapu,quiebreFarm});
+      filas.push({ws,we,abierto,revision:tocaRevision,sIni,need,env,picks,falt,farmPostPick,lleg,mermaB,mermaF,cons:abierto?cSw:0,sFin:s,bodFin:_repoSum(bod),farmFin:_repoSum(farm),quiebreSapu,quiebreFarm});
     });
     res[art]={art,o,P,filas};
   });
@@ -20179,12 +20182,13 @@ function repoRender(){
   const totF=filas.reduce((s,a)=>s+a.picks.filter(p=>p.origen==='Farmacia').reduce((t,p)=>t+p.cant,0),0);
   const nRep=filas.filter(a=>a.env>0).length,nFalt=filas.filter(a=>a.falt>0).length;
   const noAbre=!sim.semanas.filter(per.incluye).some(ws=>{const we=new Date(ws);we.setDate(we.getDate()+7);return we>sim.apertura;});
-  const lotesTxt=ps=>ps.map(p=>`${_sapuEsc(p.lote)}${p.venc&&p.venc!=='—'?' · '+p.venc:''}: <b>${_repoN(p.cant)}</b>`).join('<br>');
+  const vencePronto=p=>{const v=_repoFinVenc(p.venc);return p.sem&&v.getFullYear()<9999&&(v-p.sem)/86400000<45;};
+  const lotesTxt=ps=>ps.map(p=>`${_sapuEsc(p.lote)}${p.venc&&p.venc!=='—'?' · '+p.venc:''}: <b>${_repoN(p.cant)}</b>${vencePronto(p)?' <span title="Este lote vence en menos de 45 días desde el despacho: priorizar su uso en el SAPU" style="color:#B4530A;font-weight:700">⚠ vence pronto</span>':''}`).join('<br>');
   const multi=per.tipo==='mes'&&R.frec==='semanal'&&semP.length>1;
   el.innerHTML=`
   ${noAbre?`<div class="sp-info">El SAPU abre en ${_sapuEsc(_sapuCfg().apertura)}: en este período todavía no hay consumo ni reposición. La primera reposición llenará el SAPU hasta su máximo (ver también 🧰 Dotación inicial).</div>`:''}
   <div class="kpis" style="margin-bottom:.8rem">
-    <div class="kpi"><div class="kpi-lbl">Período</div><div class="kpi-val" style="font-size:15px">${_sapuEsc(per.etq)}</div><div class="sp-note" style="margin-top:2px">Reposición ${R.frec==='semanal'?'semanal':'mensual'}${per.tipo==='mes'?` · ${semP.length} semana(s) que comienzan en el mes`:''}</div></div>
+    <div class="kpi"><div class="kpi-lbl">Período</div><div class="kpi-val" style="font-size:15px">${_sapuEsc(per.etq)}</div><div class="sp-note" style="margin-top:2px">Reposición ${R.frec==='semanal'?'semanal':'mensual'}${per.tipo==='mes'?` · ${semP.length} semana(s) que comienzan en el mes`:''}${R.frec==='mensual'&&per.tipo==='semana'?' · con reposición mensual solo la primera semana de cada mes tiene despacho':''}</div></div>
     <div class="kpi"><div class="kpi-lbl">Artículos a reponer</div><div class="kpi-val">${nRep}</div><div class="sp-note" style="margin-top:2px">${_repoN(totB+totF)} unidades en total</div></div>
     <div class="kpi"><div class="kpi-lbl">Desde bodega central</div><div class="kpi-val">${_repoN(totB)}</div><div class="sp-note" style="margin-top:2px">unidades</div></div>
     <div class="kpi"><div class="kpi-lbl">Desde farmacia</div><div class="kpi-val">${_repoN(totF)}</div><div class="sp-note" style="margin-top:2px">unidades</div></div>
@@ -20212,7 +20216,7 @@ function repoRender(){
     <td class="n" style="font-size:11.5px">${_repoN(a.bodFin)} / ${_repoN(a.farmFin)}</td>
   </tr>`;}).join(''):`<tr><td colspan="12" style="text-align:center;padding:1.2rem;color:var(--ink3)">Sin artículos con reposición en este período. Carga los mínimos y máximos o el stock de bodega central, o desmarca «Solo artículos con movimiento».</td></tr>`}
   </tbody></table></div>
-  <p class="sp-note" style="margin-top:.6rem">Regla: en cada revisión (${R.frec==='semanal'?'cada lunes':'la primera semana de cada mes'}), si el stock del SAPU quedaría bajo el mínimo antes de la próxima reposición, se repone hasta el máximo. Se despacha primero de bodega central y luego de farmacia, siempre el lote que vence antes; farmacia conserva ${_sapuEsc(String(R.reserva))} mes(es) de consumo CESFAM como reserva (no aplica a exclusivos SAPU). El cálculo avanza semana a semana desde hoy, descontando el consumo del CESFAM y del SAPU y sumando lo programado en la semana en que llega. * Sin stock SAPU informado: se supone lleno al iniciar.</p>`;
+  <p class="sp-note" style="margin-top:.6rem">Regla: en cada revisión (${R.frec==='semanal'?'cada lunes':'la primera semana de cada mes'}), si el stock del SAPU quedaría bajo el mínimo antes de la próxima reposición, se repone hasta el máximo. Se despacha primero de bodega central y luego de farmacia, siempre el lote que vence antes; farmacia conserva ${_sapuEsc(String(R.reserva))} mes(es) de consumo CESFAM como reserva (si el CESFAM no consume el artículo, no hay reserva). El cálculo avanza semana a semana desde hoy, descontando el consumo del CESFAM y del SAPU y sumando lo programado en la semana en que llega. * Sin stock SAPU informado: se supone lleno al iniciar.</p>`;
 }
 
 /* ── Exportar ── */
@@ -20262,7 +20266,9 @@ function sapuCargarDiario(evt){
     const hdrRaw=rows[hi]||[],hdr=hdrRaw.map(x=>normArt(x).toLowerCase());
     const cA=hdr.findIndex(h=>h.includes('articulo')||h.includes('nombre')||h.includes('producto')||h.includes('medicamento'));
     const cF=hdr.findIndex(h=>h.includes('fecha')||h==='dia'||h.includes('día'));
-    const cQ=hdr.findIndex(h=>h.includes('cantidad')||h.includes('consumo')||h.includes('unidades')||h.includes('total'));
+    // Cantidad: nunca la columna de fecha; prioridad cantidad > unidades > consumo > total
+    const _bq=t=>hdr.findIndex((h,i)=>i!==cF&&i!==cA&&h.includes(t));
+    let cQ=-1;for(const t of ['cantidad','unidades','consumo','total','dispensad']){cQ=_bq(t);if(cQ>=0)break;}
     const colsFecha=hdrRaw.map((h,i)=>({i,d:_sdFecha(h)})).filter(x=>x.d&&x.i!==cA);
     if(cA<0||((cF<0||cQ<0)&&colsFecha.length<1)){alert('Formato no reconocido. Usa columnas Fecha · Artículo · Cantidad, o Artículo + una columna por fecha.\nCabeceras detectadas: '+hdrRaw.filter(Boolean).join(', '));return;}
     const nuevo={},dias=new Set(),hom={};let n=0;

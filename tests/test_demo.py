@@ -93,6 +93,11 @@ async def main():
         ok(r==['Probabilidad de quiebre'],f'Buscador → «monte carlo»: {r}')
         n=await pg.evaluate("(()=>{let f=0;AYUDA_CATALOGO.filter(e=>e.go).forEach(e=>{try{ayudaIr(e.go)}catch(x){f++}});return f})()")
         ok(n==0 and not errs,f'Buscador → todos los «Ir →» sin errores ({errs})')
+        # ── Escenario H: invariantes de Reposición SAPU con datos aleatorios ──
+        pg3,errs3=await nueva(b)
+        r=await pg3.evaluate("window.__FUZZ_N=120;"+open(os.path.join(BASE,'fuzz_reposicion.js'),encoding='utf-8').read())
+        ok(r['casos']==120 and not r['fallas'],f"Reposición SAPU: 120 escenarios aleatorios sin violar invariantes (despacho = picking, unidades enteras, sin stocks negativos, reserva de farmacia, destino de lo programado) {r['fallas'][:3]}")
+        ok(not errs3,f'Invariantes sin errores JS ({errs3})')
         # ── Escenario E: IA local (homologación, calidad, política, grupos) ──
         pg,errs=await nueva(b)
         h=await pg.evaluate("homEvaluar()")
