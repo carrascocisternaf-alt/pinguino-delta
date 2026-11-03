@@ -164,6 +164,18 @@ async def main():
            f'Consumo diario «Día N (día)»: Día 1 = lunes 12/10, columna vacía no cuenta ({r})')
         r=await pg.evaluate("(()=>{sapuCambiarInicioRel('2026-10-05');const c=_sdCfg();return{dias:c.diarioDias,p:c.diario['PARACETAMOL 500 MG COMPRIMIDO']}})()")
         ok(r['dias']==['2026-10-05','2026-10-06','2026-10-07','2026-10-08'] and r['p']=={'2026-10-05':4,'2026-10-06':0,'2026-10-07':2,'2026-10-08':6},f'Consumo diario: cambiar «Día 1» re-fecha sin duplicar ({r})')
+        r=await pg.evaluate("""JSON.stringify(['INSULINA CRISTALINA 100 UI/ML SOLUCIÓN INYECTABLEF','INSULINA CRISTALINA 200 UI/ML SOLUCIÓN INYECTABLEF','PARACETAMOL 500 MG COMPRIMIDOX'].map(n=>{const h=resolverNombreArticulo(n);return h.origen+'|'+h.avis}))""")
+        ok(r=='["aprox|INSULINA CRISTALINA 100 UI/ML SOLUCIÓN INYECTABLE","nuevo|INSULINA CRISTALINA 200 UI/ML SOLUCIÓN INYECTABLEF","aprox|PARACETAMOL 500 MG COMPRIMIDO"]',f'Homologación: corrige 1 letra de más de AVIS («…INYECTABLEF») sin cambiar dosis ({r})')
+        paq=f"""(()=>{{const wb=XLSX.utils.book_new();const add=(n,aoa)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),n);
+          add('Paquete',[['Pingüino Lotes — paquete de bodegas'],['Bodega','Fecha toma AVIS'],['Botiquín','02/11/2026'],['Bodega central','02/11/2026'],['SAPU','01/11/2026']]);
+          add('Botiquín',{toma!r});add('Bodega central',[['Nombre Artículo','Vencimiento','Lote','Stock Sist.'],['IBUPROFENO 400 MG COMPRIMIDO','01/05/2028','BC1','300.00']]);
+          add('SAPU',[['Nombre Artículo','Vencimiento','Lote','Stock Sist.'],['INSULINA CRISTALINA 100 UI/ML SOLUCIÓN INYECTABLEF','30/06/2028','BF1','1.00']]);
+          const buf=XLSX.write(wb,{{type:'array',bookType:'xlsx'}});const dt=new DataTransfer();dt.items.add(new File([buf],'Paquete_bodegas.xlsx'));
+          const el=document.getElementById('pkb-fi-s');el.files=dt.files;el.dispatchEvent(new Event('change',{{bubbles:true}}));}})()""".replace('None','null')
+        await pg.evaluate(paq); await pg.wait_for_timeout(900)
+        r=await pg.evaluate("""(()=>{const R=_repoCfg();return{inv:(inv['PARACETAMOL 500 MG COMPRIMIDO']||[]).length,bod:R.bodega['IBUPROFENO 400 MG COMPRIMIDO'][0].stock,
+          sapu:R.sapuStock['INSULINA CRISTALINA 100 UI/ML SOLUCIÓN INYECTABLE'][0].stock,fecha:R.sapuStockFecha,st:[...document.querySelectorAll('.pkb-st')].map(e=>e.textContent.slice(0,2))}})()""")
+        ok(r['inv']==2 and r['bod']==300 and r['sapu']==1 and r['fecha']=='2026-11-01' and r['st']==['✓ ','✓ '],f'Paquete de bodegas: carga Botiquín, Bodega central y SAPU de una vez ({r})')
         ok(not errs,f'Escenario AVIS / diario relativo sin errores ({errs})')
         await b.close()
     print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')

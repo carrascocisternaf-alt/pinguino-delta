@@ -31,6 +31,8 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 
 **Excel tal como sale de AVIS:** Delta busca la fila de títulos en las primeras 30 filas, así que acepta los reportes con título, fecha y funcionario arriba (por ejemplo *Toma de inventario*), números como texto («3.00», «1.234,00») y fechas dd/mm/aaaa. En el stock del SAPU usa la fecha del reporte («Fecha : dd/mm/aaaa»).
 
+**Paquete de bodegas (Pingüino Lotes):** un solo Excel con hojas «Botiquín», «Bodega central» y «SAPU» (columnas de la toma AVIS: Nombre Artículo · Vencimiento · Lote · Stock Sist.) y una hoja opcional «Paquete» con columnas *Bodega* y *Fecha toma AVIS*. El botón «📦 Importar paquete de bodegas» (Mi arsenal y Reposición SAPU) carga las tres a la vez. Todo se procesa en el navegador; nada se sube a internet.
+
 **Consumo diario sin fechas:** también acepta columnas «Consumo Día 1 (Sábado)», «Día 2 (Domingo)»… Delta deduce la fecha del Día 1 con los días de la semana (el más reciente que calce, sin pasar de hoy) y se puede corregir en pantalla; las columnas de días aún vacías no cuentan como informadas.
 
 `00_Guion_escenarios_DEMO.xlsx` indica qué debe mostrar Delta para cada artículo.

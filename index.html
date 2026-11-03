@@ -614,6 +614,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
           <button onclick="cargarDatosPrueba()" class="btn-calc" style="padding:8px 16px;white-space:nowrap;width:auto;min-width:max-content;flex:0 0 auto">🧪 Cargar datos de prueba</button>
           <span id="demo-st" style="font-size:12px;color:var(--ink3)">Carga con un clic los 12 Excels ficticios de demostración (40 artículos): inventario, consumos, programación, despachos CENABAST, costos, diferencias y, para el SAPU, bodega central, stock AVIS, mínimos/máximos y consumo diario.</span>
         </div>
+        <div class="pkb-bar"><label class="pkb-btn" for="pkb-fi-a"><input type="file" id="pkb-fi-a" accept=".xlsx,.xls" onchange="importarPaqueteBodegas(event)" style="display:none">📦 Importar paquete de bodegas</label><span class="pkb-txt"><b>Desde Pingüino Lotes:</b> un solo Excel con Botiquín, Bodega central y SAPU; carga las tres a la vez. <span class="pkb-st"></span></span></div>
         <div class="ubanner">
       <div class="uslot" id="slot-inv">
         <button class="uslot-clear" title="Limpiar" onclick="limpiarInv(event)">×</button>
@@ -2464,6 +2465,7 @@ function visSwitchSubTab(sub){
   <div class="sp-panel" id="sp-repo">
     <div class="sp-pregunta">¿Qué hay que mandar al SAPU esta semana (o este mes), desde qué bodega y de qué lote?</div>
     <div class="sp-info">Calcula cuánto reponer al SAPU por semana o por mes. Primero se despacha desde la <b>bodega central</b> y lo que falte desde <b>farmacia</b> (inventario de Mi arsenal), siempre el lote que vence antes. Lo programado por CENABAST o SSVQP llega a <b>bodega central</b> si el artículo es <b>exclusivo SAPU</b>, y a <b>farmacia</b> si también lo usa el CESFAM (desde ahí pasa a bodega central para el SAPU). Usa la programación vigente, el inventario y el consumo de Mi arsenal, y el mes de apertura de arriba.</div>
+    <div class="pkb-bar"><label class="pkb-btn" for="pkb-fi-s"><input type="file" id="pkb-fi-s" accept=".xlsx,.xls" onchange="importarPaqueteBodegas(event)" style="display:none">📦 Importar paquete de bodegas</label><span class="pkb-txt"><b>Desde Pingüino Lotes:</b> un solo Excel con Botiquín, Bodega central y SAPU; carga las tres a la vez. <span class="pkb-st"></span></span></div>
     <div class="repo-cargas">
       <div class="sp-box">
         <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.5rem">🏬 Stock de bodega central (por lote)</div>
@@ -3864,6 +3866,38 @@ function uiEquivDescartarSugerencia(i){
   _equivSugerencias.splice(i,1);
   renderEquivSugerencias();
 }
+const _artAproxCache=new Map();let _artAproxPool=null,_artAproxSig='';
+// Nombres "conocidos" contra los que se corrige un error de tipeo: arsenal fijo y
+// artículos de diccionarios, destinos de equivalencias, arsenal SAPU. No se usan
+// artículos «nuevos» creados por cargas (podrían ser el mismo error).
+function _artAproxNombres(){
+  let sapu=null;try{sapu=typeof _sapuCfg==='function'?_sapuCfg().arsenal:null;}catch(e){}
+  const sig=(typeof ARTS!=='undefined'?ARTS.length:0)+'|'+(sapu?sapu.length:-1)+'|'+JSON.stringify(Object.keys(typeof equivManual!=='undefined'?equivManual:{})).length;
+  if(_artAproxPool&&sig===_artAproxSig)return _artAproxPool;
+  const set=new Set();const add=x=>{if(x&&typeof x==='string')set.add(x);};
+  (typeof ARTS!=='undefined'?ARTS:[]).forEach(a=>{if(typeof ARTS_DINAMICOS==='undefined'||!(ARTS_DINAMICOS[a]==='nuevo'||ARTS_DINAMICOS[a]==='aprox'))add(a);});
+  [typeof DICC_CENABAST_AVIS!=='undefined'?DICC_CENABAST_AVIS:{},typeof DICC_PM_AVIS!=='undefined'?DICC_PM_AVIS:{}].forEach(D=>Object.values(D).forEach(v=>Array.isArray(v)?v.forEach(add):add(v)));
+  try{Object.entries(equivManual||{}).forEach(([k,m])=>{if(k!=='__fuentes'&&m&&typeof m==='object')Object.values(m).forEach(add);});}catch(e){}
+  try{(sapu||(typeof SAPU_ARSENAL_BASE!=='undefined'?SAPU_ARSENAL_BASE:[])).forEach(r=>add(r[4]));}catch(e){}
+  _artAproxPool=[...set].map(a=>({a,n:normArt(a)}));_artAproxSig=sig;_artAproxCache.clear();
+  return _artAproxPool;
+}
+function _artAprox(n){
+  if(n.length<12)return null;
+  const pool=_artAproxNombres();
+  if(_artAproxCache.has(n))return _artAproxCache.get(n);
+  const dig=x=>(x.match(/\d+(?:[.,]\d+)?/g)||[]).join('|');const dn=dig(n);
+  const d1=(a,b)=>{ // ¿distancia de edición ≤ 1?
+    const la=a.length,lb=b.length;if(Math.abs(la-lb)>1)return false;
+    let i=0;while(i<la&&i<lb&&a[i]===b[i])i++;
+    if(la===lb)return a.slice(i+1)===b.slice(i+1);
+    return la>lb?a.slice(i+1)===b.slice(i):a.slice(i)===b.slice(i+1);
+  };
+  const hits=new Set();
+  for(const {a,n:na} of pool){if(na===n||Math.abs(na.length-n.length)>1)continue;if(d1(n,na)&&dig(na)===dn){hits.add(na);if(hits.size>1)break;}}
+  let r=null;if(hits.size===1){const k=[...hits][0];r=(typeof _ARTS_NORM_MAP!=='undefined'&&_ARTS_NORM_MAP[k])||pool.find(x=>x.n===k).a;}
+  _artAproxCache.set(n,r);return r;
+}
 function resolverNombreArticulo(raw){
   try{
     const original=String(raw||'').trim();
@@ -3883,7 +3917,13 @@ function resolverNombreArticulo(raw){
         if(m&&m[n])return{avis:m[n],origen:'fuente:'+id,reconocido:true,manual:true};
       }
     }
-    if(_ARTS_NORM_MAP[n]) return{avis:_ARTS_NORM_MAP[n],origen:'arsenal',reconocido:true};
+    if(_ARTS_NORM_MAP[n]){
+      const ex=_ARTS_NORM_MAP[n];
+      // Si solo coincide con un artículo «nuevo» creado por una carga anterior
+      // (p. ej. el mismo error de tipeo), se prefiere el artículo real del arsenal.
+      if(typeof ARTS_DINAMICOS!=='undefined'&&ARTS_DINAMICOS[ex]==='nuevo'){const ap=_artAprox(n);if(ap)return{avis:ap,origen:'aprox',reconocido:true,aprox:true};}
+      return{avis:ex,origen:'arsenal',reconocido:true};
+    }
     if(typeof DICC_CENABAST_AVIS!=='undefined'&&DICC_CENABAST_AVIS[n]!==undefined){
       const v=DICC_CENABAST_AVIS[n];
       if(Array.isArray(v))return{avis:original,origen:'ambiguo',reconocido:false,opciones:v,fuente:'CENABAST'};
@@ -3894,6 +3934,11 @@ function resolverNombreArticulo(raw){
       if(Array.isArray(v))return{avis:original,origen:'ambiguo',reconocido:false,opciones:v,fuente:'PM'};
       return{avis:v,origen:'PM',reconocido:true};
     }
+    // Error de tipeo de 1 letra (ej. AVIS «…SOLUCIÓN INYECTABLEF»): se acepta
+    // solo si hay UN artículo del arsenal a 1 edición y con los mismos números
+    // (dosis/concentración idénticas), para no confundir presentaciones.
+    const ap=_artAprox(n);
+    if(ap)return{avis:ap,origen:'aprox',reconocido:true,aprox:true};
     return{avis:original,origen:'nuevo',reconocido:false};
   }catch(e){
     return{avis:String(raw||'').trim(),origen:'nuevo',reconocido:false};
@@ -3906,6 +3951,7 @@ function resumenHomologacion(stats){
   if(stats.CENABAST) partes.push(`${stats.CENABAST} por diccionario CENABAST`);
   if(stats.PM) partes.push(`${stats.PM} por diccionario PM`);
   Object.keys(stats).forEach(k=>{if(k.startsWith('fuente:')&&stats[k])partes.push(`${stats[k]} por diccionario ${equivFuente(k.slice(7)).nombre}`);});
+  if(stats.aprox) partes.push(`${stats.aprox} con error de tipeo corregido (1 letra, misma dosis)`);
   if(stats.ambiguo) partes.push(`${stats.ambiguo} ambiguo(s) — revisar`);
   if(stats.nuevo) partes.push(`${stats.nuevo} nuevo(s) — no en arsenal ni diccionarios`);
   return partes.length?` (homologación: ${partes.join(', ')})`:'';
@@ -4167,15 +4213,16 @@ function _cargaUnica(rows,fn,modo){
   return true;
 }
 
-function cargarInv(evt){
-  leerX(evt,(rows,fn)=>{
+function cargarInv(evt){leerX(evt,(rows,fn)=>procesarInvRows(rows,fn));}
+function procesarInvRows(rows,fn){
+  {
     const hi=detHdr(rows);
     const hdr=rows[hi].map(c=>String(c).toLowerCase().trim());
     const cA=hdr.findIndex(h=>h.includes('artículo')||h.includes('articulo')||h.includes('nombre'));
     const cV=hdr.findIndex(h=>h.includes('venc'));
     const cL=hdr.findIndex(h=>h.includes('lote'));
     const cS=hdr.findIndex(h=>h.includes('stock')||h.includes('cantidad'));
-    if(cA<0||cS<0){alert('Columnas requeridas: Artículo y Stock/Cantidad.\nCabeceras detectadas: '+hdr.filter(h=>h).join(', '));return;}
+    if(cA<0||cS<0){const m='Columnas requeridas: Artículo y Stock/Cantidad.\nCabeceras detectadas: '+hdr.filter(h=>h).join(', ');if(procesarInvRows.silencioso)return{error:m};alert(m);return;}
     inv={};
     let negativos=0,duplicados=0;
     const vistos=new Set();
@@ -4221,7 +4268,8 @@ function cargarInv(evt){
     document.getElementById('st-inv').textContent=msg;
     pdbGuardar('inv');
     renderLista();if(sel&&inv[sel])renderPanel(sel);
-  });
+    return{n:Object.keys(inv).length,lotes:Object.values(inv).reduce((a,l)=>a+l.length,0)};
+  }
 }
 
 function cargarCons(evt){leerX(evt,(rows,fn)=>{if(_cargaUnica(rows,fn,'arsenal'))return;_procCons(rows,fn);});}
@@ -18830,6 +18878,10 @@ body{background:radial-gradient(1200px 600px at 100% -10%,rgba(28,175,170,.06),t
 .lb:hover,.kc:hover{box-shadow:var(--sh-md)}
 .lb,.kc{transition:box-shadow .2s ease}
 .kpi{border-radius:var(--r-item)!important}
+.pkb-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 .6rem;padding:.5rem .8rem;border:1.5px solid #1CAFAA;border-radius:var(--r,10px);background:#F0FAF9}
+.pkb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#1CAFAA;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.pkb-btn:hover{filter:brightness(.95)}.pkb-btn:focus-within{outline:2px solid #0E6E6B;outline-offset:2px}
+.pkb-txt{font-size:12px;color:var(--ink3);flex:1 1 260px;min-width:0}.pkb-st{display:block;color:#0E6E6B;font-weight:600;margin-top:2px}
 #repo-content .kpi{border:1px solid #D5E3E3;border-radius:10px;padding:8px 12px;background:#fff}
 .repo-kf{cursor:pointer;transition:box-shadow .15s,border-color .15s}
 .repo-kf:hover{box-shadow:0 0 0 2px #1CAFAA55}
@@ -19261,6 +19313,7 @@ function anGrupo(gid){
    "Ir →" navega a la pestaña correspondiente. */
 const AYUDA_CATALOGO=[
 // ── General ──
+{t:'Importar paquete de bodegas (Pingüino Lotes)',k:'paquete bodegas pinguino lotes botiquin bodega central sapu importar stock tres bodegas',d:'Mi arsenal → barra «Importar paquete de bodegas» · también en Urgencia (SAPU) → Reposición SAPU',go:'arsenal|art',q:'Carga de una vez el stock por lote de las tres bodegas desde un solo Excel exportado por Pingüino Lotes.',c:'Cada hoja es una bodega: «Botiquín» va al inventario de lotes de Mi arsenal; «Bodega central» y «SAPU» van a Reposición SAPU. Las columnas son las de la toma de inventario AVIS (Nombre Artículo · Vencimiento · Lote · Stock Sist.). Una hoja «Paquete» opcional trae la fecha de cada toma. También puedes armarlo a mano copiando las tres tomas en un mismo Excel.',n:'Nada sale de tu computador: el archivo se lee en el navegador.'},
 {t:'Cargar datos de prueba',k:'demo demostracion ejemplo probar ficticios',d:'Mi arsenal → recuadro superior',go:'arsenal|art',
  q:'Carga de una vez 8 Excels ficticios (40 artículos) para probar Delta sin usar datos reales.',
  c:'Los Excels de ejemplo vienen dentro del archivo y se entregan a los mismos cargadores que usas al subir un archivo a mano, así que el resultado es idéntico. Reemplaza lo que haya cargado en este navegador (pide confirmación).',n:'Nada.'},
@@ -20049,22 +20102,70 @@ function _repoParseLotes(rows){
   }
   return{lotes,hom,n,colStock:rows[hi][cS],fecha:avisFecha(rows,hi)};
 }
-function repoCargarBodega(evt){
-  _repoLeer(evt,(rows,fn)=>{
-    const r=_repoParseLotes(rows);if(r.error){alert(r.error);return;}
+function repoCargarBodega(evt){_repoLeer(evt,(rows,fn)=>repoBodegaRows(rows,fn));}
+function repoBodegaRows(rows,fn,silencioso){
+  {
+    const r=_repoParseLotes(rows);if(r.error){if(silencioso)return r;alert(r.error);return;}
     const R=_repoCfg();R.bodega=r.lotes;
     R.bodegaArchivo=`${fn} · ${Object.keys(r.lotes).length} artículos, ${r.n} lotes (columna «${r.colStock}»)`+(typeof resumenHomologacion==='function'?resumenHomologacion(r.hom):'');
     _sapuGuardar();repoRender();
-  });
+    return r;
+  }
 }
-function repoCargarStockSapu(evt){
-  _repoLeer(evt,(rows,fn)=>{
-    const r=_repoParseLotes(rows);if(r.error){alert(r.error);return;}
+/* ══ PAQUETE DE BODEGAS (nov-2026, a pedido de Felipe) ══
+   Un solo Excel exportado desde Pingüino Lotes con una hoja por bodega
+   (Botiquín / Bodega central / SAPU), cada una con columnas de la toma AVIS
+   (Nombre Artículo · Vencimiento · Lote · Stock Sist.) y una hoja «Paquete»
+   opcional con la fecha de cada toma. Carga las tres de una vez:
+   Botiquín → Mi arsenal (inventario de lotes) · Bodega central y SAPU → Reposición SAPU.
+   Se reconoce la bodega por el nombre de la hoja; también sirve armado a mano. */
+function _pkbBodega(nombre){
+  const t=normArt(nombre).toLowerCase();
+  if(t.includes('sapu')||t.includes('urgencia'))return'sapu';
+  if(t.includes('central')||t==='bodega')return'bodega';
+  if(t.includes('botiquin')||t.includes('farmacia')||t.includes('cesfam')||t.includes('inventario'))return'botiquin';
+  return null;
+}
+function importarPaqueteBodegas(evt){
+  const f=evt.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{let txt='';try{
+    const hojas=parseXAllSheets(e.target.result);
+    // Hoja «Paquete»: Bodega | Fecha toma AVIS
+    const fechas={};
+    const meta=hojas.find(h=>/paquete|leeme|resumen/i.test(normArt(h.nombre)));
+    if(meta){const hi=meta.rows.findIndex(r=>r.some(c=>/^\s*bodega/i.test(String(c)))&&r.some(c=>/fecha/i.test(String(c))));if(hi>=0){const H=meta.rows[hi].map(c=>normArt(c).toLowerCase());const cB=H.findIndex(h=>h.includes('bodega')),cF=H.findIndex(h=>h.includes('fecha'));
+      if(cB>=0&&cF>=0)for(let i=hi+1;i<meta.rows.length;i++){const b=_pkbBodega(meta.rows[i][cB]);const d=_sdFecha(meta.rows[i][cF]);if(b&&d)fechas[b]=d;}}}
+    const res=[],err=[];const vistos={};
+    hojas.forEach(h=>{
+      if(h===meta)return;const b=_pkbBodega(h.nombre);if(!b)return;
+      if(vistos[b]){err.push(`hoja «${h.nombre}» repetida para ${b} (se usó la primera)`);return;}vistos[b]=1;
+      const fn=`${f.name} › ${h.nombre}`;
+      if(b==='botiquin'){procesarInvRows.silencioso=true;let r;try{r=procesarInvRows(h.rows,fn);}finally{procesarInvRows.silencioso=false;}
+        if(r&&r.error)err.push(`${h.nombre}: ${r.error}`);else if(r)res.push(`🏥 Botiquín: ${r.n} artículos, ${r.lotes} lotes → Mi arsenal`);}
+      else if(b==='bodega'){const r=repoBodegaRows(h.rows,fn,true);if(r&&r.error)err.push(`${h.nombre}: ${r.error}`);else if(r)res.push(`🏬 Bodega central: ${Object.keys(r.lotes).length} artículos, ${r.n} lotes`);}
+      else{const fd=fechas.sapu||avisFecha(h.rows,detHdr(h.rows));const r=repoStockSapuRows(h.rows,fn,true,fd);if(r&&r.error)err.push(`${h.nombre}: ${r.error}`);else if(r)res.push(`🚑 SAPU: ${Object.keys(r.lotes).length} artículos, ${r.n} lotes`);}
+    });
+    if(!res.length&&!err.length)err.push('No encontré hojas de bodega. Nombra las hojas «Botiquín», «Bodega central» y «SAPU».');
+    const fT=Object.entries(fechas).map(([b,d])=>({botiquin:'Botiquín',bodega:'Bodega central',sapu:'SAPU'}[b])+' '+d.toLocaleDateString('es-CL')).join(' · ');
+    txt=(res.length?'✓ '+f.name+': '+res.join(' · ')+(fT?' (tomas AVIS: '+fT+')':''):'')+(err.length?(res.length?' — ':'')+'⚠ '+err.join(' · '):'');
+    try{const c=_sapuCfg();c.paqueteArchivo=txt;_sapuGuardar();}catch(e2){}
+  }catch(er){txt='⚠ Error: '+er.message;}
+  finally{evt.target.value='';document.querySelectorAll('.pkb-st').forEach(el=>{el.textContent=txt;el.style.color=/⚠/.test(txt)&&!/^✓/.test(txt)?'var(--red)':'';});}};
+  rd.readAsArrayBuffer(f);
+}
+function _pkbRefrescarEstado(){try{const t=_sapuCfg().paqueteArchivo;if(t)document.querySelectorAll('.pkb-st').forEach(el=>{if(!el.textContent)el.textContent=t;});}catch(e){}}
+function repoCargarStockSapu(evt){_repoLeer(evt,(rows,fn)=>repoStockSapuRows(rows,fn));}
+function repoStockSapuRows(rows,fn,silencioso,fechaForzada){
+  {
+    const r=_repoParseLotes(rows);if(r.error){if(silencioso)return r;alert(r.error);return;}
+    if(fechaForzada&&!r.fecha)r.fecha=fechaForzada;
     const R=_repoCfg();R.sapuStock=r.lotes;
     const h=r.fecha||new Date();R.sapuStockFecha=h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0')+'-'+String(h.getDate()).padStart(2,'0');
     R.sapuStockArchivo=`${fn} · ${Object.keys(r.lotes).length} artículos, ${r.n} lotes (columna «${r.colStock}»), ${r.fecha?'toma AVIS del':'cargado el'} ${R.sapuStockFecha.split('-').reverse().join('/')}`+(typeof resumenHomologacion==='function'?resumenHomologacion(r.hom):'');
     _sapuGuardar();repoRender();
-  });
+    return r;
+  }
 }
 function repoCargarMinMax(evt){
   _repoLeer(evt,(rows,fn)=>{
