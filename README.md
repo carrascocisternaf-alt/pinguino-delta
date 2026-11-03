@@ -9,7 +9,7 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 ## ▶ Probar ahora
 
 1. Abrir Delta: **[versión web](https://carrascocisternaf-alt.github.io/pinguino-delta/)** o descargar `index.html` y abrirlo con doble clic (funciona sin internet).
-2. Presionar **🧪 Cargar datos de prueba** (arriba, en Mi arsenal): carga los 8 Excels ficticios con un clic.
+2. Presionar **🧪 Cargar datos de prueba** (arriba, en Mi arsenal): carga los 10 Excels ficticios con un clic.
 
 **O manualmente:** descargar la carpeta [`demo/`](demo/) — datos **100 % ficticios** — y cargar los archivos en este orden:
 
@@ -24,6 +24,8 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 | 6 | `07_Valor_unitario_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Valor unitario |
 | 7 | `08_Diferencias_inventario_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Diferencias de inventario |
 | 8 | `09_Gasto_consumo_externo_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Excel externo (opcional) |
+| 9 | `10_Bodega_central_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 🔁 Reposición SAPU → Stock bodega central |
+| 10 | `11_Minimos_maximos_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 🔁 Reposición SAPU → Mínimos y máximos SAPU |
 
 `00_Guion_escenarios_DEMO.xlsx` indica qué debe mostrar Delta para cada artículo.
 
@@ -35,6 +37,9 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 - Doble programación CENABAST + SSVQP en 3 artículos, estacionalidad invernal en respiratorios y antibióticos.
 
 > Los vencimientos demo están calculados desde el **16-10-2026**; con el paso del tiempo los días restantes disminuyen.
+
+## 🔁 Reposición SAPU
+Calcula cuánto reponer al SAPU por **semana o mes**: primero desde la **bodega central** (por lote y vencimiento, FEFO) y lo que falte desde **farmacia**, respetando una reserva para el CESFAM. Lo programado por CENABAST/SSVQP llega a bodega central si el artículo es **exclusivo SAPU** y a farmacia si no. Regla mín/máx con revisión periódica; exporta una guía con el picking por lote.
 
 ## 🧠 IA local (sin internet)
 Todo corre en el navegador; ningún modelo reemplaza un cálculo existente, solo sugiere.

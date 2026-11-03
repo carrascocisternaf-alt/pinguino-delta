@@ -52,12 +52,28 @@ async def main():
         # ── Escenario C: botón "Cargar datos de prueba" (datos embebidos) ──
         pg,errs=await nueva(b)
         await pg.click('#demo-bar button'); await pg.wait_for_timeout(5500)
-        ok('8 archivos de prueba cargados' in await st(pg,'demo-st'),'Botón → '+(await st(pg,'demo-st'))[:60])
+        ok('10 archivos de prueba cargados' in await st(pg,'demo-st'),'Botón → '+(await st(pg,'demo-st'))[:60])
         for sid,txt in [('st-inv','✓ 40 artículos'),('st-prog','doble programación'),('st-disp','años: 2024, 2025, 2026'),('cal-st','✓ 223 despachos'),('difinv-st','✓ 14 artículo(s)'),('gasto-st','✓ 840 registros')]:
             ok(txt in await st(pg,sid),f'Botón → {sid}')
         await pg.evaluate("calcularRotacion('arsenal')")
         c=await pg.evaluate("(()=>{const R=window._rotResultados_arsenal;const L=R.map?R:R.res;const c={};L.forEach(x=>c[x.estado]=(c[x.estado]||0)+1);return c})()")
         ok(c=={'ok':24,'critico':5,'sobrestock':6,'vence-pronto':5},f'Botón → Rotación: {c}')
+        # ── Escenario F: Reposición SAPU ──
+        await pg.evaluate("switchMode('sapu');sapuSwitch('repo');repoParam('frec','semanal');repoParam('vista','mes');repoParam('mes','2026-11')")
+        await pg.wait_for_timeout(500)
+        r=await pg.evaluate("""(()=>{const F=_repoUltimo.filas;const by=n=>F.find(a=>a.art.startsWith(n));
+          const excl=F.filter(a=>a.P.excl);
+          return{n:F.length,
+            exclSoloBodega:excl.every(a=>a.picks.every(p=>p.origen==='Bodega central')),
+            fefoLido:(by('LIDOCAINA').picks[0]||{}).lote,
+            paraB:(repoParam('mes','2026-10'),_repoUltimo.filas.find(a=>a.art.startsWith('PARACETAMOL 500')).picks[0]||{}).origen,
+            salbFalt:by('SALBUTAMOL').falt>0}})()""")
+        ok(r['n']==16 and r['exclSoloBodega'],f'Reposición SAPU: 16 artículos y exclusivos solo desde bodega central ({r})')
+        ok(r['fefoLido']=='BC-LI01' and r['paraB']=='Bodega central',f"Reposición SAPU: FEFO (lidocaína {r['fefoLido']}) y bodega antes que farmacia (paracetamol: {r['paraB']})")
+        ok(r['salbFalt'],'Reposición SAPU: respeta la reserva de farmacia (salbutamol con faltante)')
+        r=await pg.evaluate("""(()=>{repoParam('mes','2026-11');const a='ATROPINA 1 MG/ML SOLUCIÓN INYECTABLE AMPOLLA';prog[a]={origen:'CENABAST',años:{2026:{diciembre:50}},origenPorAño:{2026:'CENABAST'},desglose:{}};repoParam('mes','2026-12');
+          return _repoUltimo.filas.find(x=>x.art===a).lleg.map(l=>l.q+'|'+l.destino)})()""")
+        ok(r==['50|Bodega central'],f'Reposición SAPU: lo programado de un exclusivo llega a bodega central ({r})')
         errs=[e for e in errs if not e.startswith('DIALOGO: Se cargarán los datos FICTICIOS')]
         ok(not errs,f'Botón → sin errores JS ni alertas: {errs}')
         # ── Escenario D: buscador de la Ayuda ──
