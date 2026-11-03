@@ -19308,7 +19308,7 @@ const AYUDA_CATALOGO=[
 {t:'Consumo real del SAPU (diario y mensual)',k:'consumo diario sapu dia a dia puesta en marcha real tendencia mensual consumo sapu 2026 archivo unico origen',d:'Urgencia (SAPU) → Consumo real SAPU',go:'sapu|diario',
  q:'Registra el consumo del SAPU día a día y mes a mes para ver cómo cambia, sobre todo durante la puesta en marcha.',
  c:'Acumula los archivos diarios (los días nuevos se agregan y los repetidos se reemplazan). Acepta Fecha · Artículo · Cantidad, una columna por fecha, o columnas «Consumo Día 1 (Sábado)», «Día 2»…: en ese caso deduce la fecha del Día 1 con los días de la semana y puedes corregirla en pantalla. Luego muestra el total por día con su promedio móvil de 7 días, la tendencia de cada artículo (últimos 7 días vs. los 7 anteriores), la proyección mensual y la comparación con lo estimado. Un día informado cuenta como 0 para los artículos sin registro; los días no informados no se cuentan. El consumo mensual del SAPU viene en el archivo único con Origen «Consumo SAPU 2026» y no se suma al botiquín. Con al menos 7 días informados, el consumo real reemplaza al estimado en Reposición SAPU y en Impacto y compra.',n:'Excel de consumo diario (Fecha · Artículo · Cantidad) y/o filas «Consumo SAPU AAAA» en el archivo único.'},
-{t:'Reposición SAPU',k:'reposicion sapu bodega central semana mes minimos maximos exclusivo despacho picking lote farmacia abastecer reponer',d:'Urgencia (SAPU) → Reposición SAPU',go:'sapu|repo',
+{t:'Reposición SAPU',k:'reposicion sapu buscar buscador medicamento bodega central semana mes minimos maximos exclusivo despacho picking lote farmacia abastecer reponer',d:'Urgencia (SAPU) → Reposición SAPU',go:'sapu|repo',
  q:'Calcula cuánto reponer al SAPU por semana o por mes, desde qué bodega y de qué lotes, partiendo del stock actual del SAPU en AVIS.',
  c:'Avanza semana a semana desde hoy: suma lo programado (a bodega central si el artículo es exclusivo SAPU, a farmacia si no), descuenta el consumo del CESFAM y del SAPU, y en cada revisión repone hasta el máximo si el SAPU quedaría bajo el mínimo. Despacha primero desde bodega central y luego desde farmacia, siempre el lote que vence antes, respetando la reserva de farmacia para el CESFAM. Exporta una guía con el picking por lote.',n:'Mínimos y máximos SAPU, stock de bodega central y stock del SAPU (Toma de inventario de AVIS); inventario, consumo y programación de Mi arsenal.'},
 {t:'Urgencia (SAPU)',k:'sapu urgencia apertura dotacion inicial botiquin carro maletin',d:'Urgencia (SAPU)',go:'sapu|impacto',
@@ -20241,6 +20241,13 @@ function _repoPeriodo(){
 
 /* ── Render ── */
 let _repoUltimo=null;
+let _repoQ='';
+// Buscador de la tabla de Reposición SAPU: filtra filas sin recalcular (todas las palabras, sin tildes)
+function repoBuscar(q){
+  _repoQ=q||'';const t=normArt(_repoQ).split(' ').filter(Boolean);let n=0,tot=0;
+  document.querySelectorAll('#repo-tabla tbody tr[data-art]').forEach(tr=>{tot++;const ok=t.every(w=>tr.dataset.art.includes(w));tr.style.display=ok?'':'none';if(ok)n++;});
+  const el=document.getElementById('repo-buscar-n');if(el)el.textContent=t.length?(n?`${n} de ${tot}`:'Sin coincidencias en este período'):'';
+}
 function repoRender(){
   const el=document.getElementById('repo-content');if(!el)return;
   const R=_repoCfg();
@@ -20289,14 +20296,14 @@ function repoRender(){
     <div class="kpi"><div class="kpi-lbl">Desde farmacia</div><div class="kpi-val">${_repoN(totF)}</div><div class="sp-note" style="margin-top:2px">unidades</div></div>
     <div class="kpi"><div class="kpi-lbl">Sin stock para reponer</div><div class="kpi-val" style="color:${nFalt?'var(--red)':'var(--green)'}">${nFalt}</div><div class="sp-note" style="margin-top:2px">artículo(s) con faltante</div></div>
   </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.6rem"><button class="sp-btn" onclick="repoExportar()">⬇ Exportar guía de reposición (.xlsx)</button></div>
-  <div class="sp-tw"><table class="sp-t repo-t"><thead><tr>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:.6rem"><input type="search" id="repo-buscar" placeholder="🔍 Buscar medicamento (nombre, principio activo, dosis…)" value="${_sapuEsc(_repoQ)}" oninput="repoBuscar(this.value)" style="flex:1 1 280px;min-width:0;max-width:460px;padding:7px 10px;border:1px solid var(--border,#d0dada);border-radius:8px;font:inherit"><span class="sp-note" id="repo-buscar-n"></span><button class="sp-btn" onclick="repoExportar()">⬇ Exportar guía de reposición (.xlsx)</button></div>
+  <div class="sp-tw"><table class="sp-t repo-t" id="repo-tabla"><thead><tr>
     <th class="l">Artículo</th><th class="c" title="Exclusivo SAPU: lo programado llega a bodega central. Clic para cambiar.">Exclusivo SAPU</th><th>Stock SAPU<br>al inicio</th><th>Mín–Máx</th><th>Consumo SAPU<br>del período</th>
     ${multi?semP.map(w=>`<th>Sem. ${_repoFechaCorta(w)}</th>`).join(''):''}
     <th>A reponer</th><th class="l">Desde bodega central (lote · vence: cant.)</th><th class="l">Desde farmacia (lote · vence: cant.)</th><th>Faltante</th><th class="l">Llegadas programadas</th><th>Queda en bodega / farmacia</th>
   </tr></thead><tbody>
   ${filas.length?filas.map((a,i)=>{const _ag=x=>{const m=new Map();x.forEach(p=>{const k=p.origen+'|'+p.lote+'|'+p.venc;const g=m.get(k);if(g)g.cant+=p.cant;else m.set(k,Object.assign({},p));});return[...m.values()];};const pb=_ag(a.picks.filter(p=>p.origen==='Bodega central')),pf=_ag(a.picks.filter(p=>p.origen==='Farmacia'));
-    return `<tr>
+    return `<tr data-art="${_sapuEsc(normArt(a.art))}">
     <td class="l" style="font-weight:600;min-width:220px">${_sapuEsc(a.art)}<div class="sp-note" style="font-weight:400">Consumo: ${_sapuEsc(a.P.cons.f)} · Mín/Máx: ${_sapuEsc(a.P.fmm)}</div></td>
     <td class="c"><button class="repo-excl ${a.P.excl?'on':''}" title="${_sapuAttr(a.P.fEx)}" onclick="repoToggleExclIdx(${i})">${a.P.excl?'Sí':'No'}</button></td>
     <td class="n">${a.abierto?_repoN(a.sIni):'—'}${a.P.fStock.startsWith('Supuesto')&&a.abierto?'<span class="sp-note" title="Sin stock SAPU (ni AVIS ni Excel): se supone lleno (en el máximo) al iniciar"> *</span>':''}<div class="sp-note" style="font-family:'DM Sans',sans-serif">${_sapuEsc(a.P.fStock)}</div>${a.vencSapu.length?`<div class="sp-note" style="color:#B4530A;font-family:'DM Sans',sans-serif;white-space:normal" title="Unidades que vencen dentro del SAPU antes de usarse">⚠ Vencen en el SAPU: ${a.vencSapu.map(v=>_repoN(v.q)+' u. lote '+_sapuEsc(v.lote)+' ('+v.venc+')').join('; ')}</div>`:''}${(()=>{const pr=(a.P.sapuLotes||[]).filter(l=>{const v=_repoFinVenc(l.venc);const d=(v-per.fin)/86400000;return v.getFullYear()<9999&&d>=0&&d<60;});return pr.length?`<div class="sp-note" style="color:#B4530A;font-family:'DM Sans',sans-serif;white-space:normal">⚠ Por vencer en el SAPU: ${pr.map(l=>_repoN(l.stock)+' u. lote '+_sapuEsc(l.lote)+' ('+l.venc+')').join('; ')}</div>`:''})()}</td>
@@ -20312,6 +20319,7 @@ function repoRender(){
   </tr>`;}).join(''):`<tr><td colspan="12" style="text-align:center;padding:1.2rem;color:var(--ink3)">Sin artículos con reposición en este período. Carga los mínimos y máximos o el stock de bodega central, o desmarca «Solo artículos con movimiento».</td></tr>`}
   </tbody></table></div>
   <p class="sp-note" style="margin-top:.6rem">Regla: en cada revisión (${R.frec==='semanal'?'cada lunes':'la primera semana de cada mes'}), si el stock del SAPU quedaría bajo el mínimo antes de la próxima reposición, se repone hasta el máximo. Se despacha primero de bodega central y luego de farmacia, siempre el lote que vence antes; farmacia conserva ${_sapuEsc(String(R.reserva))} mes(es) de consumo CESFAM como reserva (si el CESFAM no consume el artículo, no hay reserva). El stock del SAPU se toma de AVIS por lote si lo cargaste (un artículo que no aparece en AVIS tiene 0); el SAPU consume primero el lote que vence antes y lo que vence dentro del SAPU se descuenta y se avisa. El cálculo avanza semana a semana desde hoy, descontando el consumo del CESFAM y del SAPU y sumando lo programado en la semana en que llega. * Sin stock SAPU informado: se supone lleno al iniciar.</p>`;
+  if(_repoQ)repoBuscar(_repoQ);
 }
 
 /* ── Exportar ── */
