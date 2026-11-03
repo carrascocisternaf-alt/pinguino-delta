@@ -210,3 +210,25 @@ BODEGA=[ # artículo, lote, meses hasta vencer, stock
 guardar("10_Bodega_central_SAPU_DEMO.xlsx",["Artículo","Lote","Vencimiento","Stock"],[[a,l,venc(m),q] for a,l,m,q in BODEGA],widths=[62,12,14,10],datecols=(2,),titulo="Bodega central")
 guardar("11_Minimos_maximos_SAPU_DEMO.xlsx",["Artículo","Mínimo","Máximo","Exclusivo SAPU","Stock SAPU","Consumo mensual SAPU"],[list(x) for x in SAPU_MM],widths=[62,10,10,15,12,22],titulo="Mín-Máx SAPU")
 print('10-11 SAPU generados')
+
+# ── 05 (actualizado): filas "Consumo SAPU 2026" en el archivo único ──
+# SAPU abierto en julio 2026: rampa de puesta en marcha jul 40% → ago 75% → sep 100%
+RAMPA={'Julio':0.40,'Agosto':0.75,'Septiembre':1.00}
+un_sapu=[]
+for a,mn,mx,ex,st,cm in SAPU_MM:
+    fila=[a,"Consumo SAPU 2026",2026]+[None]*12
+    for k,f in RAMPA.items(): fila[3+MESES.index(k)]=r(cm*f*random.uniform(0.9,1.1))
+    un_sapu.append(fila)
+guardar("05_Archivo_unico_Consumo_y_Programacion_DEMO.xlsx",["Artículo","Origen","Año"]+MESES,un+un_sapu,widths=[70,20,8]+[11]*12,numfmt={2:"0"},titulo="Consolidado")
+
+# ── 12: consumo diario SAPU (1 al 15 de octubre 2026, formato largo) ──
+dia=[]
+for d in range(1,16):
+    f=dt.date(2026,10,d); crec=1+0.012*d          # el SAPU sigue creciendo en su puesta en marcha
+    finde=1.25 if f.weekday()>=5 else 1.0         # más atenciones el fin de semana
+    for a,mn,mx,ex,st,cm in SAPU_MM:
+        lam=cm/30.4375*crec*finde
+        q=max(0,r(random.gauss(lam,max(0.6,lam**0.5))))
+        if q>0: dia.append([f,a,q])
+guardar("12_Consumo_diario_SAPU_DEMO.xlsx",["Fecha","Artículo","Cantidad"],dia,widths=[12,62,10],datecols=(0,),titulo="Consumo diario")
+print('05 con Consumo SAPU y 12 diario generados')

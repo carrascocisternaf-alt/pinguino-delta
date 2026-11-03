@@ -52,7 +52,7 @@ async def main():
         # ── Escenario C: botón "Cargar datos de prueba" (datos embebidos) ──
         pg,errs=await nueva(b)
         await pg.click('#demo-bar button'); await pg.wait_for_timeout(5500)
-        ok('10 archivos de prueba cargados' in await st(pg,'demo-st'),'Botón → '+(await st(pg,'demo-st'))[:60])
+        ok('11 archivos de prueba cargados' in await st(pg,'demo-st'),'Botón → '+(await st(pg,'demo-st'))[:60])
         for sid,txt in [('st-inv','✓ 40 artículos'),('st-prog','doble programación'),('st-disp','años: 2024, 2025, 2026'),('cal-st','✓ 223 despachos'),('difinv-st','✓ 14 artículo(s)'),('gasto-st','✓ 840 registros')]:
             ok(txt in await st(pg,sid),f'Botón → {sid}')
         await pg.evaluate("calcularRotacion('arsenal')")
@@ -74,6 +74,14 @@ async def main():
         r=await pg.evaluate("""(()=>{repoParam('mes','2026-11');const a='ATROPINA 1 MG/ML SOLUCIÓN INYECTABLE AMPOLLA';prog[a]={origen:'CENABAST',años:{2026:{diciembre:50}},origenPorAño:{2026:'CENABAST'},desglose:{}};repoParam('mes','2026-12');
           return _repoUltimo.filas.find(x=>x.art===a).lleg.map(l=>l.q+'|'+l.destino)})()""")
         ok(r==['50|Bodega central'],f'Reposición SAPU: lo programado de un exclusivo llega a bodega central ({r})')
+        # ── Escenario G: consumo real del SAPU (mensual en archivo único y diario) ──
+        r=await pg.evaluate("""(()=>{const c=_sapuCfg();return{dias:c.diarioDias.length,real:_sapuConsReal('PARACETAMOL 500 MG COMPRIMIDO'),fuente:(sapuSwitch('repo'),_repoUltimo.filas.find(a=>a.art==='PARACETAMOL 500 MG COMPRIMIDO').P.cons.f)}})()""")
+        ok(r['dias']==15 and r['real']['tipo']=='diario' and r['fuente'].startswith('Real diario'),f"Consumo real SAPU: 15 días informados y Reposición usa el real diario ({r['fuente']})")
+        pg2,errs2=await nueva(b)
+        await pg2.set_input_files('#fi-prog',f('05')); await pg2.wait_for_timeout(900)
+        r=await pg2.evaluate("[cons_mensual['PARACETAMOL 500 MG COMPRIMIDO'][2026]['julio'],(_sapuCfg().consMensualSapu['PARACETAMOL 500 MG COMPRIMIDO']||{})[2026],!!cons_mensual['ATROPINA 1 MG/ML SOLUCIÓN INYECTABLE AMPOLLA']]")
+        ok(r[0]==19874 and r[1] and r[1].get('julio')==399 and r[2] is False,f'Archivo único: «Consumo SAPU 2026» no se suma al botiquín ({r})')
+        ok(not errs2,f'Archivo único con SAPU sin errores ({errs2})')
         errs=[e for e in errs if not e.startswith('DIALOGO: Se cargarán los datos FICTICIOS')]
         ok(not errs,f'Botón → sin errores JS ni alertas: {errs}')
         # ── Escenario D: buscador de la Ayuda ──

@@ -9,7 +9,7 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 ## ▶ Probar ahora
 
 1. Abrir Delta: **[versión web](https://carrascocisternaf-alt.github.io/pinguino-delta/)** o descargar `index.html` y abrirlo con doble clic (funciona sin internet).
-2. Presionar **🧪 Cargar datos de prueba** (arriba, en Mi arsenal): carga los 10 Excels ficticios con un clic.
+2. Presionar **🧪 Cargar datos de prueba** (arriba, en Mi arsenal): carga los 11 Excels ficticios con un clic.
 
 **O manualmente:** descargar la carpeta [`demo/`](demo/) — datos **100 % ficticios** — y cargar los archivos en este orden:
 
@@ -19,13 +19,14 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 | 2 | `02_Consumo_promedio_DEMO.xlsx` | Mi arsenal → Consumos promedio |
 | 3 | `03_Programacion_vigente_DEMO.xlsx` | Mi arsenal → Programación vigente |
 | 4 | `04_Consumo_mes_a_mes_DEMO.xlsx` | Mi arsenal → Consumo mes a mes |
-| alt. | `05_Archivo_unico_Consumo_y_Programacion_DEMO.xlsx` | Reemplaza 2–4 en un solo archivo (columna *Origen*) |
+| alt. | `05_Archivo_unico_Consumo_y_Programacion_DEMO.xlsx` | Reemplaza 2–4 en un solo archivo (columna *Origen*: «Consumo 2025», «Consumo SAPU 2026», «CENABAST 2026», «SSVQP 2026») |
 | 5 | `06_Despachos_CENABAST_DEMO.xlsx` | 📊 Análisis → 📦 Abastecimiento → Calendario CENABAST |
 | 6 | `07_Valor_unitario_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Valor unitario |
 | 7 | `08_Diferencias_inventario_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Diferencias de inventario |
 | 8 | `09_Gasto_consumo_externo_DEMO.xlsx` | 📊 Análisis → 💰 Gasto y presupuesto → Gasto y consumo → Excel externo (opcional) |
 | 9 | `10_Bodega_central_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 🔁 Reposición SAPU → Stock bodega central |
 | 10 | `11_Minimos_maximos_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 🔁 Reposición SAPU → Mínimos y máximos SAPU |
+| 11 | `12_Consumo_diario_SAPU_DEMO.xlsx` | 🚑 Urgencia (SAPU) → 📈 Consumo real SAPU |
 
 `00_Guion_escenarios_DEMO.xlsx` indica qué debe mostrar Delta para cada artículo.
 
@@ -40,6 +41,9 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 
 ## 🔁 Reposición SAPU
 Calcula cuánto reponer al SAPU por **semana o mes**: primero desde la **bodega central** (por lote y vencimiento, FEFO) y lo que falte desde **farmacia**, respetando una reserva para el CESFAM. Lo programado por CENABAST/SSVQP llega a bodega central si el artículo es **exclusivo SAPU** y a farmacia si no. Regla mín/máx con revisión periódica; exporta una guía con el picking por lote.
+
+### 📈 Consumo real del SAPU
+Consumo **diario** (Fecha · Artículo · Cantidad, acumulable) y **mensual** (filas «Consumo SAPU AAAA» en el archivo único, que no se suman al botiquín). Muestra el total por día con promedio móvil de 7 días, la tendencia por artículo, la proyección mensual y la comparación con lo estimado. Con ≥ 7 días informados, el consumo real reemplaza al estimado en Reposición SAPU y en Cruce e impacto.
 
 ## 🧠 IA local (sin internet)
 Todo corre en el navegador; ningún modelo reemplaza un cálculo existente, solo sugiere.
