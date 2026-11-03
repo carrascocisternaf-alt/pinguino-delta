@@ -3898,6 +3898,24 @@ function _artAprox(n){
   let r=null;if(hits.size===1){const k=[...hits][0];r=(typeof _ARTS_NORM_MAP!=='undefined'&&_ARTS_NORM_MAP[k])||pool.find(x=>x.n===k).a;}
   _artAproxCache.set(n,r);return r;
 }
+// AVIS marca los artículos FRACCIONADOS con una «F» pegada al final del nombre
+// (ej. «…SOLUCIÓN INYECTABLEF», «…GOTASF») o separada («… F»). Es el mismo
+// artículo: se une a su nombre base si ese nombre es conocido.
+function _artFracc(n,original){
+  const m=n.match(/^(.*[A-Z0-9)\]])\s?F$/);if(!m)return null;
+  const base=m[1].trim();if(base.length<6)return null;
+  const b=resolverNombreArticulo(base);
+  let avis=b&&b.reconocido&&b.origen!=='ambiguo'?b.avis:null;
+  if(!avis){const hit=_artAproxNombres().find(x=>x.n===base);if(hit)avis=(typeof _ARTS_NORM_MAP!=='undefined'&&_ARTS_NORM_MAP[base])||hit.a;}
+  if(avis)return{avis,origen:'fraccionado',reconocido:true,fraccionado:true};
+  // Base desconocida: igual se quita la «F» si la palabra final es una forma o unidad
+  // farmacéutica, para que coincida con el mismo nombre sin «F» en otros archivos.
+  if(/(INYECTABLE|GOTAS|NEBULIZAR|NEBULIZADOR|NEBULIZACION|COMPRIMIDOS?|RECUBIERTOS?|CAPSULAS?|AMPOLLAS?|FRASCOS?|JARABE|SUSPENSION|SOLUCION|ORAL|TOPICO|TOPICA|CREMA|UNGUENTO|GEL|POLVO|SOBRES?|ML|MG|G|MCG|UI|DOSIS|INHALADOR|AEROSOL|SUPOSITORIOS?|OVULOS?|PARCHES?|BOLSAS?|UNIDAD(ES)?)$/.test(base.split(/[\s(]/).pop())){
+    const orig=(typeof ARTS!=='undefined'?ARTS:[]).find(a=>normArt(a)===base);
+    return{avis:orig||(original?String(original).trim().replace(/\s?[Ff]\s*$/,''):base),origen:'nuevo',reconocido:false,fraccionado:true};
+  }
+  return null;
+}
 function resolverNombreArticulo(raw){
   try{
     const original=String(raw||'').trim();
@@ -3921,7 +3939,7 @@ function resolverNombreArticulo(raw){
       const ex=_ARTS_NORM_MAP[n];
       // Si solo coincide con un artículo «nuevo» creado por una carga anterior
       // (p. ej. el mismo error de tipeo), se prefiere el artículo real del arsenal.
-      if(typeof ARTS_DINAMICOS!=='undefined'&&ARTS_DINAMICOS[ex]==='nuevo'){const ap=_artAprox(n);if(ap)return{avis:ap,origen:'aprox',reconocido:true,aprox:true};}
+      if(typeof ARTS_DINAMICOS!=='undefined'&&ARTS_DINAMICOS[ex]==='nuevo'){const fr=_artFracc(n,original);if(fr)return fr;const ap=_artAprox(n);if(ap)return{avis:ap,origen:'aprox',reconocido:true,aprox:true};}
       return{avis:ex,origen:'arsenal',reconocido:true};
     }
     if(typeof DICC_CENABAST_AVIS!=='undefined'&&DICC_CENABAST_AVIS[n]!==undefined){
@@ -3937,6 +3955,7 @@ function resolverNombreArticulo(raw){
     // Error de tipeo de 1 letra (ej. AVIS «…SOLUCIÓN INYECTABLEF»): se acepta
     // solo si hay UN artículo del arsenal a 1 edición y con los mismos números
     // (dosis/concentración idénticas), para no confundir presentaciones.
+    const fr=_artFracc(n,original);if(fr)return fr;
     const ap=_artAprox(n);
     if(ap)return{avis:ap,origen:'aprox',reconocido:true,aprox:true};
     return{avis:original,origen:'nuevo',reconocido:false};
@@ -3951,6 +3970,7 @@ function resumenHomologacion(stats){
   if(stats.CENABAST) partes.push(`${stats.CENABAST} por diccionario CENABAST`);
   if(stats.PM) partes.push(`${stats.PM} por diccionario PM`);
   Object.keys(stats).forEach(k=>{if(k.startsWith('fuente:')&&stats[k])partes.push(`${stats[k]} por diccionario ${equivFuente(k.slice(7)).nombre}`);});
+  if(stats.fraccionado) partes.push(`${stats.fraccionado} fraccionado(s) «F» unidos a su artículo`);
   if(stats.aprox) partes.push(`${stats.aprox} con error de tipeo corregido (1 letra, misma dosis)`);
   if(stats.ambiguo) partes.push(`${stats.ambiguo} ambiguo(s) — revisar`);
   if(stats.nuevo) partes.push(`${stats.nuevo} nuevo(s) — no en arsenal ni diccionarios`);
