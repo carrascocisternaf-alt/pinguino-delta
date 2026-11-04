@@ -17,3 +17,5 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Cargar los Excels demo en Delta y verificar resultados exactos
         run: python tests/test_demo.py
+      - name: Modo institucional (Microsoft 365 simulado)
+        run: python tests/test_nube.py

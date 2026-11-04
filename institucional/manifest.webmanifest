@@ -1,0 +1,10 @@
+{
+  "name": "Pingüino Delta",
+  "short_name": "Delta",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F5F8F8",
+  "theme_color": "#1CAFAA",
+  "icons": [{"src": "icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]
+}

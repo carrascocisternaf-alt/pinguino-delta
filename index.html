@@ -561,6 +561,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
     <button onclick="document.getElementById('pdb-vacio').style.display='none'" style="padding:5px 10px;border:1px solid #7A4A0A;border-radius:6px;background:none;color:#7A4A0A;cursor:pointer;font-size:11.5px">Empezar sin datos</button>
   </span>
 </div>
+<div id="nube-bar" style="display:none" role="status" aria-live="polite"></div>
 <div id="pdb-banner" style="display:none;align-items:center;gap:10px;justify-content:space-between;background:#EAF5EA;border-bottom:1px solid #7CB97C;padding:.5rem 1rem;font-size:12.5px;color:#1E5C1E">
   <span>🗃 Se recuperaron inventario/consumos/programación guardados de una sesión anterior en este navegador. <strong>Tip:</strong> usa "💾 Exportar respaldo" (arriba) para no depender de esto — funciona aunque cambies de archivo o de computador.</span>
   <button onclick="pdbBorrarTodo()" style="white-space:nowrap;padding:5px 12px;border:1px solid #1E5C1E;border-radius:6px;background:#fff;color:#1E5C1E;cursor:pointer;font-size:11.5px">🗑 Borrar toda la memoria guardada</button>
@@ -13453,7 +13454,7 @@ function _inicializarMesAnioActual(){
 }
 document.addEventListener('DOMContentLoaded',_inicializarMesAnioActual);
 
-document.addEventListener('DOMContentLoaded',pdbRestaurar);
+document.addEventListener('DOMContentLoaded',()=>{window.__pdbListo=pdbRestaurar();});
 
 setFiltro('all');
 
@@ -18898,6 +18899,12 @@ body{background:radial-gradient(1200px 600px at 100% -10%,rgba(28,175,170,.06),t
 .lb:hover,.kc:hover{box-shadow:var(--sh-md)}
 .lb,.kc{transition:box-shadow .2s ease}
 .kpi{border-radius:var(--r-item)!important}
+#nube-bar{align-items:center;gap:8px 14px;flex-wrap:wrap;background:#EEF7FF;border-bottom:1px solid #9CC3E6;padding:.45rem 1rem;font-size:12px;color:#123E66}
+#nube-bar .nb-t{font-size:12.5px}#nube-bar .nb-fs{display:flex;flex-wrap:wrap;gap:4px 14px;flex:1 1 380px;min-width:0}
+#nube-bar .nb-f{white-space:normal}#nube-bar .nb-err{color:#B42318;font-weight:600}
+#nube-bar .nb-b{display:flex;gap:6px;margin-left:auto}
+#nube-bar button{padding:5px 12px;border:1px solid #123E66;border-radius:6px;background:#fff;color:#123E66;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap}
+#nube-bar button.nb-main{background:#123E66;color:#fff}#nube-bar button:disabled{opacity:.6;cursor:wait}
 .pkb-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 .6rem;padding:.5rem .8rem;border:1.5px solid #1CAFAA;border-radius:var(--r,10px);background:#F0FAF9}
 .pkb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#1CAFAA;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .pkb-btn:hover{filter:brightness(.95)}.pkb-btn:focus-within{outline:2px solid #0E6E6B;outline-offset:2px}
@@ -20561,8 +20568,15 @@ function _sdRelHTML(c){
 function sapuCargarDiario(evt){
   const f=evt.target.files[0];if(!f)return;
   const rd=new FileReader();
-  rd.onload=e=>{try{
-    const rows=parseX(e.target.result);const c=_sdCfg();
+  rd.onload=e=>{try{sapuDiarioDesdeBuf(e.target.result,f.name);}catch(err){alert('Error: '+err.message);}finally{evt.target.value='';}};
+  rd.readAsArrayBuffer(f);
+}
+// Núcleo del consumo diario SAPU a partir del contenido del Excel (archivo subido o sincronizado desde Microsoft 365).
+// Devuelve un texto de error si el formato no se reconoce (silencioso) o undefined si cargó.
+function sapuDiarioDesdeBuf(buf,nombre,silencioso){
+  const f={name:nombre};const alert=silencioso?(m=>{throw new Error(m);}):(m=>window.alert(m));
+  {
+    const rows=parseX(buf);const c=_sdCfg();
     let hi=0;for(let i=0;i<Math.min(30,rows.length);i++){if(rows[i].map(x=>normArt(x).toLowerCase()).some(h=>h.includes('articulo')||h.includes('nombre')||h.includes('producto')||h.includes('medicamento'))){hi=i;break;}}
     const hdrRaw=rows[hi]||[],hdr=hdrRaw.map(x=>normArt(x).toLowerCase());
     const cA=hdr.findIndex(h=>h.includes('articulo')||h.includes('nombre')||h.includes('producto')||h.includes('medicamento'));
@@ -20600,8 +20614,7 @@ function sapuCargarDiario(evt){
     const ds=[...dias].sort();
     c.diarioArchivos=`${f.name} · ${dias.size} día(s) (${ds[0]} a ${ds[ds.length-1]}), ${Object.keys(nuevo).length} artículos`+(typeof resumenHomologacion==='function'?resumenHomologacion(hom):'');
     _sapuGuardar();sapuRefrescar();
-  }catch(err){alert('Error: '+err.message);}finally{evt.target.value='';}};
-  rd.readAsArrayBuffer(f);
+  }
 }
 function sapuLimpiarDiario(){if(!confirm('¿Borrar todo el consumo diario SAPU cargado?'))return;const c=_sdCfg();c.diario={};c.diarioDias=[];c.diarioArchivos='';c.diarioRel=null;_sapuGuardar();sapuRefrescar();}
 function sapuLimpiarMensualSapu(){if(!confirm('¿Borrar el consumo mensual SAPU cargado desde el archivo único?'))return;const c=_sdCfg();c.consMensualSapu={};c.consMensualArchivo='';_sapuGuardar();sapuRefrescar();}
@@ -20751,5 +20764,242 @@ function _sapuSyncPaso(p){
   _sapuSyncPaso(_sapuPanel);
 })();
 </script>
+<script>
+/* ══ DELTA EN RED INSTITUCIONAL · MICROSOFT 365 (nov-2026, a pedido de Felipe) ══
+   Se activa SOLO si junto a la página existe un archivo «config.json» (sitio
+   institucional, p. ej. Netlify). La versión abierta (GitHub Pages) y la copia
+   local (file://) no lo tienen y funcionan igual que siempre.
+   · Cada colega entra con su cuenta Microsoft de la institución (OAuth 2.0 +
+     PKCE, sin librerías externas). Solo quien tenga permiso en SharePoint ve
+     los archivos; nada pasa por servidores de terceros.
+   · Lee directo de SharePoint/OneDrive el Excel de consumos y programaciones
+     (archivo único con columna Origen) y el de consumo diario SAPU; solo los
+     vuelve a descargar si cambiaron (eTag).
+   · Los stocks que se cargan a mano (botiquín, bodega central, SAPU, mín/máx,
+     exclusivos y equivalencias) se guardan en un JSON compartido en OneDrive,
+     así todos los PC con el link ven lo mismo.
+   · Sin internet: usa la última copia guardada en el navegador (IndexedDB). */
+const NUBE={cfg:null,tok:null,user:null,estado:{},aplicando:false,pubTimer:null,ultimoPub:'',ultimoEtagComp:'',cache:{}};
+const NUBE_COMP='Pinguino_Delta_compartido.json';
+const NUBE_SCOPES='openid profile offline_access User.Read Files.ReadWrite.All';
+
+// ── IndexedDB propia (copias de los Excel y del JSON compartido) ──
+function _nubeDB(){return new Promise((ok,ko)=>{const r=indexedDB.open('pinguino-delta-nube',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error);});}
+async function _nubeGet(k){try{const db=await _nubeDB();return await new Promise(ok=>{const t=db.transaction('kv').objectStore('kv').get(k);t.onsuccess=()=>ok(t.result);t.onerror=()=>ok(undefined);});}catch(e){return undefined;}}
+async function _nubeSet(k,v){try{const db=await _nubeDB();await new Promise(ok=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=ok;t.onerror=ok;});}catch(e){}}
+function _lsG(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function _lsS(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v);}catch(e){}}
+
+// ── OAuth 2.0 con PKCE (aplicación de página única registrada en Entra ID) ──
+const _b64u=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+function _nubeAutoridad(){return'https://login.microsoftonline.com/'+encodeURIComponent(NUBE.cfg.tenant)+'/oauth2/v2.0/';}
+function _nubeRedirect(){return location.origin+location.pathname.replace(/index\.html$/,'');}
+async function nubeEntrar(){
+  if(!NUBE.cfg||!NUBE.cfg.clientId){_nubeMsg('Falta el «clientId» en config.json: pídeselo a informática (ver LEEME).','error');return;}
+  const ver=_b64u(crypto.getRandomValues(new Uint8Array(32)));
+  const chal=_b64u(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(ver)));
+  const st=_b64u(crypto.getRandomValues(new Uint8Array(16)));
+  _lsS('pdn_pkce',JSON.stringify({ver,st}));
+  const q=new URLSearchParams({client_id:NUBE.cfg.clientId,response_type:'code',redirect_uri:_nubeRedirect(),response_mode:'query',scope:NUBE_SCOPES,state:st,code_challenge:chal,code_challenge_method:'S256',prompt:'select_account'});
+  if(NUBE.cfg.dominio)q.set('domain_hint',NUBE.cfg.dominio);
+  location.assign(_nubeAutoridad()+'authorize?'+q);
+}
+async function _nubeToken(params){
+  const body=new URLSearchParams(Object.assign({client_id:NUBE.cfg.clientId,scope:NUBE_SCOPES},params));
+  const r=await fetch(_nubeAutoridad()+'token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+  const j=await r.json();if(!r.ok)throw new Error(j.error_description||j.error||('HTTP '+r.status));
+  NUBE.tok={at:j.access_token,rt:j.refresh_token||(NUBE.tok&&NUBE.tok.rt),exp:Date.now()+((j.expires_in||3600)-120)*1000};
+  _lsS('pdn_tok',JSON.stringify(NUBE.tok));return NUBE.tok.at;
+}
+async function _nubeVolverDeLogin(){
+  const u=new URL(location.href);const code=u.searchParams.get('code'),err=u.searchParams.get('error');
+  if(!code&&!err)return;
+  const limpiar=()=>{['code','state','session_state','error','error_description','client_info'].forEach(k=>u.searchParams.delete(k));history.replaceState(null,'',u.pathname+(u.search||'')+u.hash);};
+  if(err){_nubeMsg('No se pudo iniciar sesión: '+(u.searchParams.get('error_description')||err),'error');limpiar();return;}
+  let pk=null;try{pk=JSON.parse(_lsG('pdn_pkce')||'null');}catch(e){}
+  _lsS('pdn_pkce',null);
+  if(!pk||pk.st!==u.searchParams.get('state')){_nubeMsg('El inicio de sesión no coincide (vuelve a intentarlo).','error');limpiar();return;}
+  limpiar();
+  try{await _nubeToken({grant_type:'authorization_code',code,redirect_uri:_nubeRedirect(),code_verifier:pk.ver});}
+  catch(e){_nubeMsg('No se pudo iniciar sesión: '+e.message,'error');}
+}
+async function _nubeAT(){
+  if(!NUBE.tok){try{NUBE.tok=JSON.parse(_lsG('pdn_tok')||'null');}catch(e){}}
+  if(!NUBE.tok)return null;
+  if(NUBE.tok.at&&Date.now()<NUBE.tok.exp)return NUBE.tok.at;
+  if(NUBE.tok.rt){try{return await _nubeToken({grant_type:'refresh_token',refresh_token:NUBE.tok.rt});}catch(e){NUBE.tok=null;_lsS('pdn_tok',null);}}
+  return null;
+}
+function nubeSalir(){NUBE.tok=null;NUBE.user=null;_lsS('pdn_tok',null);_lsS('pdn_user',null);_nubeMsg('Sesión cerrada. Los datos quedan guardados en este navegador.','');nubeRender();}
+
+// ── Microsoft Graph ──
+async function _g(path,opt){
+  const at=await _nubeAT();if(!at){const e=new Error('sin sesión');e.sinSesion=true;throw e;}
+  const r=await fetch('https://graph.microsoft.com/v1.0'+path,Object.assign({},opt,{headers:Object.assign({Authorization:'Bearer '+at},(opt&&opt.headers)||{})}));
+  if(r.status===401){NUBE.tok&&(NUBE.tok.exp=0);const e=new Error('sesión vencida');e.sinSesion=true;throw e;}
+  return r;
+}
+const _shareId=url=>'u!'+btoa(unescape(encodeURIComponent(String(url).trim()))).replace(/=+$/,'').replace(/\//g,'_').replace(/\+/g,'-');
+async function _nubeItem(url){const r=await _g('/shares/'+_shareId(url)+'/driveItem',{headers:{Prefer:'redeemSharingLinkIfNecessary'}});if(!r.ok){const t=r.status===404||r.status===403?'sin acceso o vínculo no válido':'HTTP '+r.status;throw new Error(t);}return r.json();}
+
+// ── Excel sincronizados ──
+const NUBE_ARCH=[
+  {k:'consumos',etq:'Consumos y programaciones',url:c=>c.consumos,aplicar:(buf,n)=>{
+    const hojas=parseXAllSheets(buf);
+    for(const h of hojas){if(_cargaUnica(h.rows,n+' ☁','arsenal'))return null;}
+    return'No encontré la columna «Origen» (archivo único) en ninguna hoja.';}},
+  {k:'sapu',etq:'Consumo diario SAPU',url:c=>c.sapu,aplicar:(buf,n)=>{try{sapuDiarioDesdeBuf(buf,n+' ☁',true);return null;}catch(e){return e.message;}}}
+];
+async function _nubeArchivo(A,enLinea){
+  const url=A.url(NUBE.cfg);if(!url)return;
+  const E=NUBE.estado[A.k]=NUBE.estado[A.k]||{};
+  const cache=await _nubeGet('arch:'+A.k);
+  let buf=null,meta=cache&&cache.meta;
+  if(enLinea){
+    try{
+      const it=await _nubeItem(url);
+      meta={nombre:it.name,etag:it.eTag||it.cTag,mod:it.lastModifiedDateTime,por:it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName,parent:it.parentReference};
+      if(A.k==='consumos')NUBE.padre=it.parentReference;
+      if(!cache||cache.meta.etag!==meta.etag||!cache.buf){
+        const dl=it['@microsoft.graph.downloadUrl'];
+        const r=dl?await fetch(dl):await _g('/shares/'+_shareId(url)+'/driveItem/content');
+        if(!r.ok)throw new Error('descarga HTTP '+r.status);
+        buf=await r.arrayBuffer();
+        await _nubeSet('arch:'+A.k,{meta,buf,bajado:Date.now()});
+        E.bajado=Date.now();E.nuevo=true;
+      }else{buf=cache.buf;E.bajado=cache.bajado;E.nuevo=false;}
+      E.error=null;E.enLinea=true;
+    }catch(e){if(e.sinSesion)throw e;E.error=e.message;E.enLinea=false;}
+  }
+  if(!buf&&cache){buf=cache.buf;E.bajado=cache.bajado;}
+  E.meta=meta;
+  if(!buf)return;
+  // Se aplica si es nuevo o si aún no se aplicó en esta sesión
+  if(E.aplicadoEtag===(meta&&meta.etag)&&!E.nuevo)return;
+  NUBE.aplicando=true;
+  try{const err=A.aplicar(buf,(meta&&meta.nombre)||A.etq);E.formato=err||null;if(!err)E.aplicadoEtag=meta&&meta.etag;E.nuevo=false;}
+  catch(e){E.formato=e.message;}
+  finally{NUBE.aplicando=false;}
+}
+
+// ── JSON compartido (stocks y configuración manual) ──
+function _nubePaquete(){
+  const R=(typeof _repoCfg==='function')?_repoCfg():{};
+  return{inv:inv||{},invEstado:(document.getElementById('st-inv')||{}).textContent||'',
+    repo:{bodega:R.bodega||{},bodegaArchivo:R.bodegaArchivo||'',sapuStock:R.sapuStock||null,sapuStockArchivo:R.sapuStockArchivo||'',sapuStockFecha:R.sapuStockFecha||'',mm:R.mm||{},mmArchivo:R.mmArchivo||'',excl:R.excl||{}},
+    apertura:(typeof _sapuCfg==='function'?_sapuCfg().apertura:'')||'',
+    equivManual:typeof equivManual!=='undefined'?equivManual:{}};
+}
+async function _nubeCarpeta(){
+  if(NUBE.carpeta)return NUBE.carpeta;
+  if(NUBE.cfg.carpeta){const it=await _nubeItem(NUBE.cfg.carpeta);NUBE.carpeta={driveId:it.parentReference&&it.parentReference.driveId||(it.remoteItem&&it.remoteItem.parentReference.driveId),id:it.id};}
+  else if(NUBE.padre)NUBE.carpeta={driveId:NUBE.padre.driveId,id:NUBE.padre.id};
+  return NUBE.carpeta||null;
+}
+async function _nubeLeerCompartido(){
+  const E=NUBE.estado.comp=NUBE.estado.comp||{};
+  try{
+    const c=await _nubeCarpeta();if(!c){E.error='sin carpeta';return;}
+    const r=await _g(`/drives/${c.driveId}/items/${c.id}:/${encodeURIComponent(NUBE_COMP)}`);
+    if(r.status===404){E.vacio=true;E.error=null;return;}
+    if(!r.ok)throw new Error(r.status===403?'sin permiso en la carpeta':'HTTP '+r.status);
+    const it=await r.json();E.meta={etag:it.eTag,mod:it.lastModifiedDateTime,por:it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName};
+    if(E.aplicadoEtag===it.eTag){E.error=null;return;}
+    const d=await (await fetch(it['@microsoft.graph.downloadUrl'])).json();
+    await _nubeSet('comp',{meta:E.meta,d});
+    _nubeAplicarCompartido(d);E.aplicadoEtag=it.eTag;E.error=null;
+  }catch(e){if(e.sinSesion)throw e;E.error=e.message;
+    const cc=await _nubeGet('comp');if(cc&&!E.aplicadoEtag){E.meta=cc.meta;_nubeAplicarCompartido(cc.d);E.aplicadoEtag=cc.meta.etag;E.desdeCache=true;}}
+}
+function _nubeAplicarCompartido(d){
+  if(!d||!d.datos)return;const D=d.datos;
+  NUBE.aplicando=true;
+  try{
+    if(D.inv&&Object.keys(D.inv).length){inv=D.inv;try{registrarArticulosDinamicos(Object.keys(inv).map(a=>({avis:a,origen:'nuevo'})));}catch(e){}
+      const si=document.getElementById('st-inv');if(si)si.textContent=(D.invEstado||`✓ ${Object.keys(inv).length} artículos`)+' ☁';document.getElementById('slot-inv')?.classList.add('loaded');pdbGuardar('inv');}
+    if(D.equivManual&&typeof equivManual!=='undefined'){Object.keys(D.equivManual).forEach(k=>{equivManual[k]=D.equivManual[k];});try{pdbGuardar('equivManual');}catch(e){}}
+    if(D.repo&&typeof _repoCfg==='function'){const R=_repoCfg();Object.assign(R,D.repo);if(D.apertura)_sapuCfg().apertura=D.apertura;_sapuGuardar();}
+    NUBE.ultimoPub=JSON.stringify(_nubePaquete());
+    try{renderLista();if(typeof sel!=='undefined'&&sel&&inv[sel])renderPanel(sel);}catch(e){}
+    try{if(typeof repoRender==='function')repoRender();}catch(e){}
+  }finally{NUBE.aplicando=false;}
+}
+function _nubeProgramarPublicar(){
+  if(!NUBE.cfg||NUBE.aplicando)return;
+  clearTimeout(NUBE.pubTimer);NUBE.pubTimer=setTimeout(nubePublicar,2500);
+}
+async function nubePublicar(){
+  const datos=_nubePaquete();const txt=JSON.stringify(datos);
+  if(txt===NUBE.ultimoPub)return;
+  const E=NUBE.estado.comp=NUBE.estado.comp||{};
+  try{
+    const c=await _nubeCarpeta();if(!c)throw new Error('sin carpeta compartida');
+    const body=JSON.stringify({app:'Pinguino Delta',v:1,ts:new Date().toISOString(),por:NUBE.user||'',datos});
+    const r=await _g(`/drives/${c.driveId}/items/${c.id}:/${encodeURIComponent(NUBE_COMP)}:/content`,{method:'PUT',headers:{'Content-Type':'application/json'},body});
+    if(!r.ok)throw new Error(r.status===403?'tu cuenta solo puede leer la carpeta compartida':'HTTP '+r.status);
+    const it=await r.json();E.meta={etag:it.eTag,mod:it.lastModifiedDateTime,por:NUBE.user};E.aplicadoEtag=it.eTag;E.error=null;E.pendiente=false;
+    NUBE.ultimoPub=txt;await _nubeSet('comp',{meta:E.meta,d:JSON.parse(body)});
+  }catch(e){E.error=e.sinSesion?'sin sesión':e.message;E.pendiente=true;}
+  nubeRender();
+}
+
+// ── Sincronización general ──
+let _nubeOcupado=false;
+async function nubeSincronizar(manual){
+  if(!NUBE.cfg||_nubeOcupado)return;_nubeOcupado=true;nubeRender('Sincronizando…');
+  const enLinea=navigator.onLine!==false&&!!(await _nubeAT());
+  try{
+    if(enLinea&&!NUBE.user){try{const r=await _g('/me?$select=displayName,mail');if(r.ok){const j=await r.json();NUBE.user=j.displayName||j.mail;_lsS('pdn_user',NUBE.user);}}catch(e){}}
+    for(const A of NUBE_ARCH)await _nubeArchivo(A,enLinea);
+    if(enLinea){await _nubeLeerCompartido();if(NUBE.estado.comp&&NUBE.estado.comp.pendiente)await nubePublicar();}
+    else{const cc=await _nubeGet('comp');const E=NUBE.estado.comp=NUBE.estado.comp||{};if(cc&&!E.aplicadoEtag){E.meta=cc.meta;_nubeAplicarCompartido(cc.d);E.aplicadoEtag=cc.meta.etag;E.desdeCache=true;}}
+    const algunoOK=NUBE_ARCH.some(A=>NUBE.estado[A.k]&&NUBE.estado[A.k].enLinea);NUBE.sinRed=!algunoOK;
+    if(algunoOK)NUBE.ultimaSync=Date.now();
+  }catch(e){if(e.sinSesion){NUBE.tok=null;_lsS('pdn_tok',null);}}
+  finally{_nubeOcupado=false;nubeRender();}
+}
+
+// ── Interfaz ──
+function _nubeMsg(t,cls){NUBE.msg=t?{t,cls}:null;nubeRender();}
+const _fh=t=>{if(!t)return'—';const d=new Date(t);return d.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});};
+function nubeRender(ocupado){
+  const el=document.getElementById('nube-bar');if(!el||!NUBE.cfg)return;
+  el.style.display='flex';
+  const ses=!!(NUBE.tok&&(NUBE.tok.rt||Date.now()<NUBE.tok.exp));
+  const fila=(k,etq)=>{const E=NUBE.estado[k]||{};const m=E.meta;if(!NUBE.cfg[k==='comp'?'_':k]&&k!=='comp')return'';
+    let est=E.formato?`<span class="nb-err">⚠ ${_sapuEsc(E.formato)}</span>`:E.error&&!m?`<span class="nb-err">⚠ ${_sapuEsc(E.error)}</span>`:m?`✓ ${k==='comp'?'actualizado':'archivo modificado'} ${_fh(m.mod)}${m.por?' por '+_sapuEsc(m.por):''}${E.error?` <span class="nb-err" title="${_sapuEsc(E.error)}">· sin conexión, última copia</span>`:''}`:(k==='comp'&&E.vacio?'aún no hay stocks compartidos: se crearán al cargar uno':'pendiente');
+    if(k==='comp'&&E.pendiente)est+=' <span class="nb-err">· cambios sin subir</span>';
+    return`<span class="nb-f"><b>${etq}:</b> ${est}</span>`;};
+  el.innerHTML=`<span class="nb-t">☁ <b>${_sapuEsc(NUBE.cfg.nombre||'Delta en red')}</b> ${ses?`· ${_sapuEsc(NUBE.user||'conectado')}`:'· sin sesión'}${NUBE.ultimaSync?` · sincronizado ${_fh(NUBE.ultimaSync)}`:''}${navigator.onLine===false||(NUBE.sinRed&&!_nubeOcupado)?' · <span class="nb-err">sin conexión: usando la última copia guardada</span>':''}</span>
+    <span class="nb-fs">${fila('consumos','Consumos y programaciones')}${fila('sapu','Consumo diario SAPU')}${fila('comp','Stocks compartidos')}${NUBE.msg?`<span class="nb-f ${NUBE.msg.cls==='error'?'nb-err':''}">${_sapuEsc(NUBE.msg.t)}</span>`:''}</span>
+    <span class="nb-b">${ses?`<button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Sincronizando…':'🔄 Sincronizar'}</button><button onclick="nubeSalir()">Salir</button>`:`<button class="nb-main" onclick="nubeEntrar()">🔐 Entrar con cuenta ${_sapuEsc(NUBE.cfg.dominio||'institucional')}</button>`}</span>`;
+}
+async function nubeIniciar(){
+  if(location.protocol!=='https:'&&location.hostname!=='localhost')return;
+  let cfg=null;
+  try{const r=await fetch('config.json',{cache:'no-cache'});if(r.ok)cfg=await r.json();}catch(e){}
+  if(!cfg||!cfg.tenant)return;
+  NUBE.cfg=cfg;NUBE.user=_lsG('pdn_user');
+  document.body.classList.add('modo-nube');
+  if(cfg.nombre)document.title='Pingüino Delta · '+cfg.nombre;
+  try{const db=document.getElementById('demo-bar');if(db)db.style.display='none';}catch(e){}
+  // Instalable (PWA) y abre sin internet
+  try{if(!document.querySelector('link[rel=manifest]')){const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);}
+    if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
+  try{await window.__pdbListo;}catch(e){}
+  await _nubeVolverDeLogin();
+  nubeRender();
+  // Publicar al cambiar stocks a mano
+  const base=window.pdbGuardar;
+  window.pdbGuardar=pdbGuardar=function(t){const r=base.apply(this,arguments);if(!NUBE.aplicando&&(t==='inv'||t==='sapuCfg'||t==='equivManual'))_nubeProgramarPublicar();return r;};
+  await nubeSincronizar();
+  setInterval(()=>{if(document.visibilityState==='visible')nubeSincronizar();},5*60*1000);
+  window.addEventListener('focus',()=>{if(!NUBE.ultimaSync||Date.now()-NUBE.ultimaSync>60000)nubeSincronizar();});
+  window.addEventListener('online',()=>nubeSincronizar());window.addEventListener('offline',()=>nubeRender());
+}
+// Después de restaurar la memoria local (para que lo sincronizado quede encima)
+window.addEventListener('load',()=>{nubeIniciar();});
+</script>
+
 </body>
 </html>

@@ -33,6 +33,8 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 
 **Paquete de bodegas (Pingüino Lotes):** un solo Excel con hojas «Botiquín», «Bodega central» y «SAPU» (columnas de la toma AVIS: Nombre Artículo · Vencimiento · Lote · Stock Sist.) y una hoja opcional «Paquete» con columnas *Bodega* y *Fecha toma AVIS*. El botón «📦 Importar paquete de bodegas» (Mi arsenal y Reposición SAPU) carga las tres a la vez. Todo se procesa en el navegador; nada se sube a internet.
 
+**Versión institucional (Microsoft 365):** la carpeta [`institucional/`](institucional/LEEME.md) permite publicar un link propio (p. ej. en Netlify) donde cada colega entra con su cuenta Microsoft institucional; Delta lee directo de SharePoint el Excel único de consumos/programaciones y el de consumo diario SAPU, comparte los stocks cargados a mano entre todos los PC y funciona sin internet con la última copia. Sin `config.json` (como en este link abierto) no se conecta a nada.
+
 **Consumo diario sin fechas:** también acepta columnas «Consumo Día 1 (Sábado)», «Día 2 (Domingo)»… Delta deduce la fecha del Día 1 con los días de la semana (el más reciente que calce, sin pasar de hoy) y se puede corregir en pantalla; las columnas de días aún vacías no cuentan como informadas.
 
 `00_Guion_escenarios_DEMO.xlsx` indica qué debe mostrar Delta para cada artículo.
