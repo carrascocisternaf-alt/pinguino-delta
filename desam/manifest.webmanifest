@@ -1,0 +1,17 @@
+{
+  "name": "Pingüino Delta · DESAM Limache",
+  "short_name": "Delta DESAM",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F5F8F8",
+  "theme_color": "#1CAFAA",
+  "icons": [
+    {
+      "src": "icono.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

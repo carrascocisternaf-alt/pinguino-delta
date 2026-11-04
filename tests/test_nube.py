@@ -5,10 +5,12 @@ Verifica: inicio de sesión PKCE, lectura de los dos Excel por vínculo, que no 
 re-descarguen si no cambiaron, publicación de stocks al JSON compartido, que otro
 "PC" vea lo mismo, y el uso de la última copia sin internet.
 """
-import asyncio, os, json, base64, datetime as dt, urllib.parse as up
+import asyncio, os, re, json, base64, datetime as dt, urllib.parse as up
 from playwright.async_api import async_playwright
 BASE=os.path.dirname(os.path.abspath(__file__)); RAIZ=os.path.join(BASE,'..'); DEMO=os.path.join(RAIZ,'demo')
 HTML=open(os.path.join(RAIZ,'index.html'),'rb').read()
+CARGADOR=open(os.path.join(RAIZ,'institucional','index.html'),encoding='utf-8').read()
+MODO={'v':'config'}  # 'config' = config.json junto a la página · 'cargador' = index.html de un solo archivo
 def demo(p): return open(os.path.join(DEMO,next(x for x in sorted(os.listdir(DEMO)) if x.startswith(p))),'rb').read()
 CONS=demo('05_'); SAPU=demo('12_'); INV=os.path.join(DEMO,next(x for x in sorted(os.listdir(DEMO)) if x.startswith('01_')))
 CFG={"nombre":"DESAM Prueba","tenant":"prueba.cl","dominio":"prueba.cl","clientId":"00000000-test",
@@ -57,11 +59,20 @@ async def pc(b,nube,login=True):
         u=rt.request.url
         if u.startswith('https://delta.test/'):
             path=up.urlparse(u).path
-            if path in ('/','/index.html'): return await rt.fulfill(status=200,content_type='text/html',body=HTML)
-            if path=='/config.json': return await rt.fulfill(status=200,content_type='application/json',body=json.dumps(CFG))
+            if path in ('/','/index.html'):
+                if MODO['v']=='cargador':
+                    body=re.sub(r'const CONFIG = \{[\s\S]*?\};','const CONFIG = '+json.dumps(CFG)+';',CARGADOR,count=1)
+                    return await rt.fulfill(status=200,content_type='text/html',body=body)
+                return await rt.fulfill(status=200,content_type='text/html',body=HTML)
+            if path=='/config.json':
+                if MODO['v']=='cargador': return await rt.fulfill(status=404,body='')
+                return await rt.fulfill(status=200,content_type='application/json',body=json.dumps(CFG))
             if path=='/sw.js': return await rt.fulfill(status=200,content_type='text/javascript',body='self.addEventListener("fetch",()=>{});')
             if path=='/manifest.webmanifest': return await rt.fulfill(status=200,content_type='application/manifest+json',body='{"name":"x"}')
             return await rt.fulfill(status=404,body='')
+        if u.startswith('https://carrascocisternaf-alt.github.io/pinguino-delta/'):
+            if nube.caido: return await rt.abort()
+            return await rt.fulfill(status=200,content_type='text/html',headers={'Access-Control-Allow-Origin':'*'},body=HTML)
         if not await nube.handle(rt): await rt.abort()
     await ctx.route('**/*',route)
     await pg.clock.install(time=dt.datetime(2026,11,4,10,0))
@@ -110,6 +121,8 @@ async def main():
         ok(r['cons']>0 and r['ap']=='e2' and r['inv']==ninv and 'última copia' in r['txt'],f"Sin internet abre con la última copia descargada ({r['cons']} artículos, etag {r['ap']}, {r['txt'][:160]!r})")
         ok(not errs2,f'PC 2 sin errores ({errs2})')
         await b.close()
-    print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')
-    if fallas: raise SystemExit(1)
-asyncio.run(main())
+
+for modo in ('config','cargador'):
+    MODO['v']=modo; print(f'\n── Modo {modo} ──'); asyncio.run(main())
+print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')
+if fallas: raise SystemExit(1)

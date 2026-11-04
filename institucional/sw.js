@@ -1,8 +1,8 @@
 /* Pingüino Delta · sitio institucional: abre sin internet con la última versión vista.
-   Solo guarda la página, config.json y el manifiesto (mismo origen). Los datos
+   Solo guarda el cargador (index.html) y el manifiesto (mismo origen). Los datos
    (Excel y stocks) los guarda la propia página en IndexedDB. */
-const CACHE='delta-inst-v1';
-const BASICOS=['./','config.json','manifest.webmanifest','icono.svg'];
+const CACHE='delta-inst-v2';
+const BASICOS=['./','manifest.webmanifest','icono.svg'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(BASICOS).catch(()=>{})));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{

@@ -20953,7 +20953,7 @@ async function nubeSincronizar(manual){
     for(const A of NUBE_ARCH)await _nubeArchivo(A,enLinea);
     if(enLinea){await _nubeLeerCompartido();if(NUBE.estado.comp&&NUBE.estado.comp.pendiente)await nubePublicar();}
     else{const cc=await _nubeGet('comp');const E=NUBE.estado.comp=NUBE.estado.comp||{};if(cc&&!E.aplicadoEtag){E.meta=cc.meta;_nubeAplicarCompartido(cc.d);E.aplicadoEtag=cc.meta.etag;E.desdeCache=true;}}
-    const algunoOK=NUBE_ARCH.some(A=>NUBE.estado[A.k]&&NUBE.estado[A.k].enLinea);NUBE.sinRed=!algunoOK;
+    const algunoOK=NUBE_ARCH.some(A=>NUBE.estado[A.k]&&NUBE.estado[A.k].enLinea);NUBE.sinRed=enLinea?!algunoOK:navigator.onLine===false;
     if(algunoOK)NUBE.ultimaSync=Date.now();
   }catch(e){if(e.sinSesion){NUBE.tok=null;_lsS('pdn_tok',null);}}
   finally{_nubeOcupado=false;nubeRender();}
@@ -20975,9 +20975,12 @@ function nubeRender(ocupado){
     <span class="nb-b">${ses?`<button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Sincronizando…':'🔄 Sincronizar'}</button><button onclick="nubeSalir()">Salir</button>`:`<button class="nb-main" onclick="nubeEntrar()">🔐 Entrar con cuenta ${_sapuEsc(NUBE.cfg.dominio||'institucional')}</button>`}</span>`;
 }
 async function nubeIniciar(){
+  if(NUBE.iniciado)return;
   if(location.protocol!=='https:'&&location.hostname!=='localhost')return;
-  let cfg=null;
-  try{const r=await fetch('config.json',{cache:'no-cache'});if(r.ok)cfg=await r.json();}catch(e){}
+  if(NUBE.iniciado)return;NUBE.iniciado=true;
+  // Configuración: incrustada por el cargador de un solo archivo (window.DELTA_CONFIG) o config.json junto a la página
+  let cfg=window.DELTA_CONFIG||null;
+  if(!cfg){try{const r=await fetch('config.json',{cache:'no-cache'});if(r.ok)cfg=await r.json();}catch(e){}}
   if(!cfg||!cfg.tenant)return;
   NUBE.cfg=cfg;NUBE.user=_lsG('pdn_user');
   document.body.classList.add('modo-nube');
@@ -20985,7 +20988,7 @@ async function nubeIniciar(){
   try{const db=document.getElementById('demo-bar');if(db)db.style.display='none';}catch(e){}
   // Instalable (PWA) y abre sin internet
   try{if(!document.querySelector('link[rel=manifest]')){const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);}
-    if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
+    if('serviceWorker' in navigator)fetch('sw.js',{method:'HEAD'}).then(r=>{if(r.ok&&/javascript/.test(r.headers.get('content-type')||''))navigator.serviceWorker.register('sw.js').catch(()=>{});}).catch(()=>{});}catch(e){}
   try{await window.__pdbListo;}catch(e){}
   await _nubeVolverDeLogin();
   nubeRender();
@@ -20998,7 +21001,9 @@ async function nubeIniciar(){
   window.addEventListener('online',()=>nubeSincronizar());window.addEventListener('offline',()=>nubeRender());
 }
 // Después de restaurar la memoria local (para que lo sincronizado quede encima)
-window.addEventListener('load',()=>{nubeIniciar();});
+// (también funciona cuando la página la escribe el cargador de un solo archivo con document.write)
+document.addEventListener('DOMContentLoaded',()=>setTimeout(nubeIniciar,0));
+window.addEventListener('load',()=>nubeIniciar());
 </script>
 
 </body>

@@ -9,7 +9,7 @@ Un link propio de la institución: cada colega entra con su cuenta Microsoft ins
 
 Los datos no pasan por servidores de terceros: el navegador habla directo con Microsoft. Sin una cuenta de la institución con permiso sobre los archivos, el link muestra Delta vacío (como la versión abierta).
 
-La página se toma de la versión publicada de Delta (GitHub Pages), así que **se actualiza sola**. Esta carpeta solo agrega `config.json` (los datos de tu institución), el modo sin internet y el ícono.
+El `index.html` de esta carpeta es un **cargador**: trae la versión publicada de Delta (GitHub Pages), así que **se actualiza sola**, guarda una copia para abrir sin internet y le entrega la configuración de tu institución (bloque `CONFIG` al inicio del archivo). `sw.js`, `manifest.webmanifest` e `icono.svg` son opcionales: permiten abrir el link sin internet aunque se cierre el navegador e instalarlo como app.
 
 ---
 
@@ -26,10 +26,10 @@ No se crea ningún secreto ni certificado (las apps de página única no lo usan
 
 ## 2 · Publicar el sitio (Netlify, gratis)
 
-1. Edita `config.json` (Bloc de notas): pega el `clientId` del paso 1 y revisa los vínculos.
-2. Inicia sesión en Netlify → **Sites (Proyectos) → Add new site → Deploy manually** y arrastra **la carpeta** que contiene `index.html`, `_redirects`, `config.json`, `sw.js`, `manifest.webmanifest` e `icono.svg` (o usa «browse to upload» y elige esa carpeta). Si arrastras el .zip, Netlify también lo acepta.
+1. Abre `index.html` con el Bloc de notas y, en el bloque `CONFIG`, pega el `clientId` del paso 1 (entre comillas) y revisa los vínculos. Guarda.
+2. En Netlify → **Sites → Add new site → Deploy manually** arrastra la carpeta (o «browse to upload»). Basta con que suba `index.html`; si suben también `sw.js`, `manifest.webmanifest` e `icono.svg`, mejor.
 3. En **Site configuration → Change site name** elige el nombre (p. ej. `delta-desam-limache`). Esa URL es la que va en el paso 1.3.
-4. Para cambiar `config.json` más adelante: **Deploys → arrastrar la carpeta de nuevo**.
+4. Para cambiar la configuración más adelante: edita `index.html` y en **Deploys** arrastra la carpeta de nuevo.
 
 ## 3 · SharePoint / OneDrive
 
@@ -37,7 +37,7 @@ No se crea ningún secreto ni certificado (las apps de página única no lo usan
 - Stocks compartidos: crea una carpeta (p. ej. `Delta - stocks`), compártela **con permiso de edición** con los colegas que cargan stocks (y de lectura con el resto), y pega su vínculo en `"carpeta"`. Si `"carpeta"` queda vacío, se usa la carpeta donde está el Excel de consumos.
 - Quien solo tenga permiso de lectura ve todo, pero sus cargas de stock no se suben (la barra lo indica).
 
-## config.json
+## Bloque CONFIG (en index.html)
 
 | Campo | Qué es |
 |---|---|
@@ -53,4 +53,4 @@ No se crea ningún secreto ni certificado (las apps de página única no lo usan
 
 - La sesión dura hasta ~24 h sin uso; después se vuelve a presionar «Entrar».
 - Cuando varios cargan stock a la vez, queda la última carga (se muestra quién y cuándo).
-- La copia local (`index.html` abierto desde el PC) y el link abierto de GitHub siguen funcionando igual: sin `config.json` no se conectan a nada.
+- La copia local de Delta y el link abierto de GitHub siguen funcionando igual: sin configuración no se conectan a nada.

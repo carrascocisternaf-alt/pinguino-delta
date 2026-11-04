@@ -1,5 +1,0 @@
-# La página es la versión publicada de Pingüino Delta (se actualiza sola).
-# config.json, sw.js, manifest.webmanifest e icono.svg se sirven desde esta carpeta.
-# index.html está solo para que Netlify reconozca la carpeta; el «!» lo reemplaza por Delta.
-/            https://carrascocisternaf-alt.github.io/pinguino-delta/  200!
-/index.html  https://carrascocisternaf-alt.github.io/pinguino-delta/  200!
