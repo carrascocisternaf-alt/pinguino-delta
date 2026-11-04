@@ -500,6 +500,11 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
 #view-sapu .repo-excl{padding:3px 12px;border:1.5px solid var(--bdr);border-radius:20px;background:#fff;color:var(--ink3);font:700 11px 'DM Sans',sans-serif;cursor:pointer}
 #view-sapu .repo-excl.on{background:#A12895;border-color:#A12895;color:#fff}
 #view-sapu table.repo-t td{vertical-align:top}
+/* Encabezados fijos al bajar y artículo fijo al desplazar a la derecha (la tabla tiene su propio desplazamiento) */
+#view-sapu .sp-tw{max-height:var(--sapu-alto,70vh);overflow:auto;scroll-margin-top:calc(var(--sapu-top,100px) + 8px)}
+#view-sapu table.sp-t thead th{position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--bdr)}
+#view-sapu table.repo-t th:first-child,#view-sapu table.repo-t td:first-child{position:sticky;left:0;z-index:1;background:var(--surf);box-shadow:inset -1px 0 0 var(--bdr2)}
+#view-sapu table.repo-t thead th:first-child{z-index:3;background:var(--bg)}
 @media (max-width:1100px){#view-sapu .repo-params{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:820px){#view-sapu .repo-cargas{grid-template-columns:1fr}#view-sapu .repo-params{grid-template-columns:1fr}}
 </style>
@@ -20395,6 +20400,18 @@ let _repoQ='';
 let _repoFiltro='';
 const _REPO_FILTROS={rep:'Artículos a reponer',bod:'Se reponen desde bodega central',farm:'Se reponen desde farmacia',falt:'Sin stock para reponer',venc:'Con lotes que vencen en el SAPU'};
 // Filtro por tarjeta (clic en el KPI) + buscador; no recalcula, solo muestra/oculta filas
+// Alto de las barras fijas de arriba (cabecera, pestañas, pasos SAPU) para que la tabla quepa debajo con sus títulos visibles
+let _sapuTopRaf=0;
+function _sapuMedirTop(){
+  // #view-sapu tiene su propio desplazamiento y una cabecera pegajosa (pasos y pestañas):
+  // la tabla se limita al espacio visible bajo esa cabecera, con sus títulos siempre arriba.
+  _sapuTopRaf=0;const v=document.getElementById('view-sapu');if(!v||!v.offsetParent)return;
+  const cab=[...v.children].find(e=>getComputedStyle(e).position==='sticky');
+  const top=cab?cab.offsetHeight:0;
+  v.style.setProperty('--sapu-top',top+'px');
+  v.style.setProperty('--sapu-alto',Math.max(260,v.clientHeight-top-16)+'px');
+}
+window.addEventListener('resize',()=>{if(!_sapuTopRaf)_sapuTopRaf=requestAnimationFrame(_sapuMedirTop);},{passive:true});
 function repoFiltrar(k){
   _repoFiltro=(_repoFiltro===k||!k)?'':k;
   document.querySelectorAll('.repo-kf').forEach(b=>{const on=b.dataset.k===_repoFiltro;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);const ic=b.querySelector('.repo-kf-ic');if(ic)ic.textContent=on?'✕':'▾';b.title=on?'Clic para ver todos':'Clic para ver solo estos artículos';});
@@ -20486,6 +20503,7 @@ function repoRender(){
   </tbody></table></div>
   <p class="sp-note" style="margin-top:.6rem">Regla: en cada revisión (${R.frec==='semanal'?'cada lunes':'la primera semana de cada mes'}), si el stock del SAPU quedaría bajo el mínimo antes de la próxima reposición, se repone hasta el máximo. Se despacha primero de bodega central y luego de farmacia, siempre el lote que vence antes; farmacia conserva ${_sapuEsc(String(R.reserva))} mes(es) de consumo CESFAM como reserva (si el CESFAM no consume el artículo, no hay reserva). El stock del SAPU se toma de AVIS por lote si lo cargaste (un artículo que no aparece en AVIS tiene 0); el SAPU consume primero el lote que vence antes y lo que vence dentro del SAPU se descuenta y se avisa. El cálculo avanza semana a semana desde hoy, descontando el consumo del CESFAM y del SAPU y sumando lo programado en la semana en que llega. * Sin stock SAPU informado: se supone lleno al iniciar.</p>`;
   if(_repoQ||_repoFiltro)repoBuscar(_repoQ);
+  requestAnimationFrame(_sapuMedirTop);
 }
 
 /* ── Exportar ── */
