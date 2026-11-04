@@ -51,13 +51,13 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 <style>
 :root{
   /* Paleta de colores Pingüino Delta */
-  --brand-teal:#1CAFAA;--brand-teal-dark:#148F8B;--brand-orange:#EE881C;--brand-purple:#A12895;--brand-coral:#EB5A5E;
+  --brand-teal:#1CAFAA;--brand-teal-dark:#0E7470;--brand-orange:#EE881C;--brand-purple:#A12895;--brand-coral:#EB5A5E;
   --brand-gray:#A9ABAE;--brand-gray-light:#E6E7E8;
-  --navy:#148F8B;--navy2:#0F7774;--blue:#1CAFAA;--bl:#E8F7F6;--bp:#F3FBFA;
-  --teal:#148F8B;--tl:#E6F5F4;--amber:#EE881C;--al:#FFF3E5;
-  --red:#EB5A5E;--rl:#FDEDEE;--green:#148F8B;--gl:#E8F5F4;
+  --navy:#0E7470;--navy2:#0B5F5C;--blue:#1CAFAA;--bl:#E8F7F6;--bp:#F3FBFA;
+  --teal:#0E7470;--tl:#E6F5F4;--amber:#EE881C;--al:#FFF3E5;
+  --red:#C63A3F;--rl:#FDEDEE;--green:#0E7470;--gl:#E8F5F4;
   --pm:#A12895;--pml:#F7EAF5;--pmd:#7D1F73;
-  --ink:#252627;--ink2:#575A5C;--ink3:#8A8D90;
+  --ink:#1F2021;--ink2:#46494B;--ink3:#5C6064;
   --bdr:#D7D9DA;--bdr2:#ECEDEE;--surf:#fff;--bg:#F6F7F7;--bg2:#EDEEEF;
   --r:10px;--rl2:16px;
 }
@@ -68,11 +68,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .tb-mark{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center}
 .tb-mark svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2}
 .tb-title{font-size:14px;font-weight:600;color:#fff}
-.tb-sub{font-size:11px;color:rgba(255,255,255,.45);font-weight:300}
+.tb-sub{font-size:11px;color:rgba(255,255,255,.85);font-weight:400}
 .tb-r{display:flex;align-items:center;gap:7px}
 .tb-b{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid}
 .b-pm{background:rgba(123,63,196,.3);color:#D4AAFF;border-color:rgba(123,63,196,.35)}
-.b-tot{background:rgba(255,255,255,.12);color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.14)}
+.b-tot{background:rgba(255,255,255,.12);color:rgba(255,255,255,.92);border-color:rgba(255,255,255,.14)}
 .layout{display:grid;grid-template-columns:310px 1fr;height:calc(100vh - 88px);overflow:hidden}
 .sb{background:var(--surf);border-right:1px solid var(--bdr2);display:flex;flex-direction:column;height:100%;overflow:hidden}
 .sb-top{padding:1rem 1rem .6rem;border-bottom:1px solid var(--bdr2);flex-shrink:0}
@@ -102,7 +102,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .di-name{font-size:12.5px;line-height:1.3;flex:1}
 .di-tag{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:20px;flex-shrink:0}
 .t-pm{background:var(--pml);color:var(--pmd)}.t-cen{background:var(--bl);color:var(--blue)}.t-nuevo{background:#FFF3E5;color:#B4720A}
-.t-cpu{background:#F7EAF5;color:#A12895}.t-fofar{background:#E8F7F6;color:#1CAFAA}.t-iaaps{background:#E0F5EF;color:#148F8B}
+.t-cpu{background:#F7EAF5;color:#A12895}.t-fofar{background:#E8F7F6;color:#0E7470}.t-iaaps{background:#E0F5EF;color:#0E7470}
 mark{background:#FFF3E5;color:#9A5F10;border-radius:2px;padding:0 1px}
 .main{padding:1.5rem 1.75rem;overflow-y:auto;height:100%}
 .ubanner{background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:.9rem 1rem;margin-bottom:1.1rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
@@ -337,7 +337,7 @@ body{background:var(--bg);color:var(--ink)}
 .tb-title .product-desc{font-weight:500;color:#424546}
 .tb-sub{font-size:10.5px;color:#777A7C;font-weight:500;letter-spacing:.01em}
 .tb-r{color:var(--ink2)}
-.tb-r > span{color:#8A8D90!important}
+.tb-r > span{color:#5C6064!important}
 .tb-r > button,.tb-r > label{border-color:#D2D4D5!important;background:#F8F9F9!important;color:#3F4243!important;transition:.15s ease}
 .tb-r > button:hover,.tb-r > label:hover{border-color:var(--brand-teal)!important;background:#EFF9F8!important;color:var(--brand-teal-dark)!important}
 .b-tot{background:#F2F3F3!important;color:#606365!important;border-color:#DADCDD!important}
@@ -345,7 +345,7 @@ body{background:var(--bg);color:var(--ink)}
 
 /* Navegación principal */
 .mode-tabs{background:var(--brand-teal-dark);box-shadow:0 2px 8px rgba(20,143,139,.14)}
-.mtab{color:rgba(255,255,255,.72);background:rgba(255,255,255,.07)}
+.mtab{color:rgba(255,255,255,.93);background:rgba(255,255,255,.1)}
 .mtab:hover{color:#fff;background:rgba(255,255,255,.14)}
 .mtab.m-on{background:var(--bg);color:var(--brand-teal-dark);border-bottom-color:var(--brand-orange);box-shadow:0 -2px 10px rgba(0,0,0,.08)}
 #mtab-ayuda{background:rgba(255,255,255,.11)!important}
@@ -373,7 +373,7 @@ body{background:var(--bg);color:var(--ink)}
 .d-cen{background:var(--brand-teal)}
 .d-nuevo{background:var(--brand-orange)}
 .t-pm,.pill-pm{background:#F7EAF5;color:#7D1F73}
-.t-cen,.pill-cen{background:#E8F7F6;color:#148F8B}
+.t-cen,.pill-cen{background:#E8F7F6;color:#0E7470}
 .t-nuevo{background:#FFF3E5;color:#B86400}
 .kv-b,.tp{color:var(--brand-teal)}
 .kv-r,.tm,.tlo{color:var(--brand-coral)}
@@ -551,7 +551,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
       📥 Importar respaldo
       <input type="file" accept=".json" onchange="importarRespaldoCompleto(event)" style="display:none">
     </label>
-    <span style="font-size:9px;color:rgba(255,255,255,.32);white-space:nowrap;margin-left:6px">Desarrollado por Q.F. Felipe Carrasco Cisterna</span>
+    <span style="font-size:9px;color:rgba(255,255,255,.8);white-space:nowrap;margin-left:6px">Desarrollado por Q.F. Felipe Carrasco Cisterna</span>
   </div>
 </div>
 <div id="pdb-vacio" style="display:none;align-items:center;gap:12px;justify-content:space-between;background:#FEF3E2;border-bottom:1px solid #F0C27A;padding:.55rem 1rem;font-size:12.5px;color:#7A4A0A;flex-wrap:wrap">
@@ -593,8 +593,8 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
       <button class="fbtn" id="f-sin" onclick="setFiltro('sin')">Sin programación</button>
       <button class="fbtn" id="f-nuevo" onclick="setFiltro('nuevo')">🆕 Nuevos</button>
       <button class="fbtn" id="f-cpu" onclick="setFiltro('cpu')" style="color:#A12895">Ⓒ CPU</button>
-      <button class="fbtn" id="f-fofar" onclick="setFiltro('fofar')" style="color:#1CAFAA">Ⓕ FOFAR</button>
-      <button class="fbtn" id="f-iaaps" onclick="setFiltro('iaaps')" style="color:#148F8B">Ⓘ IAAPS</button>
+      <button class="fbtn" id="f-fofar" onclick="setFiltro('fofar')" style="color:#0E7470">Ⓕ FOFAR</button>
+      <button class="fbtn" id="f-iaaps" onclick="setFiltro('iaaps')" style="color:#0E7470">Ⓘ IAAPS</button>
     </div>
     <div class="sb-meta" id="meta">219 artículos</div>
     <div class="dl" id="lista"></div>
@@ -791,8 +791,8 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
         <button class="rot-etiqueta-btn" data-etiqueta="todos" onclick="rotFiltrarPorEtiqueta('arsenal','todos')" style="padding:5px 12px;border:1.5px solid var(--navy);border-radius:20px;background:var(--navy);color:#fff;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:700">Todos</button>
         <button class="rot-etiqueta-btn" data-etiqueta="pm" onclick="rotFiltrarPorEtiqueta('arsenal','pm')" style="padding:5px 12px;border:1.5px solid var(--navy);border-radius:20px;background:#fff;color:var(--navy);cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">📌 PM</button>
         <button class="rot-etiqueta-btn" data-etiqueta="cpu" onclick="rotFiltrarPorEtiqueta('arsenal','cpu')" style="padding:5px 12px;border:1.5px solid #A12895;border-radius:20px;background:#fff;color:#A12895;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓒ CPU</button>
-        <button class="rot-etiqueta-btn" data-etiqueta="fofar" onclick="rotFiltrarPorEtiqueta('arsenal','fofar')" style="padding:5px 12px;border:1.5px solid #1CAFAA;border-radius:20px;background:#fff;color:#1CAFAA;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓕ FOFAR</button>
-        <button class="rot-etiqueta-btn" data-etiqueta="iaaps" onclick="rotFiltrarPorEtiqueta('arsenal','iaaps')" style="padding:5px 12px;border:1.5px solid #148F8B;border-radius:20px;background:#fff;color:#148F8B;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓘ IAAPS</button>
+        <button class="rot-etiqueta-btn" data-etiqueta="fofar" onclick="rotFiltrarPorEtiqueta('arsenal','fofar')" style="padding:5px 12px;border:1.5px solid #1CAFAA;border-radius:20px;background:#fff;color:#0E7470;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓕ FOFAR</button>
+        <button class="rot-etiqueta-btn" data-etiqueta="iaaps" onclick="rotFiltrarPorEtiqueta('arsenal','iaaps')" style="padding:5px 12px;border:1.5px solid #148F8B;border-radius:20px;background:#fff;color:#0E7470;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓘ IAAPS</button>
         <button class="rot-etiqueta-btn" data-etiqueta="sinprog" onclick="rotFiltrarPorEtiqueta('arsenal','sinprog')" style="padding:5px 12px;border:1.5px solid var(--red);border-radius:20px;background:#fff;color:var(--red);cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">⚠ Sin programación</button>
       </div>
     </div>
@@ -847,7 +847,7 @@ table.xls td.xn{text-align:right;font-variant-numeric:tabular-nums}
           <option value="sin">Sin variación (&lt;15%)</option>
         </select>
         <button onclick="visRender_arsenal()" style="padding:6px 14px;border:1.5px solid var(--blue);border-radius:var(--r);background:#E8F7F6;color:var(--blue);font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">↻ Actualizar</button>
-        <button onclick="visLimpiar_arsenal()" style="padding:6px 14px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#EB5A5E;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">🗑 Limpiar</button>
+        <button onclick="visLimpiar_arsenal()" style="padding:6px 14px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#C63A3F;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">🗑 Limpiar</button>
       </div>
     </div>
     <div style="position:relative;margin-bottom:1rem" id="a-vis-search-wrap">
@@ -1115,7 +1115,7 @@ function visSwitchSubTab(sub){
           <option value="sin">Sin variación (&lt;15%)</option>
         </select>
         <button onclick="visRender_libre()" style="padding:6px 14px;border:1.5px solid var(--blue);border-radius:var(--r);background:#E8F7F6;color:var(--blue);font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">↻ Actualizar</button>
-        <button onclick="visLimpiar_libre()" style="padding:6px 14px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#EB5A5E;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">🗑 Limpiar</button>
+        <button onclick="visLimpiar_libre()" style="padding:6px 14px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#C63A3F;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">🗑 Limpiar</button>
       </div>
     </div>
     <div style="position:relative;margin-bottom:1rem" id="l-vis-search-wrap">
@@ -1307,8 +1307,8 @@ function visSwitchSubTab(sub){
       <button class="gasto-etiqueta-btn on" data-tag="todos" onclick="gastoFiltrarPorEtiqueta('todos')" style="padding:5px 13px;border:1.5px solid var(--navy);border-radius:20px;background:var(--navy);color:#fff;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:700">Todos</button>
       <button class="gasto-etiqueta-btn" data-tag="pm" onclick="gastoFiltrarPorEtiqueta('pm')" style="padding:5px 13px;border:1.5px solid var(--navy);border-radius:20px;background:#fff;color:var(--navy);cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">📌 PM</button>
       <button class="gasto-etiqueta-btn" data-tag="cpu" onclick="gastoFiltrarPorEtiqueta('cpu')" style="padding:5px 13px;border:1.5px solid #A12895;border-radius:20px;background:#fff;color:#A12895;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓒ CPU</button>
-      <button class="gasto-etiqueta-btn" data-tag="fofar" onclick="gastoFiltrarPorEtiqueta('fofar')" style="padding:5px 13px;border:1.5px solid #1CAFAA;border-radius:20px;background:#fff;color:#1CAFAA;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓕ FOFAR</button>
-      <button class="gasto-etiqueta-btn" data-tag="iaaps" onclick="gastoFiltrarPorEtiqueta('iaaps')" style="padding:5px 13px;border:1.5px solid #148F8B;border-radius:20px;background:#fff;color:#148F8B;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓘ IAAPS</button>
+      <button class="gasto-etiqueta-btn" data-tag="fofar" onclick="gastoFiltrarPorEtiqueta('fofar')" style="padding:5px 13px;border:1.5px solid #1CAFAA;border-radius:20px;background:#fff;color:#0E7470;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓕ FOFAR</button>
+      <button class="gasto-etiqueta-btn" data-tag="iaaps" onclick="gastoFiltrarPorEtiqueta('iaaps')" style="padding:5px 13px;border:1.5px solid #148F8B;border-radius:20px;background:#fff;color:#0E7470;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11.5px;font-weight:600">Ⓘ IAAPS</button>
       <span id="gasto-etiqueta-info" style="font-size:11px;color:var(--ink3);margin-left:6px"></span>
     </div>
 
@@ -1349,7 +1349,7 @@ function visSwitchSubTab(sub){
       <div style="display:flex;flex-direction:column;gap:6px">
         <button onclick="gastoRender()" class="btn-calc" style="padding:9px 20px;white-space:nowrap">Analizar</button>
         <button onclick="gastoABC()" style="padding:9px 20px;white-space:nowrap;border:1.5px solid #A12895;border-radius:var(--r);background:#F7EAF5;color:#7D1F73;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600">📊 ABC / Pareto</button>
-        <button onclick="gastoLimpiar()" style="padding:6px 12px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#EB5A5E;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px">🗑 Limpiar</button>
+        <button onclick="gastoLimpiar()" style="padding:6px 12px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#C63A3F;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px">🗑 Limpiar</button>
       </div>
     </div>
 
@@ -1429,7 +1429,7 @@ function visSwitchSubTab(sub){
         <h2 style="font-size:18px;font-weight:600;color:var(--navy)">Análisis de log de farmacia</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:3px">Dispensaciones por usuario, funcionario, horario y detección de volúmenes anómalos.</p>
       </div>
-      <button onclick="logLimpiar(event)" style="padding:8px 16px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#EB5A5E;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px">🗑 Limpiar</button>
+      <button onclick="logLimpiar(event)" style="padding:8px 16px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#C63A3F;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px">🗑 Limpiar</button>
     </div>
     <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem;margin-bottom:1rem">
       <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
@@ -1485,7 +1485,7 @@ function visSwitchSubTab(sub){
         <h2 style="font-size:18px;font-weight:600;color:var(--navy)">📆 Gestión de turnos</h2>
         <p style="font-size:13px;color:var(--ink3);margin-top:3px">Asignación de pausas y almuerzos para toda la semana. Minimiza repetición de horarios.</p>
       </div>
-      <button onclick="turnosLimpiar()" style="padding:8px 16px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#EB5A5E;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px">🗑 Limpiar</button>
+      <button onclick="turnosLimpiar()" style="padding:8px 16px;border:1.5px solid #EF9A9A;border-radius:var(--r);background:#FDEDEE;color:#C63A3F;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px">🗑 Limpiar</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
       <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem">
@@ -1497,7 +1497,7 @@ function visSwitchSubTab(sub){
         </div>
       </div>
       <div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#148F8B;margin-bottom:.6rem">🌙 Turno extensión — 12:00–20:00 (L–V) / 09:00–13:00 (Sáb)</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0E7470;margin-bottom:.6rem">🌙 Turno extensión — 12:00–20:00 (L–V) / 09:00–13:00 (Sáb)</div>
         <div id="t-extension-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:.75rem"></div>
         <div style="display:flex;gap:8px">
           <input type="text" id="t-extension-input" placeholder="Nombre funcionaria" style="flex:1;padding:7px 10px;border:1.5px solid var(--bdr);border-radius:var(--r);font-family:DM Sans,sans-serif;font-size:13px" onkeydown="if(event.key==='Enter')turnosAgregar('extension')">
@@ -1528,7 +1528,7 @@ function visSwitchSubTab(sub){
       </div>
       <button onclick="turnosGenerar()" class="btn-calc" style="padding:9px 24px">⚙️ Generar mes</button>
       <button onclick="turnosExportar()" style="padding:9px 14px;border:1.5px solid var(--blue);border-radius:var(--r);background:var(--bl);color:var(--blue);font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer">⬇ Exportar Excel</button>
-      <button onclick="imprimirTurnos()" style="padding:9px 14px;border:1.5px solid var(--teal);border-radius:var(--r);background:#E8F5F4;color:#148F8B;font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer">🖨 Imprimir</button>
+      <button onclick="imprimirTurnos()" style="padding:9px 14px;border:1.5px solid var(--teal);border-radius:var(--r);background:#E8F5F4;color:#0E7470;font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer">🖨 Imprimir</button>
     </div>
     <div id="turnos-content"></div>
   </div>
@@ -2723,7 +2723,7 @@ function visSwitchSubTab(sub){
             <div style="font-size:12.5px;font-weight:700;color:#7D1F73;margin-bottom:.3rem">📅 Reprogramación</div>
             <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.8">
               <li>📊 Fluctuación mensual real y envase guardado se aplican automáticamente si están cargados.</li>
-              <li>Símbolos por celda: <strong style="color:#EE881C">▲</strong> más que lo vigente · <strong style="color:#1CAFAA">▼</strong> menos que lo vigente · <strong style="color:#6A3FA0">★</strong> sin programación previa · <strong style="color:#EB5A5E">⚠</strong> riesgo de quiebre antes de reprogramar · <strong style="color:#8D6E3A">🗑</strong> mes con merma.</li>
+              <li>Símbolos por celda: <strong style="color:#EE881C">▲</strong> más que lo vigente · <strong style="color:#0E7470">▼</strong> menos que lo vigente · <strong style="color:#6A3FA0">★</strong> sin programación previa · <strong style="color:#C63A3F">⚠</strong> riesgo de quiebre antes de reprogramar · <strong style="color:#8D6E3A">🗑</strong> mes con merma.</li>
               <li>Insignia <strong>PM</strong> junto al artículo si corresponde.</li>
             </ul>
           </div>
@@ -3218,8 +3218,8 @@ function _etiquetasBadgeHTML(art){
   let h='';
   if(esPM(art))h+='<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:var(--pmd);background:var(--pml);margin-left:5px;vertical-align:middle">PM</span>';
   if(esCPU(art))h+='<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#A12895;background:#F7EAF5;margin-left:5px;vertical-align:middle">CPU</span>';
-  if(esFOFAR(art))h+='<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#1CAFAA;background:#E8F7F6;margin-left:5px;vertical-align:middle">FOFAR</span>';
-  if(esIAAPS(art))h+='<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#148F8B;background:#E0F5EF;margin-left:5px;vertical-align:middle">IAAPS</span>';
+  if(esFOFAR(art))h+='<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#0E7470;background:#E8F7F6;margin-left:5px;vertical-align:middle">FOFAR</span>';
+  if(esIAAPS(art))h+='<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;color:#0E7470;background:#E0F5EF;margin-left:5px;vertical-align:middle">IAAPS</span>';
   return h;
 }
 function toggleCPU(art){
@@ -4010,13 +4010,13 @@ function renderLista(){
     const cons=cons_map[a]!==undefined?`<span style="font-size:8px;color:var(--teal);font-weight:900">●</span>`:'';
     const esPMart=t==='pm';
     const pmTitle=esPMart?'Quitar de Prog. Ministerial (PM)':'Marcar como Prog. Ministerial (PM)';
-    const pmBtn=`<span class="pm-toggle" data-pm-art="${a.replace(/"/g,'&quot;')}" title="${pmTitle}" style="cursor:pointer;font-size:12px;padding:1px 3px;flex-shrink:0;opacity:${esPMart?'1':'.35'}">📌</span>`;
+    const pmBtn=`<span class="pm-toggle" data-pm-art="${a.replace(/"/g,'&quot;')}" title="${pmTitle}" style="cursor:pointer;font-size:12px;padding:1px 3px;flex-shrink:0;opacity:${esPMart?'1':'.55'}">📌</span>`;
     // Etiquetas CPU/FOFAR/IAAPS (a pedido de Felipe, ago-2026) — mismo
     // patrón que PM, independientes entre sí y de PM (pueden coexistir).
     const cpuOn=esCPU(a),fofarOn=esFOFAR(a),iaapsOn=esIAAPS(a);
-    const cpuBtn=`<span class="cpu-toggle" data-cpu-art="${a.replace(/"/g,'&quot;')}" title="${cpuOn?'Quitar etiqueta CPU':'Marcar como CPU (Cuidados Paliativos Universales)'}" style="cursor:pointer;font-size:10.5px;font-weight:800;padding:1px 3px;flex-shrink:0;color:#A12895;opacity:${cpuOn?'1':'.3'}">Ⓒ</span>`;
-    const fofarBtn=`<span class="fofar-toggle" data-fofar-art="${a.replace(/"/g,'&quot;')}" title="${fofarOn?'Quitar etiqueta FOFAR':'Marcar como FOFAR'}" style="cursor:pointer;font-size:10.5px;font-weight:800;padding:1px 3px;flex-shrink:0;color:#1CAFAA;opacity:${fofarOn?'1':'.3'}">Ⓕ</span>`;
-    const iaapsBtn=`<span class="iaaps-toggle" data-iaaps-art="${a.replace(/"/g,'&quot;')}" title="${iaapsOn?'Quitar etiqueta IAAPS':'Marcar como IAAPS'}" style="cursor:pointer;font-size:10.5px;font-weight:800;padding:1px 3px;flex-shrink:0;color:#148F8B;opacity:${iaapsOn?'1':'.3'}">Ⓘ</span>`;
+    const cpuBtn=`<span class="cpu-toggle" data-cpu-art="${a.replace(/"/g,'&quot;')}" title="${cpuOn?'Quitar etiqueta CPU':'Marcar como CPU (Cuidados Paliativos Universales)'}" style="cursor:pointer;font-size:10.5px;font-weight:800;padding:1px 3px;flex-shrink:0;color:#A12895;opacity:${cpuOn?'1':'.5'}">Ⓒ</span>`;
+    const fofarBtn=`<span class="fofar-toggle" data-fofar-art="${a.replace(/"/g,'&quot;')}" title="${fofarOn?'Quitar etiqueta FOFAR':'Marcar como FOFAR'}" style="cursor:pointer;font-size:10.5px;font-weight:800;padding:1px 3px;flex-shrink:0;color:#0E7470;opacity:${fofarOn?'1':'.5'}">Ⓕ</span>`;
+    const iaapsBtn=`<span class="iaaps-toggle" data-iaaps-art="${a.replace(/"/g,'&quot;')}" title="${iaapsOn?'Quitar etiqueta IAAPS':'Marcar como IAAPS'}" style="cursor:pointer;font-size:10.5px;font-weight:800;padding:1px 3px;flex-shrink:0;color:#0E7470;opacity:${iaapsOn?'1':'.5'}">Ⓘ</span>`;
     // Etiquetas diminutas junto al nombre (mismo estilo que "Prog. Min."
     // de PM) — a pedido de Felipe, ago-2026: si el artículo está
     // marcado, aparece la píldora en el nombre, no solo el ícono.
@@ -6718,9 +6718,9 @@ function renderMasiva(res,ctx,opts){
   </div>
   <div style="display:flex;gap:12px;margin-bottom:.8rem;flex-wrap:wrap;font-size:11px;color:var(--ink2)">
     <div><span style="color:#EE881C;font-weight:800">▲</span> más que la programación vigente</div>
-    <div><span style="color:#1CAFAA;font-weight:800">▼</span> menos que la programación vigente</div>
+    <div><span style="color:#0E7470;font-weight:800">▼</span> menos que la programación vigente</div>
     <div><span style="color:#6A3FA0;font-weight:800">★</span> sin programación previa (era 0)</div>
-    <div><span style="color:#EB5A5E;font-weight:800">⚠</span> riesgo de quiebre (cob&lt;2m) antes del mes "Programar desde"</div>
+    <div><span style="color:#C63A3F;font-weight:800">⚠</span> riesgo de quiebre (cob&lt;2m) antes del mes "Programar desde"</div>
     <div><span style="color:#8D6E3A;font-weight:800">🗑</span> mes con merma proyectada</div>
     <div><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;color:var(--pmd);background:var(--pml)">PM</span> artículo de Programación Ministerial</div>
   </div>
@@ -6739,7 +6739,7 @@ function renderMasiva(res,ctx,opts){
         <th style="position:sticky;top:34px;background:#1A3D66"></th>`;
   años.forEach(()=>{
     MC.forEach(m=>{
-      h+=`<th style="text-align:center;padding:.3rem .15rem;color:rgba(255,255,255,.6);font-size:10px;border-left:1px solid rgba(255,255,255,.08);position:sticky;top:34px;background:#1A3D66">${m}</th>`;
+      h+=`<th style="text-align:center;padding:.3rem .15rem;color:rgba(255,255,255,.9);font-size:10px;border-left:1px solid rgba(255,255,255,.08);position:sticky;top:34px;background:#1A3D66">${m}</th>`;
     });
   });
   h+=`</tr></thead><tbody>`;
@@ -6772,9 +6772,9 @@ function renderMasiva(res,ctx,opts){
         if(!_esPreRep){
           if((progOrig===null||progOrig===0)&&ing>0){badges.push('<span style="color:#6A3FA0;font-weight:800">★</span>');tip='Sin programación previa (era 0) — ahora se sugieren '+fmt(ing)+' uds.';}
           else if(progOrig!==null&&progOrig>0&&ing>progOrig){badges.push('<span style="color:#EE881C;font-weight:800">▲</span>');tip=`Más que la programación vigente: ${fmt(ing)} vs ${fmt(progOrig)} programadas.`;}
-          else if(progOrig!==null&&progOrig>0&&ing<progOrig){badges.push('<span style="color:#1CAFAA;font-weight:800">▼</span>');tip=`Menos que la programación vigente: ${fmt(ing)} vs ${fmt(progOrig)} programadas.`;}
+          else if(progOrig!==null&&progOrig>0&&ing<progOrig){badges.push('<span style="color:#0E7470;font-weight:800">▼</span>');tip=`Menos que la programación vigente: ${fmt(ing)} vs ${fmt(progOrig)} programadas.`;}
         }
-        if(_esPreRep&&cob<2){badges.push('<span style="color:#EB5A5E;font-weight:800">⚠</span>');tip=(tip?tip+' · ':'')+`Riesgo de quiebre antes de reprogramar: cobertura ${cob.toFixed(1)}m.`;}
+        if(_esPreRep&&cob<2){badges.push('<span style="color:#C63A3F;font-weight:800">⚠</span>');tip=(tip?tip+' · ':'')+`Riesgo de quiebre antes de reprogramar: cobertura ${cob.toFixed(1)}m.`;}
         if(merma>0){badges.push('<span style="color:#8D6E3A;font-weight:800">🗑</span>');tip=(tip?tip+' · ':'')+`Merma proyectada este mes: ${fmt(merma)} uds.`;}
         const badgeRow=badges.length?`<div style="font-size:9px;line-height:1.2;margin-top:2px">${badges.join(' ')}</div>`:'';
         h+=`<td style="text-align:center;padding:.35rem .2rem;background:${cellBg};border:1px solid rgba(255,255,255,.7);min-width:46px"${tip?` title="${tip.replace(/"/g,'&quot;')}"`:''}>
@@ -9486,7 +9486,7 @@ function ssRenderizar(res,a0,aFin,opts){
   h+=`</tr><tr style="background:#1A3D66">
         <th style="position:sticky;left:0;background:#1A3D66;z-index:2"></th><th></th><th></th>`;
   años.forEach(()=>MC.forEach(m=>{
-    h+=`<th style="text-align:center;padding:.2rem .1rem;color:rgba(255,255,255,.5);font-size:8px">${m}</th>`;
+    h+=`<th style="text-align:center;padding:.2rem .1rem;color:rgba(255,255,255,.9);font-size:8px">${m}</th>`;
   }));
   h+=`</tr></thead><tbody>`;
 
@@ -9724,7 +9724,7 @@ th{background:#0F2A4A;color:#fff;padding:5px 8px;text-align:left;font-size:9pt}
 th:not(:first-child){text-align:right}
 td{padding:4px 8px;border-bottom:1px solid #e0e0e0}
 tr:nth-child(even) td{background:#F8FBFF}
-.footer{margin-top:20px;padding-top:8px;border-top:1px solid #ccc;font-size:8pt;color:#888;display:flex;justify-content:space-between}
+.footer{margin-top:20px;padding-top:8px;border-top:1px solid #ccc;font-size:8pt;color:#5C6064;display:flex;justify-content:space-between}
 @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style><'+'/head><'+'body>
 <div class="header">
@@ -9897,7 +9897,7 @@ function imprimirInforme(){
   @page{margin:1.5cm 2cm}
   body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#222;margin:0;padding:0}
   h1{font-size:14pt;color:#0F2A4A;margin:0 0 4px 0}
-  h2{font-size:11pt;color:#1CAFAA;margin:16px 0 6px 0;border-bottom:1.5px solid #1CAFAA;padding-bottom:3px}
+  h2{font-size:11pt;color:#0E7470;margin:16px 0 6px 0;border-bottom:1.5px solid #1CAFAA;padding-bottom:3px}
   .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #0F2A4A}
   .meta{font-size:9pt;color:#555;margin-top:4px}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
@@ -9911,7 +9911,7 @@ function imprimirInforme(){
   tr:nth-child(even) td{background:#F8FBFF}
   .alerta{background:#FFF0F0;border:1.5px solid #EB5A5E;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:10pt;color:#7B0000}
   .ok{background:#EAF5EA;border:1.5px solid #2E7D32;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:10pt;color:#1E5E28}
-  .footer{margin-top:20px;padding-top:8px;border-top:1px solid #ccc;font-size:8pt;color:#888;display:flex;justify-content:space-between}
+  .footer{margin-top:20px;padding-top:8px;border-top:1px solid #ccc;font-size:8pt;color:#5C6064;display:flex;justify-content:space-between}
   @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .sw-x,.asw-x{position:relative;display:block}
 .sw-x input,.asw-x input{width:100%;box-sizing:border-box}
@@ -11868,7 +11868,7 @@ function generarResumenEjecutivo(){
   const nQF=rot.filter(r=>r.estado==='quiebre-futuro').length;
   const nSobrestock=rot.filter(r=>r.estado==='sobrestock').length;
   const nOk=rot.filter(r=>r.estado==='ok').length;
-  let abcHtml='<p style="color:#888">Carga el archivo de Gasto y presiona "ABC/Pareto" para incluir esta sección.</p>';
+  let abcHtml='<p style="color:#5C6064">Carga el archivo de Gasto y presiona "ABC/Pareto" para incluir esta sección.</p>';
   if(gastoData.length){
     const{filas,tieneCosto}=calcularClasificacionABC();
     const nA=filas.filter(f=>f.clase==='A').length;
@@ -11879,7 +11879,7 @@ function generarResumenEjecutivo(){
     </table>`;
   }
   const masivaA=window._masiva_res;
-  let gastoProyHtml='<p style="color:#888">Genera la reprogramación masiva y revisa "Proyección de gasto" para incluir esta sección.</p>';
+  let gastoProyHtml='<p style="color:#5C6064">Genera la reprogramación masiva y revisa "Proyección de gasto" para incluir esta sección.</p>';
   if(masivaA&&masivaA.length){
     let total=0,nSinCosto=0;
     masivaA.forEach(r=>{
@@ -11905,7 +11905,7 @@ function generarResumenEjecutivo(){
     .kpi{flex:1;min-width:110px;background:#F5F8FC;border-left:4px solid #1CAFAA;border-radius:4px;padding:8px 12px}
     .kpi .n{font-size:22px;font-weight:800;color:#0F2A4A}
     .kpi .l{font-size:9.5px;color:#667;text-transform:uppercase}
-    .footer{padding:12px 24px;font-size:9.5px;color:#999;display:flex;justify-content:space-between}
+    .footer{padding:12px 24px;font-size:9.5px;color:#5C6064;display:flex;justify-content:space-between}
     @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
   </style></head><body>
   <div class="header"><h1>Resumen ejecutivo — Pingüino Delta</h1><p>Generado ${hoy.toLocaleString('es-CL')} · Montos en ${vistaGastoIVA==='con_iva'?'CON IVA (19%)':'BRUTO (sin IVA)'}</p></div>
@@ -12725,9 +12725,9 @@ function _visRenderCtx(ctx, consM, estIdx, pfx){
   // Tabla comparativa
   h+=`<div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);overflow:hidden;margin-bottom:1rem"><div style="padding:.6rem 1rem;background:var(--bg);border-bottom:1px solid var(--bdr2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3)">Tabla comparativa — ${curArt}</div>
     <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--navy)"><th style="text-align:left;padding:.4rem .8rem;color:#fff;font-size:10px">Mes</th>`;
-  años.forEach((a,ai)=>{h+=`<th style="text-align:right;padding:.4rem .6rem;color:rgba(255,255,255,.85);font-size:10px">${a}</th>`;if(ai>0)h+=`<th style="text-align:right;padding:.4rem .4rem;color:rgba(255,255,255,.55);font-size:9px">Δ${a}</th>`;});
+  años.forEach((a,ai)=>{h+=`<th style="text-align:right;padding:.4rem .6rem;color:rgba(255,255,255,.85);font-size:10px">${a}</th>`;if(ai>0)h+=`<th style="text-align:right;padding:.4rem .4rem;color:rgba(255,255,255,.9);font-size:9px">Δ${a}</th>`;});
   if(progVals)h+=`<th style="text-align:right;padding:.4rem .6rem;color:#E4D3F5;font-size:10px">📋 Prog. ${progAnioSel}</th>`;
-  if(idxE)h+=`<th style="text-align:center;padding:.4rem .5rem;color:rgba(255,255,255,.55);font-size:9px">Est.</th>`;
+  if(idxE)h+=`<th style="text-align:center;padding:.4rem .5rem;color:rgba(255,255,255,.9);font-size:9px">Est.</th>`;
   h+='</tr></thead><tbody>';
   MN.forEach((mn,mi)=>{
     const bg=mi%2===0?'var(--bg)':'#fff';
@@ -12943,7 +12943,7 @@ function turnosRenderTabla({diurnas,extension,resultadosSemanas,minSala}){
           <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
           <thead><tr style="background:#A12895">
             <th style="text-align:left;padding:.4rem .8rem;color:#fff;font-size:10px;min-width:130px">Funcionaria</th>
-            <th style="padding:.4rem .4rem;color:rgba(255,255,255,.6);font-size:9px;text-align:center">Turno</th>`;
+            <th style="padding:.4rem .4rem;color:rgba(255,255,255,.9);font-size:9px;text-align:center">Turno</th>`;
         DIAS_D.forEach((d,di)=>{
         const _lReal2=new Date(lunes);_lReal2.setDate(lunes.getDate()-((lunes.getDay()+6)%7));
         const _dDate=new Date(_lReal2);_dDate.setDate(_lReal2.getDate()+di);
@@ -12966,7 +12966,7 @@ function turnosRenderTabla({diurnas,extension,resultadosSemanas,minSala}){
       h+=`<div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);overflow:hidden">
         <div style="padding:.5rem 1rem;background:var(--bg);border-bottom:1px solid var(--bdr2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3)">🍽 Almuerzo · Ext. fijo 14:00–15:00</div>
         <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
-        <thead><tr style="background:var(--navy)"><th style="text-align:left;padding:.4rem .8rem;color:#fff;font-size:10px;min-width:130px">Funcionaria</th><th style="padding:.4rem .4rem;color:rgba(255,255,255,.6);font-size:9px;text-align:center">T</th>`;
+        <thead><tr style="background:var(--navy)"><th style="text-align:left;padding:.4rem .8rem;color:#fff;font-size:10px;min-width:130px">Funcionaria</th><th style="padding:.4rem .4rem;color:rgba(255,255,255,.9);font-size:9px;text-align:center">T</th>`;
       DIAS_ALL.forEach((d,di)=>{
         const _lReal3=new Date(lunes);_lReal3.setDate(lunes.getDate()-((lunes.getDay()+6)%7));
         const _dDateA=new Date(_lReal3);_dDateA.setDate(_lReal3.getDate()+di);
@@ -12984,7 +12984,7 @@ function turnosRenderTabla({diurnas,extension,resultadosSemanas,minSala}){
         h+='</tr>';
       });
       extension.forEach((func,fi)=>{
-        h+=`<tr style="background:${(diurnas.length+fi)%2===0?'var(--bg)':'#fff'}"><td style="padding:.32rem .8rem;font-weight:600;color:#148F8B">${func}</td><td style="text-align:center;font-size:10px">🌙</td>`;
+        h+=`<tr style="background:${(diurnas.length+fi)%2===0?'var(--bg)':'#fff'}"><td style="padding:.32rem .8rem;font-weight:600;color:#0E7470">${func}</td><td style="text-align:center;font-size:10px">🌙</td>`;
         DIAS_ALL.forEach(dia=>{h+=`<td style="text-align:center;padding:.32rem .4rem;font-family:DM Mono,monospace;font-size:11px;color:${dia==='Sábado'?'var(--ink3)':'#148F8B'};font-weight:${dia==='Sábado'?'400':'600'}">${dia==='Sábado'?'—':'14:00–15:00'}</td>`;});
         h+='</tr>';
       });
@@ -14154,7 +14154,7 @@ function resolverObjetivoCobertura(){
       <td style="text-align:right;padding:.4rem .8rem;font-family:DM Mono,monospace;color:var(--ink2)">${fmt(f.progVigente)} uds</td>
       <td style="text-align:right;padding:.4rem .8rem;font-family:DM Mono,monospace;font-weight:700;color:var(--red)">+${fmt(f.totalIng)} uds</td>
       <td style="text-align:right;padding:.4rem .8rem;font-family:DM Mono,monospace;font-weight:700;color:var(--navy)">${fmt(f.totalNecesario)} uds</td>
-      <td style="text-align:left;padding:.4rem .8rem;font-size:11.5px;color:#EB5A5E;font-weight:600">${f.primerMesDeficit||'—'}</td>
+      <td style="text-align:left;padding:.4rem .8rem;font-size:11.5px;color:#C63A3F;font-weight:600">${f.primerMesDeficit||'—'}</td>
       <td style="text-align:right;padding:.4rem .9rem;font-family:DM Mono,monospace;color:${f.tieneCosto?'#A12895':'var(--ink3)'}">${f.tieneCosto?'$'+fmt(f.valor):'sin costo'}</td></tr>
     <tr id="${filaId}" style="display:none;background:${bg}"><td colspan="6" style="padding:.5rem 1.2rem .8rem 2.2rem">
       <div style="font-size:10.5px;font-weight:700;color:var(--ink3);margin-bottom:5px">DETALLE MES A MES — cuánto falta pedir cada mes con déficit:</div>
@@ -18906,7 +18906,7 @@ body{background:radial-gradient(1200px 600px at 100% -10%,rgba(28,175,170,.06),t
 #nube-bar button{padding:5px 12px;border:1px solid #123E66;border-radius:6px;background:#fff;color:#123E66;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap}
 #nube-bar button.nb-main{background:#123E66;color:#fff}#nube-bar button:disabled{opacity:.6;cursor:wait}
 .pkb-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 .6rem;padding:.5rem .8rem;border:1.5px solid #1CAFAA;border-radius:var(--r,10px);background:#F0FAF9}
-.pkb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#1CAFAA;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.pkb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#0E7470;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .pkb-btn:hover{filter:brightness(.95)}.pkb-btn:focus-within{outline:2px solid #0E6E6B;outline-offset:2px}
 .pkb-txt{font-size:12px;color:var(--ink3);flex:1 1 260px;min-width:0}.pkb-st{display:block;color:#0E6E6B;font-weight:600;margin-top:2px}
 #repo-content .kpi{border:1px solid #D5E3E3;border-radius:10px;padding:8px 12px;background:#fff}
@@ -18980,11 +18980,11 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]):focus,select:focus
 .grano{position:absolute;left:0;top:0;border-radius:50%;will-change:transform,opacity;box-shadow:inset -1px -1px 2px rgba(0,0,0,.12),inset 1px 1px 1px rgba(255,255,255,.55)}
 .fc-splash{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:radial-gradient(900px 520px at 50% 42%,rgba(28,175,170,.10),transparent 70%),#F5F9F9;pointer-events:none;animation:splashOut .5s ease 2.35s forwards}
 .fc-splash .sp-tt{font:800 26px/1.1 var(--font-display);color:#1F3536;letter-spacing:-.02em;opacity:0;animation:spTexto .5s ease 1.25s forwards}
-.fc-splash .sp-ss{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#148F8B;font-weight:700;opacity:0;animation:spTexto .5s ease 1.4s forwards}
+.fc-splash .sp-ss{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#0E7470;font-weight:700;opacity:0;animation:spTexto .5s ease 1.4s forwards}
 @keyframes spTexto{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes splashOut{to{opacity:0;visibility:hidden}}
 .fc-sello{position:fixed;left:50%;top:42%;z-index:9998;transform:translate(-50%,-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 26px 14px;border-radius:20px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);box-shadow:0 18px 50px rgba(20,60,60,.18),0 0 0 1px rgba(20,143,139,.14);animation:selloIn .3s var(--fx-spring),selloOut .35s ease 1.65s forwards}
-.fc-sello span{font:800 13.5px/1 var(--font-display);color:#148F8B}
+.fc-sello span{font:800 13.5px/1 var(--font-display);color:#0E7470}
 .sello-cap{width:120px;height:85px;position:relative}.sello-cap .cap-stage{position:absolute;left:0;top:0;transform-origin:0 0}
 @keyframes selloIn{from{opacity:0;transform:translate(-50%,-46%) scale(.9)}to{opacity:1;transform:translate(-50%,-50%)}}
 @keyframes selloOut{to{opacity:0;transform:translate(-50%,-54%) scale(.97)}}
