@@ -27,7 +27,7 @@ No se crea ningún secreto ni certificado (las apps de página única no lo usan
 ## 2 · Publicar el sitio (Netlify, gratis)
 
 1. Edita `config.json` (Bloc de notas): pega el `clientId` del paso 1 y revisa los vínculos.
-2. En <https://app.netlify.com/drop> arrastra **la carpeta completa** (con `_redirects`, `config.json`, `sw.js`, `manifest.webmanifest`, `icono.svg`).
+2. Inicia sesión en Netlify → **Sites (Proyectos) → Add new site → Deploy manually** y arrastra **la carpeta** que contiene `index.html`, `_redirects`, `config.json`, `sw.js`, `manifest.webmanifest` e `icono.svg` (o usa «browse to upload» y elige esa carpeta). Si arrastras el .zip, Netlify también lo acepta.
 3. En **Site configuration → Change site name** elige el nombre (p. ej. `delta-desam-limache`). Esa URL es la que va en el paso 1.3.
 4. Para cambiar `config.json` más adelante: **Deploys → arrastrar la carpeta de nuevo**.
 
