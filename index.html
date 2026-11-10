@@ -21257,7 +21257,7 @@ function _nubeProgramarPublicar(){
 async function nubePublicar(){
   const datos=_nubePaquete();const txt=JSON.stringify(datos);
   if(txt===NUBE.ultimoPub)return;
-  if(_esLotes())return _lxPublicarComp(datos,txt);
+  if(_esLotes())return;
   const E=NUBE.estado.comp=NUBE.estado.comp||{};
   try{
     const c=await _nubeCarpeta();if(!c)throw new Error('sin carpeta compartida');
@@ -21342,7 +21342,8 @@ async function _lxSincronizar(){
       }else if(cache){buf=cache.buf;E.error='sin conexión';}
       E.meta=meta;if(buf)_lxAplicarArch(A,E,buf,meta);
     }
-    await _lxStocks(!!idx);
+    if(NUBE.cfg.stocksLotes)await _lxStocks(!!idx);
+    await _lxEstado(idx);
     // Configuración compartida (mín/máx SAPU, exclusivos, equivalencias, apertura)
     const EC=NUBE.estado.comp=NUBE.estado.comp||{};
     let comp=null;
@@ -21383,25 +21384,80 @@ async function nubeSubirExcel(k,inp){
   }catch(e){msg('⚠ '+(e.status===401?'Clave incorrecta.':e.message),true);}
   finally{inp.value='';nubeRender();}
 }
+// ── Estado completo publicado (nov-2026): lo que Felipe carga en SU PC (todos los Excel y
+// ajustes de Delta) se sube comprimido y los colegas lo ven igual al abrir el link. ──
+const LX_EXCLUIR=['fotosProgramacion'];
+function _lxSnapshot(){const d={};PDB_KEYS.forEach(k=>{if(LX_EXCLUIR.includes(k))return;const v=pdbMapaGlobal(k);if(v!==null&&v!==undefined)d[k]=v;});d.vistaGastoIVA=vistaGastoIVA;
+  // textos de estado de las casillas de carga (qué archivo y cuándo) para que el colega vea lo mismo
+  const st={};document.querySelectorAll('.u-st[id]').forEach(e=>{const t=(e.textContent||'').trim();if(t&&!/^Sin cargar/.test(t))st[e.id]=t;});d._estados=st;return d;}
+async function _gz(txt){const cs=new Blob([txt]).stream().pipeThrough(new CompressionStream('gzip'));return _bufB64(await new Response(cs).arrayBuffer());}
+async function _gunz(b64){const ds=new Blob([_b64Buf(b64)]).stream().pipeThrough(new DecompressionStream('gzip'));return await new Response(ds).text();}
+const _lxPuedePublicar=()=>!!_lsG('pdn_clave')&&_lsG('pdn_pub')!=='0';
+async function _lxPublicarEstado(forzar){
+  const E=NUBE.estado.estado=NUBE.estado.estado||{};
+  const clave=_lsG('pdn_clave');if(!clave)return;
+  const txt=JSON.stringify(_lxSnapshot());
+  if(!forzar&&txt===NUBE.ultimoEstado)return;
+  E.subiendo=true;nubeRender();
+  try{
+    const b64=await _gz(txt);
+    const j=await _lxJSON(NUBE.cfg.api||'/api/delta',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+clave},body:JSON.stringify({k:'estado',nombre:'estado-delta.json.gz',b64,por:_lsG('pdn_por')||''})});
+    NUBE.ultimoEstado=txt;_lsS('pdn_estado_etag',j.meta.etag);
+    E.meta={etag:j.meta.etag,mod:j.meta.subido,por:j.meta.por};E.error=null;E.pendiente=false;_lsS('pdn_estado_meta',JSON.stringify(E.meta));
+  }catch(e){E.error=e.status===401?'clave incorrecta':e.status===413?'demasiado grande para publicar':e.message;E.pendiente=true;}
+  finally{E.subiendo=false;nubeRender();}
+}
+function _lxProgramarEstado(){if(!_esLotes()||NUBE.aplicando||!_lxPuedePublicar())return;const E=NUBE.estado.estado=NUBE.estado.estado||{};E.pendiente=true;clearTimeout(NUBE.estTimer);NUBE.estTimer=setTimeout(()=>_lxPublicarEstado(),5000);nubeRender();}
+async function _lxEstado(idx){
+  const E=NUBE.estado.estado=NUBE.estado.estado||{};
+  const m=idx&&idx.archivos&&idx.archivos.estado;
+  if(!idx){E.error='sin conexión';return;}
+  if(!m){E.vacio=true;
+    // Primera vez: quien tiene la clave publica lo que ya tiene cargado
+    if(_lxPuedePublicar())_lxPublicarEstado(true);return;}
+  E.vacio=false;E.meta={etag:m.etag,mod:m.subido,por:m.por};E.error=null;_lsS('pdn_estado_meta',JSON.stringify(E.meta));
+  if(_lsG('pdn_estado_etag')===m.etag)return; // ya está aplicado (o lo publicó este PC)
+  if(_lxPuedePublicar()&&E.pendiente)return;   // este PC tiene cambios propios sin subir: no se pisan
+  try{
+    const j=await _lxJSON((NUBE.cfg.api||'/api/delta')+'?k=estado');
+    const d=JSON.parse(await _gunz(j.b64));
+    for(const k of PDB_KEYS){if(d[k]!==undefined)await pdbSet(k,d[k]);}
+    if(d.vistaGastoIVA)await pdbSet('vistaGastoIVA',d.vistaGastoIVA);
+    if(d._estados)_lsS('pdn_estados',JSON.stringify(d._estados));
+    _lsS('pdn_estado_etag',j.etag);
+    NUBE.recargando=true;nubeRender();
+    setTimeout(()=>location.reload(),400);
+  }catch(e){E.error='no se pudo aplicar: '+e.message;}
+}
+// Al abrir: muestra en las casillas de carga el mismo texto que en el PC que publicó
+function _lxRestaurarEstados(){try{const st=JSON.parse(_lsG('pdn_estados')||'null');if(!st)return;Object.entries(st).forEach(([id,t])=>{const e=document.getElementById(id);if(e&&(!(e.textContent||'').trim()||/^Sin cargar/.test(e.textContent.trim()))){e.textContent=t+' ☁';const sl=e.closest('.uslot');if(sl)sl.classList.add('loaded');}});}catch(e){}}
+function nubeGuardarClave(){
+  const c=(document.getElementById('lx-clave')||{}).value||'';const por=(document.getElementById('lx-por')||{}).value||'';
+  const auto=(document.getElementById('lx-auto')||{}).checked;
+  _lsS('pdn_clave',c||null);_lsS('pdn_por',por||null);_lsS('pdn_pub',auto?'1':'0');NUBE.pubClave=null;NUBE.pubPor=null;
+  if(c&&auto)_lxPublicarEstado(true);else nubeRender();
+}
 function nubeTogglePublicar(){NUBE.panelPub=!NUBE.panelPub;nubeRender();}
 function _lxRender(el,ocupado){
   el.style.display='flex';
-  const fila=(etq,E)=>{E=E||{};const m=E.meta;
-    const est=E.formato?`<span class="nb-err">⚠ ${_sapuEsc(E.formato)}</span>`:m?`✓ publicado ${_fh(m.mod)}${m.por?' por '+_sapuEsc(m.por):''}${E.error?' <span class="nb-err">· sin conexión, última copia</span>':''}`:(E.vacio?'aún no publicado':(E.error?`<span class="nb-err">⚠ ${_sapuEsc(E.error)}</span>`:'pendiente'));
-    return`<span class="nb-f"><b>${etq}:</b> ${est}</span>`;};
-  const ES=NUBE.estado.stocks||{};
-  const stk=LX_BOD.map(B=>{const E=ES[B.k]||{};const m=E.meta;return`${B.etq} ${m?(m.fechaReporte?m.fechaReporte.split('-').reverse().join('/'):_fh(m.cargado)):E.vacio?'—':'…'}`;}).join(' · ');
-  const EC=NUBE.estado.comp||{};
-  const ses=!!_lsG('pdn_clave');
-  el.innerHTML=`<span class="nb-t">☁ <b>${_sapuEsc(NUBE.cfg.nombre||'Delta compartido')}</b>${NUBE.ultimaSync?` · sincronizado ${_fh(NUBE.ultimaSync)}`:''}${NUBE.sinRed&&!_nubeOcupado?' · <span class="nb-err">sin conexión: usando la última copia guardada</span>':''}</span>
-    <span class="nb-fs">${fila('Consumos y programaciones',NUBE.estado.consumos)}${fila('Consumo diario SAPU',NUBE.estado.sapu)}<span class="nb-f"><b>Stocks (Pingüino Lotes):</b> ${stk}</span>${EC.local?'<span class="nb-f nb-err">Mín/máx o equivalencias cambiados solo en este PC (sin clave)</span>':EC.error?`<span class="nb-f nb-err">Config compartida: ${_sapuEsc(EC.error)}</span>`:''}</span>
-    <span class="nb-b"><button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Sincronizando…':'🔄 Sincronizar'}</button><button onclick="nubeTogglePublicar()" title="Solo para quien tiene la clave de Lotes">${NUBE.panelPub?'✕ Cerrar':'⬆ Publicar Excel'}</button></span>
+  const E=NUBE.estado.estado||{};let m=E.meta;if(!m){try{m=JSON.parse(_lsG('pdn_estado_meta')||'null');}catch(e){}}
+  const pub=_lxPuedePublicar(),clave=!!_lsG('pdn_clave');
+  let est;
+  if(NUBE.recargando)est='⏳ Cargando lo último publicado…';
+  else if(E.subiendo)est='⏳ Publicando lo cargado en este PC…';
+  else if(m)est=`✓ ${pub?'publicado desde este PC':'datos publicados'} ${_fh(m.mod)}${m.por?' por '+_sapuEsc(m.por):''}${E.pendiente&&pub?' · <span class="nb-err">cambios por subir…</span>':''}`;
+  else if(E.vacio)est=pub?'aún no publicado (se publica al cargar o con «Publicar ahora»)':'aún no hay datos publicados';
+  else est='…';
+  if(E.error&&!NUBE.recargando)est+=` <span class="nb-err">· ${_sapuEsc(E.error)}${E.error==='sin conexión'?': usando la última copia guardada':''}</span>`;
+  const stk=NUBE.cfg.stocksLotes?(()=>{const ES=NUBE.estado.stocks||{};return'<span class="nb-f"><b>Stocks (Pingüino Lotes):</b> '+LX_BOD.map(B=>{const x=ES[B.k]||{};const mm=x.meta;return`${B.etq} ${mm?(mm.fechaReporte?mm.fechaReporte.split('-').reverse().join('/'):_fh(mm.cargado)):x.vacio?'—':'…'}`;}).join(' · ')+'</span>';})():'';
+  el.innerHTML=`<span class="nb-t">☁ <b>${_sapuEsc(NUBE.cfg.nombre||'Delta compartido')}</b>${NUBE.ultimaSync?` · revisado ${_fh(NUBE.ultimaSync)}`:''}</span>
+    <span class="nb-fs"><span class="nb-f">${est}</span>${stk}${!pub?'<span class="nb-f" style="opacity:.85">Vista de consulta: lo que cargues en este PC no se comparte y se reemplaza con la próxima publicación.</span>':''}</span>
+    <span class="nb-b"><button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Revisando…':'🔄 Actualizar'}</button>${pub?`<button onclick="_lxPublicarEstado(true)"${E.subiendo?' disabled':''}>⬆ Publicar ahora</button>`:''}<button onclick="nubeTogglePublicar()" title="Para quien publica (clave de Lotes)">${NUBE.panelPub?'✕ Cerrar':'🔑 Publicar desde este PC'}</button></span>
     ${NUBE.panelPub?`<div class="nb-pub"><label>Clave (la misma de Lotes)<input type="password" id="lx-clave" value="${_sapuEsc(NUBE.pubClave!=null?NUBE.pubClave:(_lsG('pdn_clave')||''))}" oninput="NUBE.pubClave=this.value" autocomplete="current-password"></label>
-      <label>Tu nombre (opcional)<input type="text" id="lx-por" value="${_sapuEsc(NUBE.pubPor!=null?NUBE.pubPor:(_lsG('pdn_por')||''))}" oninput="NUBE.pubPor=this.value" placeholder="p. ej. Q.F. Felipe"></label>
-      <label class="nb-file">📊 Consumos y programaciones (archivo único)<input type="file" accept=".xlsx,.xls" onchange="nubeSubirExcel('consumos',this)"></label>
-      <label class="nb-file">🚑 Consumo diario SAPU<input type="file" accept=".xlsx,.xls" onchange="nubeSubirExcel('sapu',this)"></label>
-      <span id="lx-st" class="nb-f" style="${NUBE.pubMsg&&NUBE.pubMsg.err?'color:var(--red)':''}">${NUBE.pubMsg?_sapuEsc(NUBE.pubMsg.t):''}</span>
-      <span class="nb-f" style="flex-basis:100%;opacity:.9">Los stocks no se suben aquí: se cargan en Pingüino Lotes (Botiquín, Bodega central y SAPU) y Delta los toma solos. Con la clave guardada en este PC, los cambios de mín/máx, exclusivos SAPU y equivalencias también se comparten.</span></div>`:''}`;
+      <label>Tu nombre (se muestra a los colegas)<input type="text" id="lx-por" value="${_sapuEsc(NUBE.pubPor!=null?NUBE.pubPor:(_lsG('pdn_por')||''))}" oninput="NUBE.pubPor=this.value" placeholder="p. ej. Q.F. Felipe"></label>
+      <label style="flex-direction:row;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="lx-auto" ${_lsG('pdn_pub')!=='0'?'checked':''}> Publicar automáticamente todo lo que cargo en este PC</label>
+      <button class="nb-main" onclick="nubeGuardarClave()">Guardar</button>${clave?'<button onclick="_lsS(\'pdn_clave\',null);NUBE.pubClave=\'\';nubeRender()">Quitar clave de este PC</button>':''}
+      <span class="nb-f" style="flex-basis:100%;opacity:.9">Con la clave guardada, cada Excel o ajuste que cargues en Delta (inventario, consumos, programación, SAPU, mín/máx, equivalencias…) se publica solo a los pocos segundos y los colegas lo ven al abrir el link. Solo debe publicar un PC.</span></div>`:''}`;
 }
 
 // ── Interfaz ──
@@ -21437,10 +21493,11 @@ async function nubeIniciar(){
     if('serviceWorker' in navigator)fetch('sw.js',{method:'HEAD'}).then(r=>{if(r.ok&&/javascript/.test(r.headers.get('content-type')||''))navigator.serviceWorker.register('sw.js').catch(()=>{});}).catch(()=>{});}catch(e){}
   try{await window.__pdbListo;}catch(e){}
   if(!_esLotes())await _nubeVolverDeLogin();
+  else _lxRestaurarEstados();
   nubeRender();
   // Publicar al cambiar stocks a mano
   const base=window.pdbGuardar;
-  window.pdbGuardar=pdbGuardar=function(t){const r=base.apply(this,arguments);if(!NUBE.aplicando&&(t==='inv'||t==='sapuCfg'||t==='equivManual'))_nubeProgramarPublicar();return r;};
+  window.pdbGuardar=pdbGuardar=function(t){const r=base.apply(this,arguments);if(_esLotes()){_lxProgramarEstado();}else if(!NUBE.aplicando&&(t==='inv'||t==='sapuCfg'||t==='equivManual'))_nubeProgramarPublicar();return r;};
   await nubeSincronizar();
   setInterval(()=>{if(document.visibilityState==='visible')nubeSincronizar();},5*60*1000);
   window.addEventListener('focus',()=>{if(!NUBE.ultimaSync||Date.now()-NUBE.ultimaSync>60000)nubeSincronizar();});

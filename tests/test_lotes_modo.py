@@ -11,7 +11,7 @@ BASE=os.path.dirname(os.path.abspath(__file__)); RAIZ=os.path.join(BASE,'..'); D
 HTML=open(os.path.join(RAIZ,'index.html'),'rb').read()
 CARGADOR=open(os.path.join(RAIZ,'institucional','index.html'),encoding='utf-8').read()
 def ruta(p): return os.path.join(DEMO,next(x for x in sorted(os.listdir(DEMO)) if x.startswith(p)))
-CFG={"nombre":"DESAM Prueba","modo":"lotes","api":"/api/delta","inventario":"/api/inventario"}
+CFG={"nombre":"DESAM Prueba","modo":"lotes","api":"/api/delta"}
 PAGINA=re.sub(r'const CONFIG = \{[\s\S]*?\};','const CONFIG = '+json.dumps(CFG)+';',CARGADOR,count=1)
 CLAVE='clave-buena'
 fallas=[]
@@ -78,40 +78,43 @@ async def pc(b,srv):
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(); S=Servidor()
+        # ── PC de Felipe: guarda la clave y carga sus Excel como siempre ──
         ctx,pg,errs=await pc(b,S)
         await pg.goto('https://lotes.test/delta/'); await pg.wait_for_timeout(4000)
-        r=await pg.evaluate("({bar:document.getElementById('nube-bar').innerText,inv:Object.keys(inv).length,bod:Object.keys(_repoCfg().bodega||{}).length,sapu:_repoCfg().sapuStock,fecha:_repoCfg().sapuStockFecha})")
-        ok('aún no publicado' in r['bar'] and 'Botiquín 09/11/2026' in r['bar'],f"Barra: sin Excel publicados y stocks de Lotes ({r['bar'][:200]!r})")
-        ok(r['inv']==2 and r['bod']==1 and r['sapu'] and 'INSULINA CRISTALINA 100 UI/ML SOLUCIÓN INYECTABLE' in r['sapu'] and r['fecha']=='2026-11-07',
-           f"Stocks de las tres bodegas desde Lotes, con homologación («F») y fecha de la toma ({r['inv']} botiquín, {r['bod']} central, fecha {r['fecha']})")
-        # Publicar con clave equivocada → rechazo
-        await pg.click('text=⬆ Publicar Excel'); await pg.fill('#lx-clave','mala')
-        await pg.set_input_files('.nb-pub label.nb-file >> nth=0 >> input',ruta('05_')); await pg.wait_for_timeout(2500)
-        ok('Clave incorrecta' in await pg.inner_text('#lx-st') and S.posts==0,'Clave equivocada: no se publica')
-        await pg.fill('#lx-clave',CLAVE); await pg.fill('#lx-por','Q.F. Prueba')
-        await pg.set_input_files('.nb-pub label.nb-file >> nth=0 >> input',ruta('05_')); await pg.wait_for_timeout(3000)
-        await pg.set_input_files('.nb-pub label.nb-file >> nth=1 >> input',ruta('12_')); await pg.wait_for_timeout(3000)
-        ok('consumos' in S.arch and 'sapu' in S.arch and 'Publicado' in await pg.inner_text('#lx-st'),f"Publica los dos Excel con la clave ({list(S.arch)})")
-        # Un Excel que Delta no entiende no se publica
-        n0=S.posts; await pg.set_input_files('.nb-pub label.nb-file >> nth=0 >> input',ruta('07_')); await pg.wait_for_timeout(2500)
-        ok(S.posts==n0 and 'No se publicó' in await pg.inner_text('#lx-st'),'Excel con formato equivocado: avisa y no lo publica')
-        # Mín/máx compartido (con la clave guardada en este PC)
-        await pg.evaluate("switchMode('sapu');sapuSwitch('repo')")
-        await pg.set_input_files('#sp-mm-fi',ruta('11_')); await pg.wait_for_timeout(4500)
-        ok(S.comp and len(S.comp['datos']['repo']['mm'])>0 and 'bodega' not in S.comp['datos']['repo'],f"Mín/máx se comparte (sin stocks, que vienen de Lotes) ({len(S.comp['datos']['repo']['mm']) if S.comp else 0} artículos)")
-        ok(not errs,f'PC 1 sin errores ({errs})')
-        # ── PC 2: colega, sin clave, no carga nada ──
+        ok('aún no hay datos publicados' in await pg.inner_text('#nube-bar'),'Sin clave: vista de consulta, aún sin datos')
+        await pg.click('text=🔑 Publicar desde este PC'); await pg.fill('#lx-clave','mala'); await pg.fill('#lx-por','Q.F. Prueba')
+        await pg.click('#nube-bar .nb-pub button.nb-main'); await pg.wait_for_timeout(2500)
+        ok('clave incorrecta' in await pg.inner_text('#nube-bar') and 'estado' not in S.arch,'Clave equivocada: no publica y avisa')
+        if not await pg.is_visible('#lx-clave'): await pg.click('text=🔑 Publicar desde este PC')
+        await pg.fill('#lx-clave',CLAVE)
+        await pg.click('#nube-bar .nb-pub button.nb-main'); await pg.wait_for_timeout(2500)
+        for fid,pre in [('fi-inv','01'),('fi-prog','05')]:
+            await pg.set_input_files('#'+fid,ruta(pre)); await pg.wait_for_timeout(900)
+        await pg.evaluate("switchMode('sapu');sapuSwitch('diario')")
+        await pg.set_input_files('#sp-dia-fi',ruta('12_')); await pg.wait_for_timeout(900)
+        await pg.evaluate("sapuSwitch('repo')")
+        await pg.set_input_files('#sp-mm-fi',ruta('11_')); await pg.wait_for_timeout(900)
+        await pg.set_input_files('#sp-sst-fi',ruta('13_')); await pg.wait_for_timeout(7000)
+        n=await pg.evaluate("({inv:Object.keys(inv).length,cons:Object.keys(cons_map).length,prog:Object.keys(prog).length,dias:_sdCfg().diarioDias.length,mm:Object.keys(_repoCfg().mm||{}).length,sst:Object.keys(_repoCfg().sapuStock||{}).length,bar:document.getElementById('nube-bar').innerText})")
+        ok('estado' in S.arch and 'publicado desde este PC' in n['bar'],f"Lo cargado se publica solo ({n['bar'][:120]!r})")
+        ok(not errs,f'PC de Felipe sin errores ({errs})')
+        # ── PC de una colega: solo abre el link ──
         ctx2,pg2,errs2=await pc(b,S)
-        await pg2.goto('https://lotes.test/delta/'); await pg2.wait_for_timeout(6000)
-        r=await pg2.evaluate("({cons:Object.keys(cons_map).length,prog:Object.keys(prog).length,dias:_sdCfg().diarioDias.length,inv:Object.keys(inv).length,mm:Object.keys(_repoCfg().mm||{}).length,bar:document.getElementById('nube-bar').innerText})")
-        ok(r['cons']==40 and r['prog']>0 and r['dias']==15 and r['inv']==2 and r['mm']>0,f"Colega ve consumos, programación, diario SAPU, stocks y mín/máx sin cargar nada ({ {k:v for k,v in r.items() if k!='bar'} })")
-        ok('publicado' in r['bar'] and 'Q.F. Prueba' in r['bar'],f"Barra del colega muestra quién y cuándo publicó ({r['bar'][:160]!r})")
-        # ── Sin internet: reabre con la última copia ──
+        await pg2.goto('https://lotes.test/delta/'); await pg2.wait_for_timeout(9000)
+        r=await pg2.evaluate("({inv:Object.keys(inv).length,cons:Object.keys(cons_map).length,prog:Object.keys(prog).length,dias:_sdCfg().diarioDias.length,mm:Object.keys(_repoCfg().mm||{}).length,sst:Object.keys(_repoCfg().sapuStock||{}).length,stinv:document.getElementById('st-inv').textContent,bar:document.getElementById('nube-bar').innerText})")
+        ok(all(r[k]==n[k] for k in ['inv','cons','prog','dias','mm','sst']) and r['inv']>0,f"La colega ve exactamente lo mismo ({ {k:r[k] for k in ['inv','cons','prog','dias','mm','sst']} })")
+        ok('datos publicados' in r['bar'] and 'Q.F. Prueba' in r['bar'],f"Barra de la colega: quién y cuándo publicó ({r['bar'][:140]!r})")
+        # Felipe actualiza el inventario → la colega lo ve al «Actualizar»
+        await pg.evaluate("inv={'PARACETAMOL 500 MG COMPRIMIDO':[{lote:'NUEVO',venc:'01/2029',stock:5}]};pdbGuardar('inv')"); await pg.wait_for_timeout(7000)
+        await pg2.click('text=🔄 Actualizar'); await pg2.wait_for_timeout(7000)
+        r=await pg2.evaluate("JSON.stringify(inv)")
+        ok('NUEVO' in r,'Cambio posterior de Felipe llega a la colega')
+        # Sin internet: reabre con la última copia
         S.caido=True
         await pg2.reload(); await pg2.wait_for_timeout(5000)
-        r=await pg2.evaluate("({cons:Object.keys(cons_map).length,dias:_sdCfg().diarioDias.length,inv:Object.keys(inv).length,bar:document.getElementById('nube-bar').innerText})")
-        ok(r['cons']==40 and r['dias']==15 and r['inv']==2 and 'sin conexión' in r['bar'],f"Sin internet abre con la última copia ({r['cons']}, {r['dias']} días, {r['inv']} art.)")
-        ok(not errs2,f'PC 2 sin errores ({errs2})')
+        r=await pg2.evaluate("({inv:JSON.stringify(inv),cons:Object.keys(cons_map).length,bar:document.getElementById('nube-bar').innerText})")
+        ok('NUEVO' in r['inv'] and r['cons']==n['cons'] and 'sin conexión' in r['bar'],f"Sin internet abre con la última copia ({r['bar'][:150]!r})")
+        ok(not errs2,f'PC de la colega sin errores ({errs2})')
         await b.close()
     print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')
     if fallas: raise SystemExit(1)
