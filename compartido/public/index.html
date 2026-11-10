@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pingüino Delta · DESAM Limache</title>
+<link rel="manifest" href="manifest.webmanifest">
+</head>
+<body style="font-family:system-ui,sans-serif;margin:0;padding:2rem;color:#123E66;background:#F5F8F8">
+<p id="msg">Cargando Pingüino Delta…</p>
+<script>
+/* Cargador de Pingüino Delta · versión institucional (un solo archivo).
+   1) Descarga la versión publicada de Delta (se actualiza sola) y guarda una copia
+      en este navegador para abrir sin internet.
+   2) Le entrega la configuración de abajo (cuenta Microsoft y vínculos de SharePoint).
+   Para otra institución, solo se cambia el bloque CONFIG. */
+const CONFIG = {
+  "nombre": "DESAM Limache",
+  "modo": "lotes",
+  "api": "/api/delta"
+};
+const FUENTE = 'https://carrascocisternaf-alt.github.io/pinguino-delta/';
+(function () {
+  const msg = t => { const m = document.getElementById('msg'); if (m) m.innerHTML = t; };
+  const db = () => new Promise((ok, ko) => { const r = indexedDB.open('delta-cargador', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+  const leer = async () => { try { const d = await db(); return await new Promise(ok => { const q = d.transaction('kv').objectStore('kv').get('html'); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); }); } catch (e) { return null; } };
+  const guardar = async v => { try { const d = await db(); d.transaction('kv', 'readwrite').objectStore('kv').put(v, 'html'); } catch (e) {} };
+  (async () => {
+    let html = null;
+    try { const r = await fetch(FUENTE, { cache: 'no-cache' }); if (r.ok) { html = await r.text(); if (html.length > 100000) guardar(html); else html = null; } } catch (e) {}
+    if (!html) html = await leer();
+    if (!html) { msg('No hay internet y este navegador aún no tiene una copia de Delta. Conéctate una vez para guardarla.'); return; }
+    const cfg = '<script>window.DELTA_CONFIG=' + JSON.stringify(CONFIG).replace(/</g, '\\u003c') + ';<\/script>';
+    html = html.replace(/<head(\s[^>]*)?>/i, m => m + cfg);
+    document.open(); document.write(html); document.close();
+  })();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+</script>
+</body></html>

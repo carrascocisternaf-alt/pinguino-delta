@@ -1,0 +1,4 @@
+# Sitio «Pingüino Delta compartido» (Netlify, desde este repositorio con Base directory = compartido)
+[build]
+  publish = "public"
+  functions = "netlify/functions"
