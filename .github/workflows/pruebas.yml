@@ -19,3 +19,5 @@ jobs:
         run: python tests/test_demo.py
       - name: Modo institucional (Microsoft 365 simulado)
         run: python tests/test_nube.py
+      - name: Modo compartido como Lotes (servidor simulado)
+        run: python tests/test_lotes_modo.py

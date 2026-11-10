@@ -18980,7 +18980,12 @@ body{background:radial-gradient(1200px 600px at 100% -10%,rgba(28,175,170,.06),t
 #nube-bar .nb-f{white-space:normal}#nube-bar .nb-err{color:#B42318;font-weight:600}
 #nube-bar .nb-b{display:flex;gap:6px;margin-left:auto}
 #nube-bar button{padding:5px 12px;border:1px solid #123E66;border-radius:6px;background:#fff;color:#123E66;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap}
-#nube-bar button.nb-main{background:#123E66;color:#fff}#nube-bar button:disabled{opacity:.6;cursor:wait}
+#nube-bar button.nb-main{background:#123E66;color:#fff}
+#nube-bar .nb-pub{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;padding:.5rem 0 .2rem;border-top:1px dashed #9CC3E6}
+#nube-bar .nb-pub label{display:flex;flex-direction:column;gap:3px;font-weight:600}
+#nube-bar .nb-pub input[type=password],#nube-bar .nb-pub input[type=text]{padding:5px 8px;border:1px solid #9CC3E6;border-radius:6px;font:inherit;min-width:170px}
+#nube-bar .nb-pub .nb-file{padding:6px 10px;border:1px solid #123E66;border-radius:6px;background:#fff;cursor:pointer}
+#nube-bar .nb-pub .nb-file input{font-size:11px;margin-top:3px}#nube-bar button:disabled{opacity:.6;cursor:wait}
 .pkb-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 .6rem;padding:.5rem .8rem;border:1.5px solid #1CAFAA;border-radius:var(--r,10px);background:#F0FAF9}
 .pkb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#0E7470;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .pkb-btn:hover{filter:brightness(.95)}.pkb-btn:focus-within{outline:2px solid #0E6E6B;outline-offset:2px}
@@ -21204,6 +21209,8 @@ async function _nubeArchivo(A,enLinea){
 // ── JSON compartido (stocks y configuración manual) ──
 function _nubePaquete(){
   const R=(typeof _repoCfg==='function')?_repoCfg():{};
+  if(_esLotes())return{repo:{mm:R.mm||{},mmArchivo:R.mmArchivo||'',excl:R.excl||{}},
+    apertura:(typeof _sapuCfg==='function'?_sapuCfg().apertura:'')||'',equivManual:typeof equivManual!=='undefined'?equivManual:{}};
   return{inv:inv||{},invEstado:(document.getElementById('st-inv')||{}).textContent||'',
     repo:{bodega:R.bodega||{},bodegaArchivo:R.bodegaArchivo||'',sapuStock:R.sapuStock||null,sapuStockArchivo:R.sapuStockArchivo||'',sapuStockFecha:R.sapuStockFecha||'',mm:R.mm||{},mmArchivo:R.mmArchivo||'',excl:R.excl||{}},
     apertura:(typeof _sapuCfg==='function'?_sapuCfg().apertura:'')||'',
@@ -21250,6 +21257,7 @@ function _nubeProgramarPublicar(){
 async function nubePublicar(){
   const datos=_nubePaquete();const txt=JSON.stringify(datos);
   if(txt===NUBE.ultimoPub)return;
+  if(_esLotes())return _lxPublicarComp(datos,txt);
   const E=NUBE.estado.comp=NUBE.estado.comp||{};
   try{
     const c=await _nubeCarpeta();if(!c)throw new Error('sin carpeta compartida');
@@ -21265,6 +21273,7 @@ async function nubePublicar(){
 // ── Sincronización general ──
 let _nubeOcupado=false;
 async function nubeSincronizar(manual){
+  if(NUBE.cfg&&_esLotes())return _lxSincronizar();
   if(!NUBE.cfg||_nubeOcupado)return;_nubeOcupado=true;nubeRender('Sincronizando…');
   const enLinea=navigator.onLine!==false&&!!(await _nubeAT());
   try{
@@ -21278,11 +21287,129 @@ async function nubeSincronizar(manual){
   finally{_nubeOcupado=false;nubeRender();}
 }
 
+// ══ MODO «COMO LOTES» (nov-2026): sin cuenta Microsoft ══
+// El sitio de Pingüino Lotes guarda los Excel publicados por Felipe (con su clave) y
+// Delta los lee desde ahí; los stocks de las tres bodegas salen del mismo Lotes.
+// config: {modo:'lotes', api:'/api/delta', inventario:'/api/inventario'}
+const _esLotes=()=>!!(NUBE.cfg&&NUBE.cfg.modo==='lotes');
+const _b64Buf=b=>{const s=atob(b);const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer;};
+const _bufB64=buf=>{const u=new Uint8Array(buf);let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);};
+async function _lxJSON(url,opt){const r=await fetch(url,Object.assign({cache:'no-store'},opt||{}));let j={};try{j=await r.json();}catch(e){}if(!r.ok){const e=new Error(j.error||('HTTP '+r.status));e.status=r.status;throw e;}return j;}
+const LX_BOD=[{k:'botiquin',q:'',etq:'Botiquín'},{k:'central',q:'?bodega=central',etq:'Bodega central'},{k:'sapu',q:'?bodega=sapu',etq:'SAPU'}];
+function _lxAplicarArch(A,E,buf,meta){
+  if(E.aplicadoEtag===(meta&&meta.etag)&&!E.nuevo)return;
+  NUBE.aplicando=true;
+  try{const err=A.aplicar(buf,(meta&&meta.nombre)||A.etq);E.formato=err||null;if(!err)E.aplicadoEtag=meta&&meta.etag;E.nuevo=false;}
+  catch(e){E.formato=e.message;}finally{NUBE.aplicando=false;}
+}
+async function _lxStocks(enLinea){
+  const ES=NUBE.estado.stocks=NUBE.estado.stocks||{};
+  for(const B of LX_BOD){
+    const E=ES[B.k]=ES[B.k]||{};let d=null;
+    if(enLinea){try{d=await _lxJSON(NUBE.cfg.inventario+B.q);await _nubeSet('lotes:'+B.k,d);E.error=null;E.vacio=false;}
+      catch(e){if(e.status===404){E.vacio=true;E.error=null;}else E.error=e.message;}}
+    if(!d&&!E.vacio){d=await _nubeGet('lotes:'+B.k);if(d)E.cache=true;}
+    if(!d||!d.meta||!Array.isArray(d.items))continue;
+    E.meta=d.meta;
+    if(E.aplicado===d.meta.cargado)continue;
+    const rows=[['Nombre Artículo','Vencimiento','Lote','Stock Sist.']];
+    d.items.forEach(it=>(it.lots||[]).forEach(l=>rows.push([it.n,l[0]?l[0].split('-').reverse().join('/'):'',l[1]||'S/L',+l[2]||0])));
+    const fn=`Pingüino Lotes · ${B.etq}${d.meta.archivo?' ('+d.meta.archivo+')':''}`;
+    const fr=d.meta.fechaReporte?(p=>new Date(p[0],p[1]-1,p[2]))(d.meta.fechaReporte.split('-').map(Number)):null;
+    NUBE.aplicando=true;
+    try{
+      if(B.k==='botiquin'){procesarInvRows.silencioso=true;try{procesarInvRows(rows,fn);}finally{procesarInvRows.silencioso=false;}}
+      else if(B.k==='central')repoBodegaRows(rows,fn,true);
+      else repoStockSapuRows(rows,fn,true,fr);
+      E.aplicado=d.meta.cargado;
+    }catch(e){E.error=e.message;}finally{NUBE.aplicando=false;}
+  }
+}
+async function _lxSincronizar(){
+  if(_nubeOcupado)return;_nubeOcupado=true;nubeRender(true);
+  const api=NUBE.cfg.api||'/api/delta';
+  let idx=null;
+  try{idx=await _lxJSON(api);NUBE.sinRed=false;}catch(e){NUBE.sinRed=true;}
+  try{
+    for(const A of NUBE_ARCH){
+      const E=NUBE.estado[A.k]=NUBE.estado[A.k]||{};
+      const cache=await _nubeGet('arch:'+A.k);let buf=null,meta=cache&&cache.meta;
+      if(idx){const m=idx.archivos&&idx.archivos[A.k];
+        if(!m){E.vacio=true;E.meta=null;continue;}
+        E.vacio=false;meta={nombre:m.nombre,etag:m.etag,mod:m.subido,por:m.por};
+        try{if(!cache||!cache.buf||cache.meta.etag!==m.etag){const j=await _lxJSON(api+'?k='+A.k);buf=_b64Buf(j.b64);await _nubeSet('arch:'+A.k,{meta,buf,bajado:Date.now()});E.nuevo=true;}else buf=cache.buf;E.error=null;}
+        catch(e){E.error=e.message;if(cache)buf=cache.buf;}
+      }else if(cache){buf=cache.buf;E.error='sin conexión';}
+      E.meta=meta;if(buf)_lxAplicarArch(A,E,buf,meta);
+    }
+    await _lxStocks(!!idx);
+    // Configuración compartida (mín/máx SAPU, exclusivos, equivalencias, apertura)
+    const EC=NUBE.estado.comp=NUBE.estado.comp||{};
+    let comp=null;
+    if(idx&&idx.comp){if(EC.aplicadoEtag!==idx.comp.etag){try{comp=await _lxJSON(api+'?k=comp');await _nubeSet('comp',{meta:{etag:comp.etag,mod:comp.ts,por:comp.por},d:{datos:comp.datos}});}catch(e){EC.error=e.message;}}EC.meta={etag:idx.comp.etag,mod:idx.comp.ts,por:idx.comp.por};}
+    else if(!idx){const cc=await _nubeGet('comp');if(cc&&!EC.aplicadoEtag){comp={etag:cc.meta.etag,datos:cc.d.datos};EC.meta=cc.meta;}}
+    else EC.vacio=true;
+    if(comp&&comp.datos){_nubeAplicarCompartido({datos:comp.datos});EC.aplicadoEtag=comp.etag;}
+    if(idx)NUBE.ultimaSync=Date.now();
+  }finally{_nubeOcupado=false;nubeRender();}
+}
+async function _lxPublicarComp(datos,txt){
+  const clave=_lsG('pdn_clave');const EC=NUBE.estado.comp=NUBE.estado.comp||{};
+  if(!clave){EC.local=true;nubeRender();return;} // sin clave: el cambio queda solo en este PC
+  try{const j=await _lxJSON(NUBE.cfg.api||'/api/delta',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+clave},body:JSON.stringify({k:'comp',datos,por:_lsG('pdn_por')||''})});
+    EC.meta={etag:j.etag,mod:j.ts,por:_lsG('pdn_por')||''};EC.aplicadoEtag=j.etag;EC.error=null;EC.local=false;NUBE.ultimoPub=txt;}
+  catch(e){EC.error=e.status===401?'clave incorrecta':e.message;}
+  nubeRender();
+}
+async function nubeSubirExcel(k,inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  const clave=(document.getElementById('lx-clave')||{}).value||_lsG('pdn_clave')||'';
+  const por=(document.getElementById('lx-por')||{}).value||_lsG('pdn_por')||'';
+  const msg=(t,err)=>{NUBE.pubMsg={t,err};const st=document.getElementById('lx-st');if(st){st.textContent=t;st.style.color=err?'var(--red)':'';}};
+  if(!clave){msg('Escribe la clave antes de elegir el archivo.',true);inp.value='';return;}
+  try{
+    msg('Subiendo '+f.name+'…');
+    const buf=await f.arrayBuffer();const A=NUBE_ARCH.find(a=>a.k===k);
+    // Se prueba antes de publicar: si Delta no lo entiende, no se sube
+    NUBE.aplicando=true;let err;try{err=A.aplicar(buf,f.name);}finally{NUBE.aplicando=false;}
+    if(err){msg('No se publicó: '+err,true);return;}
+    const j=await _lxJSON(NUBE.cfg.api||'/api/delta',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+clave},body:JSON.stringify({k,nombre:f.name,b64:_bufB64(buf),por})});
+    _lsS('pdn_clave',clave);if(por)_lsS('pdn_por',por);
+    const meta={nombre:j.meta.nombre,etag:j.meta.etag,mod:j.meta.subido,por:j.meta.por};
+    await _nubeSet('arch:'+k,{meta,buf,bajado:Date.now()});
+    const E=NUBE.estado[k]=NUBE.estado[k]||{};E.meta=meta;E.aplicadoEtag=meta.etag;E.vacio=false;E.error=null;E.formato=null;
+    msg('✓ Publicado: los colegas lo verán al abrir o sincronizar.');
+    if(NUBE.estado.comp&&NUBE.estado.comp.local)nubePublicar();
+  }catch(e){msg('⚠ '+(e.status===401?'Clave incorrecta.':e.message),true);}
+  finally{inp.value='';nubeRender();}
+}
+function nubeTogglePublicar(){NUBE.panelPub=!NUBE.panelPub;nubeRender();}
+function _lxRender(el,ocupado){
+  el.style.display='flex';
+  const fila=(etq,E)=>{E=E||{};const m=E.meta;
+    const est=E.formato?`<span class="nb-err">⚠ ${_sapuEsc(E.formato)}</span>`:m?`✓ publicado ${_fh(m.mod)}${m.por?' por '+_sapuEsc(m.por):''}${E.error?' <span class="nb-err">· sin conexión, última copia</span>':''}`:(E.vacio?'aún no publicado':(E.error?`<span class="nb-err">⚠ ${_sapuEsc(E.error)}</span>`:'pendiente'));
+    return`<span class="nb-f"><b>${etq}:</b> ${est}</span>`;};
+  const ES=NUBE.estado.stocks||{};
+  const stk=LX_BOD.map(B=>{const E=ES[B.k]||{};const m=E.meta;return`${B.etq} ${m?(m.fechaReporte?m.fechaReporte.split('-').reverse().join('/'):_fh(m.cargado)):E.vacio?'—':'…'}`;}).join(' · ');
+  const EC=NUBE.estado.comp||{};
+  const ses=!!_lsG('pdn_clave');
+  el.innerHTML=`<span class="nb-t">☁ <b>${_sapuEsc(NUBE.cfg.nombre||'Delta compartido')}</b>${NUBE.ultimaSync?` · sincronizado ${_fh(NUBE.ultimaSync)}`:''}${NUBE.sinRed&&!_nubeOcupado?' · <span class="nb-err">sin conexión: usando la última copia guardada</span>':''}</span>
+    <span class="nb-fs">${fila('Consumos y programaciones',NUBE.estado.consumos)}${fila('Consumo diario SAPU',NUBE.estado.sapu)}<span class="nb-f"><b>Stocks (Pingüino Lotes):</b> ${stk}</span>${EC.local?'<span class="nb-f nb-err">Mín/máx o equivalencias cambiados solo en este PC (sin clave)</span>':EC.error?`<span class="nb-f nb-err">Config compartida: ${_sapuEsc(EC.error)}</span>`:''}</span>
+    <span class="nb-b"><button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Sincronizando…':'🔄 Sincronizar'}</button><button onclick="nubeTogglePublicar()" title="Solo para quien tiene la clave de Lotes">${NUBE.panelPub?'✕ Cerrar':'⬆ Publicar Excel'}</button></span>
+    ${NUBE.panelPub?`<div class="nb-pub"><label>Clave (la misma de Lotes)<input type="password" id="lx-clave" value="${_sapuEsc(NUBE.pubClave!=null?NUBE.pubClave:(_lsG('pdn_clave')||''))}" oninput="NUBE.pubClave=this.value" autocomplete="current-password"></label>
+      <label>Tu nombre (opcional)<input type="text" id="lx-por" value="${_sapuEsc(NUBE.pubPor!=null?NUBE.pubPor:(_lsG('pdn_por')||''))}" oninput="NUBE.pubPor=this.value" placeholder="p. ej. Q.F. Felipe"></label>
+      <label class="nb-file">📊 Consumos y programaciones (archivo único)<input type="file" accept=".xlsx,.xls" onchange="nubeSubirExcel('consumos',this)"></label>
+      <label class="nb-file">🚑 Consumo diario SAPU<input type="file" accept=".xlsx,.xls" onchange="nubeSubirExcel('sapu',this)"></label>
+      <span id="lx-st" class="nb-f" style="${NUBE.pubMsg&&NUBE.pubMsg.err?'color:var(--red)':''}">${NUBE.pubMsg?_sapuEsc(NUBE.pubMsg.t):''}</span>
+      <span class="nb-f" style="flex-basis:100%;opacity:.9">Los stocks no se suben aquí: se cargan en Pingüino Lotes (Botiquín, Bodega central y SAPU) y Delta los toma solos. Con la clave guardada en este PC, los cambios de mín/máx, exclusivos SAPU y equivalencias también se comparten.</span></div>`:''}`;
+}
+
 // ── Interfaz ──
 function _nubeMsg(t,cls){NUBE.msg=t?{t,cls}:null;nubeRender();}
 const _fh=t=>{if(!t)return'—';const d=new Date(t);return d.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});};
 function nubeRender(ocupado){
   const el=document.getElementById('nube-bar');if(!el||!NUBE.cfg)return;
+  if(_esLotes())return _lxRender(el,ocupado);
   el.style.display='flex';
   const ses=!!(NUBE.tok&&(NUBE.tok.rt||Date.now()<NUBE.tok.exp));
   const fila=(k,etq)=>{const E=NUBE.estado[k]||{};const m=E.meta;if(!NUBE.cfg[k==='comp'?'_':k]&&k!=='comp')return'';
@@ -21300,7 +21427,7 @@ async function nubeIniciar(){
   // Configuración: incrustada por el cargador de un solo archivo (window.DELTA_CONFIG) o config.json junto a la página
   let cfg=window.DELTA_CONFIG||null;
   if(!cfg){try{const r=await fetch('config.json',{cache:'no-cache'});if(r.ok)cfg=await r.json();}catch(e){}}
-  if(!cfg||!cfg.tenant)return;
+  if(!cfg||!(cfg.tenant||cfg.modo==='lotes'))return;
   NUBE.cfg=cfg;NUBE.user=_lsG('pdn_user');
   document.body.classList.add('modo-nube');
   if(cfg.nombre)document.title='Pingüino Delta · '+cfg.nombre;
@@ -21309,7 +21436,7 @@ async function nubeIniciar(){
   try{if(!document.querySelector('link[rel=manifest]')){const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);}
     if('serviceWorker' in navigator)fetch('sw.js',{method:'HEAD'}).then(r=>{if(r.ok&&/javascript/.test(r.headers.get('content-type')||''))navigator.serviceWorker.register('sw.js').catch(()=>{});}).catch(()=>{});}catch(e){}
   try{await window.__pdbListo;}catch(e){}
-  await _nubeVolverDeLogin();
+  if(!_esLotes())await _nubeVolverDeLogin();
   nubeRender();
   // Publicar al cambiar stocks a mano
   const base=window.pdbGuardar;
