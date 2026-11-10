@@ -178,6 +178,19 @@ async def main():
         r=await pg.evaluate("""(()=>{const R=_repoCfg();return{inv:(inv['PARACETAMOL 500 MG COMPRIMIDO']||[]).length,bod:R.bodega['IBUPROFENO 400 MG COMPRIMIDO'][0].stock,
           sapu:R.sapuStock['INSULINA CRISTALINA 100 UI/ML SOLUCIÓN INYECTABLE'][0].stock,fecha:R.sapuStockFecha,st:[...document.querySelectorAll('.pkb-st')].map(e=>e.textContent.slice(0,2))}})()""")
         ok(r['inv']==2 and r['bod']==300 and r['sapu']==1 and r['fecha']=='2026-11-01' and r['st']==['✓ ','✓ '],f'Paquete de bodegas: carga Botiquín, Bodega central y SAPU de una vez ({r})')
+        # Anexo «Pedido del jueves»: encabezados solo con el día de la semana y FERIADO
+        pg2,errs2=await nueva(b)
+        await pg2.evaluate("switchMode('sapu')")
+        semana=[['ARTICULO','SABADO','DOMINGO','LUNES','MARTES','FERIADO','STOCK'],['PARACETAMOL 500 MG COMPRIMIDO',6,4,1,2,5,99],['IBUPROFENO 400 MG COMPRIMIDO',0,0,0,0,0,10]]
+        await pg2.evaluate(f"({SUBIR})('sp-dia-fi',{semana!r},'semana.xlsx')".replace('None','null')); await pg2.wait_for_timeout(700)
+        await pg2.evaluate(f"({SUBIR})('sp-sst-fi',{toma!r},'toma.xlsx')".replace('None','null')); await pg2.wait_for_timeout(700)
+        r=await pg2.evaluate("""(()=>{sapuSwitch('quincenal');const c=_sdCfg();const p=QN_RES.rows.find(x=>x.name==='PARACETAMOL 500 MG COMPRIMIDO');
+          return{ini:c.diarioRel.inicio,fer:c.diarioFeriados,dias:c.diarioDias.length,mW:Math.round(p.mW*100)/100,mD:p.mD,mn:p.mn,st:p.st,ibu:QN_RES.rows.find(x=>x.name==='IBUPROFENO 400 MG COMPRIMIDO').tipo,
+            tabla:!!document.querySelector('#qn-tabla table'),visible:document.getElementById('sp-quincenal').style.display}})()""")
+        # fin de semana = sáb, dom y feriado (6,4,5 → 5/día); hábil = lun, mar (1,2 → 1,5/día); mínimo = ceil(1,5 × 2 × 5) = 15
+        ok(r['ini']=='2026-10-10' and r['fer']==['2026-10-14'] and r['dias']==5 and r['mW']==5 and r['mD']==1.5 and r['mn']==15 and r['st']==1237 and r['ibu']=='sin consumo' and r['tabla'] and r['visible']=='block',
+           f'Pedido del jueves: días por nombre (SABADO…FERIADO), feriado como fin de semana, mínimo y stock AVIS ({r})')
+        ok(not errs2,f'Pedido del jueves sin errores ({errs2})')
         ok(not errs,f'Escenario AVIS / diario relativo sin errores ({errs})')
         await b.close()
     print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')

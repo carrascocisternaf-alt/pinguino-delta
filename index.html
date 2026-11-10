@@ -2297,6 +2297,33 @@ function visSwitchSubTab(sub){
 #view-sapu .sp-tab:hover{background:var(--bg2);color:var(--navy)}
 #view-sapu .sp-tab.sp-on{background:var(--navy);color:#fff;font-weight:600}
 #view-sapu .sp-panel{display:none;padding:1.25rem 1.75rem 3rem}
+#view-sapu #sp-quincenal .qn-params{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 18px}
+#view-sapu #sp-quincenal .qn-params label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink2);font-weight:500}
+#view-sapu #sp-quincenal .qn-params input,#view-sapu #sp-quincenal .qn-params select,#view-sapu #sp-quincenal .qn-bar input[type=search]{padding:6px 9px;border:1.5px solid var(--bdr);border-radius:8px;font:inherit;font-size:13px;background:#fff;color:var(--ink)}
+#view-sapu #sp-quincenal .qn-srcs{display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+#view-sapu #sp-quincenal .qn-src.ok{color:var(--ink)}#sp-quincenal .qn-src.no{color:var(--red)}
+#view-sapu #sp-quincenal .qn-src a{color:var(--navy);margin-left:6px;font-size:12px}#sp-quincenal .qn-opt{color:var(--ink3);font-weight:400}
+#view-sapu #sp-quincenal .qn-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:0 0 1rem}
+#view-sapu #sp-quincenal .qn-kpis .kpi{border:1px solid #D5E3E3;border-radius:10px;padding:8px 12px;background:#fff}
+#view-sapu #sp-quincenal .qn-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.7rem}
+#view-sapu #sp-quincenal .qn-tabs button{padding:7px 13px;border:1.5px solid var(--bdr);border-radius:999px;background:#fff;color:var(--ink2);cursor:pointer;font:inherit;font-size:12.5px;font-weight:600}
+#view-sapu #sp-quincenal .qn-tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+#view-sapu #sp-quincenal .qn-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 .6rem}
+#view-sapu #sp-quincenal .qn-bar input[type=search]{flex:1 1 240px;max-width:380px;min-width:0}
+#view-sapu #sp-quincenal .qn-msg{background:#FFF4E5;border:1px solid #F3C98B;color:#7A4A00;border-radius:8px;padding:6px 10px;margin:0 0 6px;font-size:12.5px}
+#view-sapu #sp-quincenal table.qn-t td,#view-sapu #sp-quincenal table.qn-t th{text-align:left;font-family:'DM Sans',system-ui,sans-serif;vertical-align:top}
+#view-sapu #sp-quincenal table.qn-t td.n,#view-sapu #sp-quincenal table.qn-t th.n{text-align:right!important;font-family:'DM Mono',monospace!important}
+#view-sapu #sp-quincenal table.qn-t td.qn-need{font-weight:700;color:var(--ink)}
+#view-sapu #sp-quincenal table.qn-t td.qn-art{font-weight:600;min-width:240px}
+#view-sapu #sp-quincenal table.qn-t td.qn-obs{font-size:12px;color:var(--ink2);min-width:260px}
+#view-sapu #sp-quincenal tr.qn-clk{cursor:pointer}#sp-quincenal tr.qn-clk:hover td{background:#F0FAF9}
+#view-sapu #sp-quincenal tr.qn-r td{background:#FDECEC}
+#view-sapu #sp-quincenal tr.qn-why td{background:#F4F8F8;color:var(--ink2);font-size:12.5px;line-height:1.65;padding:10px 14px}
+#view-sapu #sp-quincenal tr.qn-why code{font-family:'DM Mono',monospace;color:var(--navy);font-weight:700}
+#view-sapu #sp-quincenal .qn-pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+#view-sapu #sp-quincenal .qn-pill.r{background:#C63A3F;color:#fff}#sp-quincenal .qn-pill.o{background:#F2A33A;color:#2B1A00}#sp-quincenal .qn-pill.b{background:#2F64A8;color:#fff}
+#view-sapu #sp-quincenal .qn-pill.gr{background:#2E7D4F;color:#fff}#sp-quincenal .qn-pill.g{background:#E3E8E8;color:var(--ink2)}
+#view-sapu #sp-quincenal .qn-met{font-size:13.5px;line-height:1.65;color:var(--ink2)}#sp-quincenal .qn-met b{color:var(--ink)}
 #view-sapu .sp-box{background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);padding:1rem 1.25rem;margin-bottom:1rem}
 #view-sapu .sp-params{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px;align-items:end}
 #view-sapu .sp-params .fld label{font-size:11px}
@@ -2363,6 +2390,7 @@ function visSwitchSubTab(sub){
     <button class="sp-tab" data-sp="dotacion" onclick="sapuSwitch('dotacion')">🧰 Dotación inicial</button>
     <button class="sp-tab" data-sp="repo" onclick="sapuSwitch('repo')">🔁 Reposición SAPU</button>
     <button class="sp-tab" data-sp="diario" onclick="sapuSwitch('diario')">📈 Consumo real SAPU</button>
+    <button class="sp-tab" data-sp="quincenal" onclick="sapuSwitch('quincenal')" title="Anexo: pedido del jueves para entrega del viernes y mín-máx para AVIS">🗓 Pedido del jueves</button>
     <button class="sp-tab" data-sp="homolog" onclick="sapuSwitch('homolog')">🔗 Asociar con la referencia</button>
     <button class="sp-tab" data-sp="fuentes" onclick="sapuSwitch('fuentes')">⚙️ Fuentes y método</button>
     <button class="sp-btn" onclick="sapuExportarExcel()" style="margin-left:auto">⬇ Exportar planilla de gestión (.xlsx)</button>
@@ -2527,6 +2555,27 @@ function visSwitchSubTab(sub){
       </div>
     </div>
     <div id="sd-content"></div>
+  </div>
+  <!-- ═══ PANEL: PEDIDO DEL JUEVES · ANEXO (nov-2026, integrado desde «Pingüino Delta · Reposición SAPU») ═══ -->
+  <div class="sp-panel" id="sp-quincenal">
+    <div class="sp-pregunta">¿Qué pido el jueves para que el SAPU quede en su máximo el viernes, y qué mín-máx cargo en AVIS?</div>
+    <div class="sp-info">Anexo para el esquema de <b>stock fijo</b>: se solicita el jueves y se repone el viernes cada ciclo (por defecto 14 días), dejando cada artículo en su máximo. Separa el consumo de <b>fin de semana y feriados</b> (16 h de atención) del de <b>días hábiles</b> (7 h), propone el mínimo (pasar un fin de semana con margen) y el máximo, y los compara con lo cargado en AVIS. Usa los datos ya cargados en Delta; no hay que subir nada aparte.</div>
+    <div class="sp-box" id="qn-fuentes"></div>
+    <div class="sp-box">
+      <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.6rem">Parámetros</div>
+      <div class="qn-params">
+        <label>Fecha del inventario<input type="date" id="qn-inv" onchange="qnParam('inv',this.value)"></label>
+        <label>Día de entrega (viernes)<input type="date" id="qn-ent" onchange="qnParam('ent',this.value)"></label>
+        <label>Ciclo de reposición (días)<input type="number" id="qn-ciclo" min="7" max="31" onchange="qnParam('ciclo',this.value)"></label>
+        <label>Factor de seguridad del mínimo (× fin de semana promedio)<input type="number" id="qn-fs" step="0.1" min="1" onchange="qnParam('fs',this.value)"></label>
+        <label>Excluir primeros días (apertura)<input type="number" id="qn-skip" min="0" onchange="qnParam('skip',this.value)"></label>
+        <label>Umbral para proponer ajuste (%)<input type="number" id="qn-umb" min="0" step="5" onchange="qnParam('umb',this.value)"></label>
+        <label>Piso de máximo (unidades; tope: máx AVIS)<input type="number" id="qn-piso" min="0" onchange="qnParam('piso',this.value)"></label>
+        <label>Máximo que se carga en AVIS<select id="qn-mode" onchange="qnParam('mode',this.value)"><option value="ciclo">Ciclo (cubre hasta la próxima entrega + mínimo)</option><option value="mes">Mes (30 días + mínimo)</option></select></label>
+        <label style="grid-column:1/-1">Feriados (dd/mm/aaaa, separados por coma; cuentan como día de fin de semana)<input type="text" id="qn-fer" onchange="qnParam('fer',this.value)"></label>
+      </div>
+    </div>
+    <div id="qn-content"></div>
   </div>
   <!-- ═══ PANEL: FUENTES ═══ -->
   <div class="sp-panel" id="sp-fuentes">
@@ -18447,6 +18496,7 @@ function sapuRefrescar(){
     else if(_sapuPanel==='dotacion')sapuRenderDotacion();
     else if(_sapuPanel==='repo')repoRender();
     else if(_sapuPanel==='diario')sapuRenderDiario();
+    else if(_sapuPanel==='quincenal')qnRender();
     else if(_sapuPanel==='homolog')sapuRenderHomolog();
     else if(_sapuPanel==='fuentes')sapuRenderFuentes();
   }catch(e){console.error('SAPU:',e);}
@@ -19345,6 +19395,7 @@ function anGrupo(gid){
    "Ir →" navega a la pestaña correspondiente. */
 const AYUDA_CATALOGO=[
 // ── General ──
+{t:'Pedido del jueves (stock fijo SAPU)',k:'pedido jueves viernes quincenal ciclo stock fijo minimo maximo avis ajuste fin de semana feriado sapu anexo carga avis calendario',d:'Urgencia (SAPU) → 2 · Operar el SAPU → 🗓 Pedido del jueves',go:'sapu|quincenal',q:'Calcula qué pedir el jueves para que el SAPU quede en su máximo el viernes, y propone el mín-máx para cargar en AVIS.',c:'Usa el consumo diario SAPU, la toma AVIS del SAPU y el mín/máx de AVIS ya cargados en Delta. Separa el consumo de fin de semana y feriados del de días hábiles: mínimo = factor × fin de semana promedio; máximo = consumo del ciclo (o del mes) + mínimo; pedido = objetivo − stock proyectado a la entrega. Pestañas: pedido, mín-máx propuesto, ajuste AVIS (subir/bajar/crear), calendario de entregas y método. El Excel trae una hoja «Carga AVIS».',n:'Clic en una fila para ver el cálculo paso a paso.'},
 {t:'Importar paquete de bodegas (Pingüino Lotes)',k:'paquete bodegas pinguino lotes botiquin bodega central sapu importar stock tres bodegas',d:'Mi arsenal → barra «Importar paquete de bodegas» · también en Urgencia (SAPU) → Reposición SAPU',go:'arsenal|art',q:'Carga de una vez el stock por lote de las tres bodegas desde un solo Excel exportado por Pingüino Lotes.',c:'Cada hoja es una bodega: «Botiquín» va al inventario de lotes de Mi arsenal; «Bodega central» y «SAPU» van a Reposición SAPU. Las columnas son las de la toma de inventario AVIS (Nombre Artículo · Vencimiento · Lote · Stock Sist.). Una hoja «Paquete» opcional trae la fecha de cada toma. También puedes armarlo a mano copiando las tres tomas en un mismo Excel.',n:'Nada sale de tu computador: el archivo se lee en el navegador.'},
 {t:'Cargar datos de prueba',k:'demo demostracion ejemplo probar ficticios',d:'Mi arsenal → recuadro superior',go:'arsenal|art',
  q:'Carga de una vez 8 Excels ficticios (40 artículos) para probar Delta sin usar datos reales.',
@@ -20204,7 +20255,7 @@ function repoCargarMinMax(evt){
     const hi=detHdr(rows);const hdr=rows[hi].map(c=>normArt(c).toLowerCase());
     const cA=hdr.findIndex(h=>h.includes('articulo')||h.includes('nombre')||h.includes('producto')||h.includes('medicamento'));
     const cMin=hdr.findIndex(h=>/\bmin/.test(h)),cMax=hdr.findIndex(h=>/\bmax/.test(h));
-    const cEx=hdr.findIndex(h=>h.includes('exclusiv')),cSt=hdr.findIndex(h=>h.includes('stock')),cC=hdr.findIndex(h=>h.includes('consumo'));
+    const cEx=hdr.findIndex(h=>h.includes('exclusiv')),cSt=hdr.findIndex(h=>h.includes('stock')&&!/\bmin|\bmax/.test(h)),cC=hdr.findIndex(h=>h.includes('consumo'));
     if(cA<0||(cMin<0&&cMax<0)){alert('Columnas requeridas: Artículo, Mínimo y Máximo. Opcionales: Exclusivo SAPU (Sí/No), Stock SAPU y Consumo mensual SAPU.\nCabeceras detectadas: '+hdr.filter(Boolean).join(', '));return;}
     const R=_repoCfg();const mm={};const hom={};
     const num=v=>{if(v===''||v===null||v===undefined)return null;const x=parseFloat(String(v).replace(',','.'));return isNaN(x)?null:x;};
@@ -20546,7 +20597,9 @@ function _sdFecha(v){
 }
 // Columnas "CONSUMO DIA 1 (SABADO)": días relativos sin fecha real.
 const _SD_DOW={domingo:0,lunes:1,martes:2,miercoles:3,jueves:4,viernes:5,sabado:6};
-function _sdColRel(h){const t=normArt(h).toLowerCase();const m=t.match(/\bdia\s*n?[°º.]?\s*(\d{1,3})\b/);if(!m)return null;let w=null;for(const k in _SD_DOW)if(t.includes(k)){w=_SD_DOW[k];break;}return{n:+m[1],w};}
+function _sdColRel(h){const t=normArt(h).toLowerCase();if(/stock|articulo|codigo|total|promedio/.test(t))return null;const m=t.match(/\bdia\s*n?[°º.]?\s*(\d{1,3})\b/);let w=null;for(const k in _SD_DOW)if(t.includes(k)){w=_SD_DOW[k];break;}const fer=/feriado/.test(t);
+  // «CONSUMO DIA 3 (LUNES)» → n=3 · «LUNES» / «FERIADO» sin número → n por orden de columna (se asigna después)
+  if(m)return{n:+m[1],w,fer};if(w!==null||fer)return{n:null,w,fer};return null;}
 // Día 1 = la fecha más reciente coherente con los días de la semana del encabezado,
 // con el último día informado ≤ hoy. Sin días de semana: último día = ayer.
 function _sdInferirInicio(cols){
@@ -20569,6 +20622,8 @@ function _sdAplicarRel(c,quitarAnterior){
   Object.entries(R.datos).forEach(([a,m])=>{Object.entries(m).forEach(([n,q])=>{((c.diario[a]=c.diario[a]||{})[fechaDe(R.inicio,+n)])=q;});});
   c.diarioDias=[...new Set(c.diarioDias.concat([...dias]))].sort();
   R.fechas=[...dias].sort();
+  // Feriados marcados en el encabezado del archivo (los usa el pedido quincenal)
+  const ferAnt=new Set((c.diarioFeriados||[]).filter(k=>!(quitarAnterior||[]).includes(k)));(R.feriados||[]).forEach(n=>ferAnt.add(fechaDe(R.inicio,n)));c.diarioFeriados=[...ferAnt].sort();
   return dias;
 }
 function sapuCambiarInicioRel(v){
@@ -20603,7 +20658,9 @@ function sapuDiarioDesdeBuf(buf,nombre,silencioso){
     const _bq=t=>hdr.findIndex((h,i)=>i!==cF&&i!==cA&&h.includes(t));
     let cQ=-1;for(const t of ['cantidad','unidades','consumo','total','dispensad']){cQ=_bq(t);if(cQ>=0)break;}
     const colsFecha=hdrRaw.map((h,i)=>({i,d:_sdFecha(h)})).filter(x=>x.d&&x.i!==cA);
-    const colsRel=colsFecha.length?[]:hdrRaw.map((h,i)=>({i,r:i===cA?null:_sdColRel(h)})).filter(x=>x.r).map(x=>({i:x.i,n:x.r.n,w:x.r.w}));
+    const colsRel=colsFecha.length?[]:hdrRaw.map((h,i)=>({i,r:i===cA?null:_sdColRel(h)})).filter(x=>x.r).map(x=>({i:x.i,n:x.r.n,w:x.r.w,fer:x.r.fer}));
+    // Encabezados solo con el día de la semana (SABADO, DOMINGO, LUNES… FERIADO): días consecutivos en orden de columna
+    if(colsRel.length&&colsRel.some(x=>x.n===null)){if(colsRel.length<2||colsRel.some(x=>x.n!==null))colsRel.length=0;else colsRel.forEach((x,k)=>{x.n=k+1;});}
     // Columnas de días aún vacías (plantilla por llenar) no cuentan como informadas
     for(let k=colsRel.length-1;k>=0;k--){const j=colsRel[k].i;let lleno=false;for(let i=hi+1;i<rows.length&&!lleno;i++){const v=rows[i][j];if(v!==''&&v!==null&&v!==undefined)lleno=true;}if(!lleno)colsRel.splice(k,1);}
     if(cA>=0&&colsRel.length&&cF<0){
@@ -20614,7 +20671,7 @@ function sapuDiarioDesdeBuf(buf,nombre,silencioso){
       const inf=_sdInferirInicio(colsRel);
       // Si es el mismo archivo que crece día a día y el usuario ya fijó Día 1, se respeta
       const prev=c.diarioRel;const mismo=prev&&prev.inferido===false;
-      c.diarioRel={archivo:f.name,inicio:mismo?prev.inicio:_sdISO(inf.d),inferido:!mismo,porSemana:inf.porSemana,dias:[...new Set(colsRel.map(x=>x.n))].sort((a,b)=>a-b),datos,fechas:ant};
+      c.diarioRel={archivo:f.name,inicio:mismo?prev.inicio:_sdISO(inf.d),inferido:!mismo,porSemana:inf.porSemana,dias:[...new Set(colsRel.map(x=>x.n))].sort((a,b)=>a-b),feriados:colsRel.filter(x=>x.fer).map(x=>x.n),datos,fechas:ant};
       const dias=_sdAplicarRel(c,ant);const ds=[...dias].sort();
       c.diarioArchivos=`${f.name} · ${dias.size} día(s) (Día 1 = ${ds[0].split('-').reverse().join('/')} … ${ds[ds.length-1].split('-').reverse().join('/')}), ${Object.keys(datos).length} artículos`+(typeof resumenHomologacion==='function'?resumenHomologacion(hom):'');
       _sapuGuardar();sapuRefrescar();return;
@@ -20754,7 +20811,7 @@ function sapuExportarDiario(){
 /* ══ SAPU EN 3 PASOS (nov-2026): solo navegación y textos, los cálculos no cambian ══ */
 const SAPU_PASOS=[
   {id:'abrir',n:'1 · Preparar la apertura',d:'impacto, compra y dotación',tabs:['impacto','dotacion','articulo'],titulo:'🚑 Preparar la apertura del SAPU',nota:'El SAPU se abastece del mismo stock que hoy tiene Mi arsenal: su consumo se suma al del CESFAM desde el mes de apertura.'},
-  {id:'operar',n:'2 · Operar el SAPU',d:'reposición y consumo real',tabs:['repo','diario'],titulo:'🚑 Operar el SAPU',nota:'Reposición semanal o mensual desde bodega central y farmacia, y seguimiento del consumo real.'},
+  {id:'operar',n:'2 · Operar el SAPU',d:'reposición y consumo real',tabs:['repo','diario','quincenal'],titulo:'🚑 Operar el SAPU',nota:'Reposición semanal o mensual desde bodega central y farmacia, y seguimiento del consumo real.'},
   {id:'config',n:'⚙️ Configurar',d:'arsenal, referencia y asociaciones',tabs:['homolog','fuentes'],titulo:'⚙️ Configurar el SAPU',nota:'Arsenal SAPU, SAPU de referencia y cómo se asocian sus productos.'}
 ];
 function _sapuPasoDe(p){return(SAPU_PASOS.find(x=>x.tabs.includes(p))||SAPU_PASOS[0]);}
@@ -20782,6 +20839,229 @@ function _sapuSyncPaso(p){
   _sapuSyncPaso(_sapuPanel);
 })();
 </script>
+<script>
+/* ══ ANEXO · PEDIDO DEL JUEVES (stock fijo SAPU, nov-2026) ══
+   Integra «Pingüino Delta · Reposición SAPU» (herramienta aparte de Felipe) como
+   pestaña de «2 · Operar el SAPU». Mismo cálculo, pero toma los datos que Delta ya
+   tiene: consumo diario SAPU (con fechas reales; las columnas FERIADO del archivo
+   se marcan como feriado), stock actual del SAPU (toma AVIS, lotes sumados) y
+   mín/máx de AVIS (Excel de mín/máx de Reposición SAPU).
+   - Fin de semana = sábado, domingo o feriado (16 h); hábil = resto (7 h).
+   - Mínimo = factor × fin de semana promedio (2 × prom. por día de fin de semana).
+   - Máximo ciclo = consumo esperado del ciclo + mínimo; máximo mes = 30 días + mínimo.
+   - Pedido = objetivo − stock proyectado a la entrega.
+   - Ajuste AVIS: Subir/Bajar si la diferencia ≥ umbral % y ≥ 2 u.; Crear si no está. */
+const QN_DEF={ciclo:14,fs:1.5,skip:0,umb:20,piso:5,mode:'ciclo',fer:'08/12/2026, 25/12/2026, 01/01/2027',inv:'',ent:''};
+let QN_RES=null,QN_TAB='ped',QN_OPEN=null,QN_FILT='',QN_SOLO=true;
+const _qnFold=s=>normArt(s);
+const _qnFmt=(v,d=0)=>v==null||isNaN(v)?'':Number(v).toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d});
+const _qnCeil=x=>Math.ceil(x-1e-9);
+const _QN_DOW=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const _qnAdd=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const _qnDMY=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+const _qnISO=d=>_sdISO(d);
+const _qnD=s=>{const p=String(s||'').split('-').map(Number);return p.length===3&&p[0]?new Date(p[0],p[1]-1,p[2],12):null;};
+const _qnParseDMY=s=>{const m=String(s||'').match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1],12):null;};
+function _qnCfg(){const c=_sapuCfg();if(!c.quincenal||typeof c.quincenal!=='object')c.quincenal={};const q=c.quincenal;Object.keys(QN_DEF).forEach(k=>{if(q[k]===undefined)q[k]=QN_DEF[k];});return q;}
+function _qnProxViernes(){const t=new Date();t.setHours(12,0,0,0);let f=new Date(t);while(f.getDay()!==5||f<=t)f=_qnAdd(f,1);return f;}
+function qnParam(k,v){const q=_qnCfg();q[k]=['ciclo','fs','skip','umb','piso'].includes(k)?(v===''?QN_DEF[k]:+v):v;_sapuGuardar();QN_OPEN=null;qnRender();}
+function qnTab(t){QN_TAB=t;QN_OPEN=null;qnRender();}
+
+// ── Datos desde Delta ──
+function _qnDatos(){
+  const c=_sdCfg(),R=_repoCfg(),q=_qnCfg();
+  const dias=(c.diarioDias||[]).slice().sort();
+  const fer=new Set(String(q.fer||'').split(/[,;\s]+/).map(_qnParseDMY).filter(Boolean).map(_qnISO));
+  (c.diarioFeriados||[]).forEach(k=>fer.add(k));
+  const fechas=dias.map(_qnD);
+  const we=fechas.map((d,i)=>d.getDay()===0||d.getDay()===6||fer.has(dias[i]));
+  const sat=fechas.map(d=>d.getDay()===6),sun=fechas.map(d=>d.getDay()===0);
+  const consec=fechas.map((d,i)=>i<fechas.length-1&&Math.round((fechas[i+1]-d)/864e5)===1);
+  const items=Object.keys(c.diario||{}).map(a=>({k:a,v:dias.map(k=>{const x=c.diario[a][k];return x==null?0:+x||0;})}));
+  const inv=R.sapuStock?Object.entries(R.sapuStock).map(([k,ls])=>({k,st:(ls||[]).reduce((s,l)=>s+(+l.stock||0),0)})):null;
+  const mm=Object.keys(R.mm||{}).length?Object.entries(R.mm).filter(([,o])=>o&&(o.min!=null||o.max!=null)).map(([k,o])=>({k,mn:o.min,mx:o.max})):null;
+  return{dias,fechas,fer,we,sat,sun,consec,items,inv,mm,invFecha:R.sapuStockFecha||'',invArchivo:R.sapuStockArchivo||'',mmArchivo:R.mmArchivo||'',diaArchivo:c.diarioArchivos||''};
+}
+function _qnMatcher(list){const ex=new Map(list.map(x=>[_qnFold(x.k),x]));return k=>ex.get(_qnFold(k))||null;}
+
+// ── Cálculo (idéntico al de la herramienta original) ──
+function qnCalcular(){
+  const q=_qnCfg(),S=_qnDatos();
+  if(!S.dias.length||!S.items.length||!S.inv)return{S,falta:true};
+  const P={inv:_qnD(q.inv)||_qnD(S.invFecha)||(()=>{const t=new Date();t.setHours(12,0,0,0);return t;})(),
+    ent:_qnD(q.ent)||_qnProxViernes(),ciclo:+q.ciclo||14,fs:+q.fs||1.5,piso:+q.piso||0,mode:q.mode==='mes'?'mes':'ciclo',skip:Math.max(0,+q.skip||0),umb:(+q.umb||0)/100,fer:S.fer};
+  const isWE=d=>d.getDay()===0||d.getDay()===6||P.fer.has(_qnISO(d));
+  const count=(d0,n)=>{let w=0,h=0;for(let i=0;i<n;i++){const d=_qnAdd(d0,i);if(isWE(d))w++;else h++;}return{w,h};};
+  let sW=0,sH=0;for(let i=0;i<P.ciclo;i++){const dw=(5+i)%7;if(dw===0||dw===6)sW++;else sH++;}
+  const mW30=30*2/7,mH30=30*5/7;
+  const preN=Math.max(0,Math.round((P.ent-P.inv)/864e5));
+  const pre=count(P.inv,preN),cyc=count(P.ent,P.mode==='mes'?30:P.ciclo);
+  const mInv=_qnMatcher(S.inv),mMM=S.mm?_qnMatcher(S.mm):()=>null;
+  const rows=S.items.map(s=>{
+    const v=s.v.map((x,i)=>i>=P.skip?x:null),W=v.filter((x,i)=>x!=null&&S.we[i]),H=v.filter((x,i)=>x!=null&&!S.we[i]);
+    const tot=v.reduce((a,b)=>a+(b||0),0),mW=W.length?W.reduce((a,b)=>a+b,0)/W.length:0,mD=H.length?H.reduce((a,b)=>a+b,0)/H.length:mW;
+    const wks=[];for(let i=0;i<v.length-1;i++)if(S.sat[i]&&S.sun[i+1]&&S.consec[i]&&v[i]!=null&&v[i+1]!=null)wks.push(v[i]+v[i+1]);
+    const maxWk=wks.length?Math.max(...wks):0;
+    const iv=mInv(s.k),st=iv?iv.st:0,mm=mMM(s.k),minA=mm?mm.mn:null,maxA=mm?mm.mx:null;
+    let mn,mxC,mxM,tipo;
+    if(tot===0){mn=minA??st;mxC=mxM=maxA??Math.max(st,mn);tipo='sin consumo';}
+    else{mn=Math.max(1,_qnCeil(P.fs*2*mW));const piso=Math.min(P.piso,maxA??P.piso);
+      mxC=Math.max(mn+1,_qnCeil(sW*mW+sH*mD+mn),piso);mxM=Math.max(mn+1,_qnCeil(mW30*mW+mH30*mD+mn),piso);tipo='calculado';}
+    const mx=P.mode==='mes'?mxM:mxC;
+    const preC=pre.w*mW+pre.h*mD,stProj=Math.max(0,st-preC),cycC=cyc.w*mW+cyc.h*mD;
+    const objetivo=tot===0?mx:Math.max(mx,_qnCeil(cycC+mn));
+    const ped=Math.max(0,_qnCeil(objetivo-stProj));
+    const alerta=tot>0&&stProj<mn?'Bajo mínimo antes de la entrega':(st<mn?'Bajo mínimo hoy':'');
+    const dir=(nv,av)=>av==null?'Crear':(Math.abs(nv-av)>=Math.max(2,P.umb*av)?(nv>av?'Subir':'Bajar'):'Mantener');
+    const ajMin=tot===0?(minA==null?'Crear':'Mantener'):dir(mn,minA),ajMax=tot===0?(maxA==null?'Crear':'Mantener'):dir(mx,maxA);
+    const cmp=maxA==null?'No cargado en AVIS':tot===0?'Sin consumo: se mantiene':ajMax==='Mantener'?'OK':ajMax;
+    const dia=(2*mW+5*mD)/7,durMax=maxA!=null&&dia>0?maxA/dia:null,cubMin=minA!=null&&mW>0?minA/(2*mW):null;
+    let obs='';
+    if(tot===0)obs='Sin consumo en el período: stock de emergencia, revisar criterio clínico';
+    else{const p=[];
+      if(cubMin!=null)p.push(cubMin<1?`el mín AVIS (${minA}) no alcanza un fin de semana promedio (${_qnFmt(2*mW,1)})`:`el mín AVIS (${minA}) cubre ${_qnFmt(cubMin,1)} fines de semana`);
+      if(durMax!=null)p.push(durMax<P.ciclo?`el máx AVIS (${maxA}) dura ~${_qnFmt(durMax,0)} días: no llega a la próxima entrega`:`el máx AVIS (${maxA}) dura ~${_qnFmt(durMax,0)} días para un ciclo de ${P.ciclo}`);
+      obs=p.join('; ');}
+    return{ajMin,ajMax,durMax,cubMin,obs,dMin:minA==null?null:mn-minA,dMax:maxA==null?null:mx-maxA,name:s.k,invName:iv?iv.k:null,tot,mW,mD,maxWk,wkAvg:2*mW,mn,mxC,mxM,mx,minA,maxA,cmp,st,preC,stProj,cycC,objetivo,ped,alerta,tipo};
+  });
+  const sinInv=S.inv.filter(x=>!rows.some(r=>r.invName===x.k)).map(x=>x.k);
+  return{S,rows,P,pre,preN,cyc,sW,sH,nd:Math.max(0,S.dias.length-P.skip),sinInv};
+}
+
+// ── Explicación de una fila ──
+function _qnWhy(x){
+  const P=QN_RES.P,f1=v=>_qnFmt(v,1),c=v=>`<code>${v}</code>`,mxTxt=P.mode==='mes'?'mes':'ciclo';
+  if(x.tipo==='sin consumo')return`<b>Sin consumo</b> en ${QN_RES.nd} días: se mantiene el mín-máx de AVIS como stock de emergencia (${x.minA??'—'} / ${x.maxA??'—'}). Stock hoy ${c(_qnFmt(x.st))}, proyectado a la entrega ${c(_qnFmt(x.stProj))} → pedido ${c(x.ped)}.`;
+  return`<b>Consumo</b>: ${_qnFmt(x.tot)} unidades en ${QN_RES.nd} días → ${c(f1(x.mW))}/día de fin de semana y ${c(f1(x.mD))}/día hábil. Fin de semana promedio = 2 × ${f1(x.mW)} = ${c(f1(x.wkAvg))} (el más alto observado: ${_qnFmt(x.maxWk)}).<br>
+  <b>Mínimo</b> = ${_qnFmt(P.fs,1)} × ${f1(x.wkAvg)} = ${c(x.mn)}: lo que se necesita para pasar un fin de semana con margen.<br>
+  <b>Máximo ${mxTxt}</b> = consumo de ${P.mode==='mes'?'30 días (8,6 fin de semana + 21,4 hábiles)':`${P.ciclo} días (${QN_RES.sW} de fin de semana + ${QN_RES.sH} hábiles)`} + mínimo = ${c(x.mx)}. (Máx ciclo ${x.mxC} · máx mes ${x.mxM}; AVIS hoy ${x.minA??'—'} / ${x.maxA??'—'}.)<br>
+  <b>Pedido</b>: stock hoy ${_qnFmt(x.st)} − consumo hasta la entrega (${QN_RES.pre.w} días fin de semana + ${QN_RES.pre.h} hábiles = ${f1(x.preC)}) = ${c(f1(x.stProj))}. Objetivo al entregar = ${x.objetivo>x.mx?`consumo del período real con feriados (${f1(x.cycC)}) + mínimo = ${x.objetivo}`:`máximo ${x.mx}`}. Pedido = ${x.objetivo} − ${f1(x.stProj)} = ${c(x.ped)}.<br>
+  <b>Ajuste AVIS</b>: mín ${x.minA??'—'} → ${c(x.mn)} (${x.ajMin}), máx ${x.maxA??'—'} → ${c(x.mx)} (${x.ajMax}). Se propone cambiar cuando la diferencia es ≥ ${Math.round(P.umb*100)} % y al menos 2 unidades. Observado: ${_sapuEsc(x.obs)}.`;
+}
+function _qnMetodo(){
+  const P=QN_RES.P;
+  return[
+  `<b>Esquema.</b> Farmacia SAPU mantiene un stock fijo. Se solicita el jueves y se repone el viernes cada ${P.ciclo} días (antes de que abra a las 17:00), dejando cada artículo en su máximo.`,
+  `<b>Consumo.</b> Se usa el consumo diario SAPU cargado en «📈 Consumo real SAPU». Cada día se clasifica por su fecha: sábado, domingo o feriado (los de la lista y las columnas FERIADO del archivo) = día de fin de semana (16 h de atención); el resto = día hábil (7 h). Se promedia por separado.`,
+  `<b>Mínimo</b> = ${_qnFmt(P.fs,1)} × consumo de un fin de semana promedio (2 × promedio por día de fin de semana), nunca menos de 1. Es el stock que debe quedar para pasar un fin de semana con margen. Si un artículo baja del mínimo antes del jueves de solicitud, se pide reposición extraordinaria.`,
+  `<b>Máximo ciclo</b> = consumo esperado de ${P.ciclo} días (${QN_RES.sW} de fin de semana + ${QN_RES.sH} hábiles) + mínimo. Así, al llegar la siguiente entrega queda aproximadamente el mínimo. <b>Máximo mes</b> = consumo de 30 días + mínimo (alternativa más holgada). Con consumo bajo, el máximo no baja de ${P.piso} unidades (o del máximo AVIS si es menor). Se usa: <b>${P.mode==='mes'?'mes':'ciclo'}</b>.`,
+  `<b>Sin consumo</b> en el período: se mantiene el mín-máx de AVIS (stock de emergencia).`,
+  `<b>Pedido</b> = objetivo − stock proyectado a la entrega. Stock proyectado = stock de la toma AVIS del SAPU (lotes sumados) − consumo esperado desde la fecha del inventario hasta el día anterior a la entrega. Objetivo = máximo; si el ciclo trae feriados, el objetivo sube a lo que se espera consumir en ese ciclo real + mínimo.`,
+  `<b>Ajuste AVIS</b>: para mínimo y máximo se compara lo propuesto con lo cargado en AVIS (Excel de mín/máx de «🔁 Reposición SAPU»). Subir o Bajar cuando la diferencia es de al menos ${Math.round(P.umb*100)} % y 2 unidades; si no, Mantener. Crear = no está cargado en AVIS. «Lo observado» indica cuántos fines de semana cubre el mínimo de AVIS y cuántos días dura su máximo con el consumo registrado. La hoja «Carga AVIS» del Excel trae los valores nuevos en el formato del archivo de AVIS.`,
+  `<b>Apertura.</b> Se pueden excluir los primeros días del registro (parámetro) cuando el consumo de apertura no es representativo.`,
+  `<b>Nombres.</b> Los tres archivos pasan por la homologación de Delta (equivalencias, «F» de fraccionado, errores de tipeo), así que se cruzan por el mismo nombre de artículo.`,
+  `<b>Diferencia con «🔁 Reposición SAPU».</b> Aquella simula semana a semana desde bodega central y farmacia con mín/máx fijos; este anexo propone el mín-máx a partir del consumo de fin de semana y calcula el pedido de un ciclo de entrega.`];
+}
+function _qnCalendario(){
+  const P=QN_RES.P,out=[];
+  for(let i=0;i<8;i++){
+    const ent=_qnAdd(P.ent,i*P.ciclo),sol=_qnAdd(ent,-1);let w=0;const f=[];
+    for(let j=0;j<P.ciclo;j++){const d=_qnAdd(ent,j);if(P.fer.has(_qnISO(d))){f.push(_qnDMY(d)+' ('+_QN_DOW[d.getDay()]+')');if(d.getDay()!==0&&d.getDay()!==6)w++;}}
+    const ferEnt=P.fer.has(_qnISO(ent))||P.fer.has(_qnISO(sol));
+    out.push({sol:`${_QN_DOW[sol.getDay()]} ${_qnDMY(sol)}`,ent:`${_QN_DOW[ent.getDay()]} ${_qnDMY(ent)}`,hasta:_qnDMY(_qnAdd(ent,P.ciclo-1)),fer:f.join(', '),nota:ferEnt?'Solicitud o entrega cae en feriado: adelantar al día hábil anterior':(w?`${w} feriado(s) en día hábil: el pedido de ese ciclo sube (se calcula solo)`:'')});
+  }
+  return out;
+}
+
+// ── Vista ──
+const _QN_COM={'Bajar':'b','Subir':'o','OK':'gr','No cargado en AVIS':'r','Sin consumo: se mantiene':'g'};
+const _QN_COLS={
+  ped:[['name','Artículo'],['st','Stock hoy','n'],['stProj','Stock al entregar (proy.)','n'],['mn','Mínimo','n'],['mx','Máximo','n'],['ped','PEDIDO','n'],['alerta','Alerta']],
+  aj:[['name','Artículo'],['minA','Mín AVIS','n'],['mn','MÍN nuevo','n'],['ajMin','Ajuste mín'],['maxA','Máx AVIS','n'],['mx','MÁX nuevo','n'],['ajMax','Ajuste máx'],['obs','Lo observado']],
+  mm:[['name','Artículo'],['tot','Consumo período','n'],['wkAvg','Fin de semana prom.','n',1],['maxWk','Fin de semana máx.','n'],['minA','Mín AVIS','n'],['maxA','Máx AVIS','n'],['mn','MÍN propuesto','n'],['mxC','MÁX ciclo','n'],['mxM','MÁX mes','n'],['cmp','Cambio']]
+};
+function _qnFilas(t,todo){
+  const f=todo?'':_qnFold(QN_FILT),solo=todo?false:QN_SOLO;
+  let r=QN_RES.rows.filter(x=>!f||f.split(' ').filter(Boolean).every(w=>_qnFold(x.name).includes(w)));
+  if(t==='ped'){if(solo)r=r.filter(x=>x.ped>0||x.alerta);r=r.slice().sort((a,b)=>(b.alerta?1:0)-(a.alerta?1:0)||b.ped-a.ped||a.name.localeCompare(b.name));}
+  if(t==='aj'){if(solo)r=r.filter(x=>x.ajMin!=='Mantener'||x.ajMax!=='Mantener');const o={Crear:0,Subir:1,Bajar:2,Mantener:3};r=r.slice().sort((a,b)=>Math.min(o[a.ajMin],o[a.ajMax])-Math.min(o[b.ajMin],o[b.ajMax])||b.tot-a.tot);}
+  if(t==='mm')r=r.slice().sort((a,b)=>b.tot-a.tot||a.name.localeCompare(b.name));
+  return r;
+}
+function _qnCelda(x,k,n,d){
+  if(k==='ajMin'||k==='ajMax'){const v=x[k],dd=k==='ajMin'?x.dMin:x.dMax;return`<td><span class="qn-pill ${({Subir:'o',Bajar:'b',Crear:'r',Mantener:'g'})[v]}">${v}${dd&&v!=='Mantener'?' '+(dd>0?'+':'')+dd:''}</span></td>`;}
+  if(k==='obs')return`<td class="qn-obs">${_sapuEsc(x.obs)}</td>`;
+  if(k==='cmp')return`<td><span class="qn-pill ${_QN_COM[x.cmp]||'g'}">${x.cmp}</span></td>`;
+  if(k==='alerta')return`<td>${x.alerta?`<span class="qn-pill r">${x.alerta}</span>`:''}</td>`;
+  if(n)return`<td class="n${['ped','mn','mx','mxC'].includes(k)?' qn-need':''}">${x[k]==null?'—':_qnFmt(x[k],d||0)}</td>`;
+  return`<td class="qn-art">${_sapuEsc(x[k])}</td>`;
+}
+function _qnFuentesHTML(S){
+  const ok=(b,t)=>`<span class="qn-src ${b?'ok':'no'}">${b?'✓':'○'} ${t}</span>`;
+  const dd=S.dias.length?`${S.dias.length} días (${S.dias[0].split('-').reverse().join('/')} – ${S.dias[S.dias.length-1].split('-').reverse().join('/')})${S.fer.size?'':''}`:'';
+  return`<div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:.5rem">Datos que usa (ya cargados en Delta)</div>
+  <div class="qn-srcs">
+    ${ok(S.dias.length&&S.items.length,`<b>Consumo diario SAPU</b> — ${S.dias.length?`${S.items.length} artículos · ${dd}`:'sin cargar'} <a href="#" onclick="event.preventDefault();sapuSwitch('diario')">📈 Consumo real SAPU</a>`)}
+    ${ok(!!S.inv,`<b>Stock actual del SAPU (toma AVIS)</b> — ${S.inv?`${S.inv.length} artículos, lotes sumados${S.invFecha?' · toma del '+S.invFecha.split('-').reverse().join('/'):''}`:'sin cargar'} <a href="#" onclick="event.preventDefault();sapuSwitch('repo')">🔁 Reposición SAPU → Stock actual del SAPU</a>`)}
+    ${ok(!!S.mm,`<b>Mín-Máx cargado en AVIS</b> <span class="qn-opt">(opcional)</span> — ${S.mm?`${S.mm.length} artículos`:'sin cargar: no se compara con AVIS'} <a href="#" onclick="event.preventDefault();sapuSwitch('repo')">🔁 Reposición SAPU → Mínimos y máximos</a>`)}
+  </div>`;
+}
+function qnRender(){
+  const q=_qnCfg();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=v;};
+  const S0=_qnDatos();
+  set('qn-inv',q.inv||S0.invFecha||_qnISO(new Date()));set('qn-ent',q.ent||_qnISO(_qnProxViernes()));
+  set('qn-ciclo',q.ciclo);set('qn-fs',q.fs);set('qn-skip',q.skip);set('qn-umb',q.umb);set('qn-piso',q.piso);set('qn-mode',q.mode);set('qn-fer',q.fer);
+  const fu=document.getElementById('qn-fuentes');if(fu)fu.innerHTML=_qnFuentesHTML(S0);
+  const el=document.getElementById('qn-content');if(!el)return;
+  const res=qnCalcular();
+  if(res.falta){QN_RES=null;el.innerHTML=`<div class="sp-note" style="padding:1rem;background:var(--surf);border:1px dashed var(--bdr);border-radius:10px">Para calcular hacen falta el <b>consumo diario SAPU</b> y el <b>stock actual del SAPU</b> (toma AVIS). El mín-máx de AVIS es opcional.</div>`;return;}
+  QN_RES=res;const R=res.rows;
+  const ms=[];
+  if(res.P.skip)ms.push(`Se excluyen los primeros ${res.P.skip} días del registro (apertura).`);
+  if(res.nd<28)ms.push(`El consumo sale de ${res.nd} días: revisar los mín-máx al completar un mes antes de cargarlos en AVIS.`);
+  if(res.P.ent.getDay()!==5)ms.push('La fecha de entrega no es viernes.');
+  if(res.P.ent<res.P.inv)ms.push('La entrega es anterior a la fecha del inventario: revisa las fechas.');
+  if(res.sinInv.length)ms.push(`En el inventario pero no en el consumo (no se calculan): ${res.sinInv.join('; ')}.`);
+  const noInv=R.filter(x=>!x.invName).map(x=>x.name);if(noInv.length)ms.push(`Sin stock en el inventario SAPU (se toma 0): ${noInv.join('; ')}.`);
+  const tabs=[['ped','1 · Pedido del jueves'],['mm','2 · Mín-Máx propuesto'],['aj','3 · Ajuste AVIS'],['cal','4 · Calendario'],['met','5 · Cómo se calcula']];
+  let cuerpo='';
+  if(QN_TAB==='met')cuerpo=`<div class="qn-met">${_qnMetodo().map(x=>`<p>${x}</p>`).join('')}</div>`;
+  else if(QN_TAB==='cal'){const c=_qnCalendario();cuerpo=`<div class="sp-tw"><table class="sp-t qn-t"><thead><tr><th>Solicitud</th><th>Entrega</th><th>Cubre hasta</th><th>Feriados en el ciclo</th><th>Nota</th></tr></thead><tbody>${c.map(x=>`<tr><td>${x.sol}</td><td><b>${x.ent}</b></td><td>${x.hasta}</td><td>${_sapuEsc(x.fer)}</td><td>${_sapuEsc(x.nota)}</td></tr>`).join('')}</tbody></table></div>`;}
+  else{const cols=_QN_COLS[QN_TAB],rows=_qnFilas(QN_TAB);
+    cuerpo=`<div class="sp-tw"><table class="sp-t qn-t"><thead><tr>${cols.map(([k,l,n])=>`<th class="${n||''}">${_sapuEsc(l)}</th>`).join('')}</tr></thead><tbody>${
+      rows.map(x=>{const i=R.indexOf(x);return`<tr class="qn-clk${x.alerta&&QN_TAB==='ped'?' qn-r':''}" data-i="${i}" onclick="qnAbrir(${i})" title="Clic para ver el cálculo">${cols.map(([k,,n,d])=>_qnCelda(x,k,n,d)).join('')}</tr>`+(QN_OPEN===i?`<tr class="qn-why"><td colspan="${cols.length}">${_qnWhy(x)}</td></tr>`:'');}).join('')||`<tr><td colspan="${cols.length}" class="sp-note">Sin artículos.</td></tr>`}</tbody></table></div>`;}
+  el.innerHTML=`
+  <div class="kpis qn-kpis">
+    <div class="kpi"><div class="kpi-lbl">Artículos a reponer</div><div class="kpi-val" style="color:var(--navy)">${R.filter(x=>x.ped>0).length}</div><div class="sp-note">entrega ${_QN_DOW[res.P.ent.getDay()]} ${_qnDMY(res.P.ent)}</div></div>
+    <div class="kpi"><div class="kpi-lbl">Bajo mínimo</div><div class="kpi-val" style="color:${R.some(x=>x.alerta)?'var(--red)':'var(--green)'}">${R.filter(x=>x.alerta).length}</div></div>
+    <div class="kpi"><div class="kpi-lbl">Ajustes AVIS propuestos</div><div class="kpi-val" style="color:#B4530A">${R.filter(x=>x.ajMin!=='Mantener'||x.ajMax!=='Mantener').length}</div><div class="sp-note">máx: ${R.filter(x=>x.ajMax==='Subir').length} subir · ${R.filter(x=>x.ajMax==='Bajar').length} bajar · mín: ${R.filter(x=>x.ajMin==='Subir').length} subir · ${R.filter(x=>x.ajMin==='Bajar').length} bajar</div></div>
+    <div class="kpi"><div class="kpi-lbl">Datos de consumo</div><div class="kpi-val">${res.nd} días</div><div class="sp-note">${res.nd<28?'recalcular con más días':''}</div></div>
+    <div class="kpi"><div class="kpi-lbl">Ciclo</div><div class="kpi-val">${res.P.ciclo} días</div><div class="sp-note">${res.sW} fin de semana + ${res.sH} hábiles</div></div>
+  </div>
+  <div class="sp-box">
+    <div class="qn-tabs">${tabs.map(([k,l])=>`<button class="${QN_TAB===k?'on':''}" onclick="qnTab('${k}')">${l}</button>`).join('')}</div>
+    ${['ped','mm','aj'].includes(QN_TAB)?`<div class="qn-bar"><input type="search" id="qn-filt" placeholder="🔍 Filtrar artículo…" value="${_sapuEsc(QN_FILT)}" oninput="QN_FILT=this.value;qnRenderTabla()"><label class="sp-note"><input type="checkbox" ${QN_SOLO?'checked':''} onchange="QN_SOLO=this.checked;qnRenderTabla()"> Solo artículos con pedido o ajuste</label><button class="sp-btn" onclick="qnExcel()">⬇ Descargar Excel</button><span class="sp-note">Clic en una fila para ver el cálculo.</span></div>`:`<div class="qn-bar"><button class="sp-btn" onclick="qnExcel()">⬇ Descargar Excel</button></div>`}
+    ${ms.map(m=>`<div class="qn-msg">${_sapuEsc(m)}</div>`).join('')}
+    <div id="qn-tabla">${cuerpo}</div>
+  </div>`;
+}
+// Redibuja solo la tabla (para no perder el foco del filtro al escribir)
+function qnRenderTabla(){const f=document.activeElement&&document.activeElement.id==='qn-filt';const pos=f?document.activeElement.selectionStart:0;qnRender();if(f){const e=document.getElementById('qn-filt');if(e){e.focus();try{e.setSelectionRange(pos,pos);}catch(x){}}}}
+function qnAbrir(i){QN_OPEN=QN_OPEN===i?null:i;qnRenderTabla();}
+
+// ── Excel (mismas hojas que la herramienta original) ──
+function qnExcel(){
+  if(!QN_RES)return;
+  const plain=s=>String(s).replace(/<br>/g,' ').replace(/<[^>]+>/g,'').replace(/&gt;/g,'>').replace(/&lt;/g,'<').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/\s+/g,' ').trim();
+  const wb=XLSX.utils.book_new(),P=QN_RES.P;
+  const mk=(t,name)=>{const cols=_QN_COLS[t],rows=_qnFilas(t,true);
+    const aoa=[cols.map(c=>c[1]).concat(['Cálculo'])].concat(rows.map(x=>cols.map(([k,,n,d])=>n?(x[k]==null?'':+(+x[k]).toFixed(d||0)):x[k]).concat([plain(_qnWhy(x))])));
+    const ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=aoa[0].map((c,i)=>({wch:i===0?70:c==='Cálculo'?150:15}));
+    ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:aoa.length-1,c:aoa[0].length-1}})};
+    XLSX.utils.book_append_sheet(wb,ws,name);};
+  mk('ped',`Pedido entrega ${_qnDMY(P.ent).replace(/\//g,'-')}`.slice(0,31));mk('mm','Mín-Máx propuesto');mk('aj','Ajuste mín-máx AVIS');
+  const ca=[['Nombre Medicamento','Stock mínimo','Stock Máximo']].concat(QN_RES.rows.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>[x.name,x.mn,x.mx]));
+  const wca=XLSX.utils.aoa_to_sheet(ca);wca['!cols']=[{wch:80},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,wca,'Carga AVIS');
+  const c=_qnCalendario();const wc=XLSX.utils.aoa_to_sheet([['Solicitud','Entrega','Cubre hasta','Feriados en el ciclo','Nota'],...c.map(x=>[x.sol,x.ent,x.hasta,x.fer,x.nota])]);wc['!cols']=[{wch:22},{wch:22},{wch:14},{wch:40},{wch:60}];XLSX.utils.book_append_sheet(wb,wc,'Calendario');
+  const S=QN_RES.S,q=_qnCfg();
+  const met=[['Cómo se calcula'],[''],..._qnMetodo().map(x=>[plain(x)]),[''],['Parámetros'],['Fecha del inventario',_qnDMY(P.inv)],['Entrega',_qnDMY(P.ent)],['Ciclo (días)',P.ciclo],['Factor mínimo',P.fs],['Piso de máximo',P.piso],['Días excluidos (apertura)',P.skip],['Umbral de ajuste (%)',Math.round(P.umb*100)],['Máximo usado',P.mode==='mes'?'Mes':'Ciclo'],['Feriados',[...P.fer].sort().map(k=>k.split('-').reverse().join('/')).join(', ')],['Días de consumo registrados',QN_RES.nd],[''],['Datos (Pingüino Delta)'],
+    ['Consumo diario SAPU',S.diaArchivo],['Stock actual del SAPU (AVIS)',S.invArchivo],['Mín-Máx AVIS',S.mmArchivo||'no cargado']];
+  const wm=XLSX.utils.aoa_to_sheet(met);wm['!cols']=[{wch:130},{wch:40}];XLSX.utils.book_append_sheet(wb,wm,'Cómo se calculó');
+  XLSX.writeFile(wb,`Reposicion_SAPU_${_qnISO(P.ent)}.xlsx`);
+}
+</script>
+
 <script>
 /* ══ DELTA EN RED INSTITUCIONAL · MICROSOFT 365 (nov-2026, a pedido de Felipe) ══
    Se activa SOLO si junto a la página existe un archivo «config.json» (sitio
