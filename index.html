@@ -2784,7 +2784,7 @@ function visSwitchSubTab(sub){
           <div>
             <div style="font-size:12.5px;font-weight:700;color:#7D1F73;margin-bottom:.3rem">🔍 Evaluación de ajustes</div>
             <ul style="font-size:12px;color:var(--ink2);margin:0;padding-left:18px;line-height:1.8">
-              <li><strong>🔻 Bajar a cero:</strong> meses donde conviene cancelar la programación vigente (sobrestock).</li>
+              <li><strong>🔻 Bajar a cero:</strong> meses donde conviene cancelar la programación vigente (sobrestock), incluidos los meses <b>antes de «Mes inicio reprogramar»</b> (p. ej. el mes previo a la apertura del período CENABAST) cuando, aun sin ese ingreso, la cobertura queda sobre el máximo.</li>
               <li><strong>🚨 Pedido especial:</strong> meses en riesgo de quiebre antes de que la reprogramación normal actúe.</li>
             </ul>
             <div style="font-size:12.5px;font-weight:700;color:#7D1F73;margin:.6rem 0 .3rem">💰 Proyección de gasto / ⚖ Comparar escenarios</div>
@@ -6136,6 +6136,14 @@ function simularArticulo(art, cons_base, um, ua, cmin, cmax, lotes, aFin2, mults
   const reprogAbs=mesReprog?mesAbs(mesReprog<um?ua+1:ua,mesReprog):mesAbs(ua,um);
   let ls=lotes.map(l=>({...l}));
   const res=[];let mermaT=0;const mermasLotes=[];
+  // «Bajar a cero» ANTES del mes de reprogramar (nov-2026, a pedido de Felipe):
+  // en esos meses rige lo programado (no se modifica la trayectoria), pero se
+  // evalúa la MISMA regla de sobrestock del motor como sugerencia: si aun sin
+  // ese ingreso el stock queda sobre la cobertura máxima, ese ingreso se puede
+  // cancelar (p. ej. el mes previo a la apertura del período CENABAST). Las
+  // cancelaciones sugeridas se acumulan para no proponer cancelar dos meses
+  // seguidos contando el mismo stock.
+  let cancelAcum=0;
   for(const{a:an,m:mn}of sim){
     const si=ls.reduce((s,l)=>s+l.q,0);let merma=0;
     ls=ls.filter(l=>{
@@ -6151,7 +6159,7 @@ function simularArticulo(art, cons_base, um, ua, cmin, cmax, lotes, aFin2, mults
     const progOrig=getProgOrig(an,mn);
     const isSkip=skipMeses&&skipMeses.includes(`${an}-${mn}`);
     const esFuturo=mesAbs(an,mn)>=reprogAbs;
-    let ing=0;
+    let ing=0,ingSug=null,cobSinIng=null;
     let regla='sin-ingreso'; // trazabilidad (auditoría ago-2026): qué rama generó "ing"
     if(isSkip){
       regla='mes-omitido';
@@ -6162,6 +6170,11 @@ function simularArticulo(art, cons_base, um, ua, cmin, cmax, lotes, aFin2, mults
       // Before reprog month: apply existing programming as-is
       ing=progOrig!==null?progOrig:0;
       regla=progOrig!==null?'prog-vigente (antes de reprogramar)':'sin-ingreso';
+      if(progOrig>0){
+        const sfS=sfProj-cancelAcum;cobSinIng=cons>0?sfS/cons:null;
+        ingSug=sfS>cons*cmax?Math.min(progOrig,Math.max(0,Math.round(cons*cmax-sfS))):progOrig;
+        cancelAcum+=progOrig-ingSug;
+      }
     }
     // "Vista realista" (a pedido de Felipe, ago-2026, Túnel del
     // tiempo): normalmente, en meses futuros, el motor SIEMPRE calcula
@@ -6226,7 +6239,7 @@ function simularArticulo(art, cons_base, um, ua, cmin, cmax, lotes, aFin2, mults
     let rest=sinConsumo?0:Math.min(cons,ls.reduce((s,l)=>s+l.q,0));const cr=rest;
     if(!sinConsumo){for(const l of ls){if(rest<=0)break;const d=Math.min(l.q,rest);l.q-=d;rest-=d;}ls=ls.filter(l=>l.q>0);}
     const sf=ls.reduce((s,l)=>s+l.q,0),cob=sinConsumo?999:cons>0?sf/cons:999;
-    res.push({an,mn,si,merma,ing,cr,sf,cob,progOrig,sinConsumo,cons,esFuturo,regla});
+    res.push({an,mn,si,merma,ing,cr,sf,cob,progOrig,sinConsumo,cons,esFuturo,regla,ingSug,cobSinIng});
   }
   return{res,mermaT,mermasLotes};
 }
@@ -6610,7 +6623,7 @@ function calcularMasiva(ctx){
         const filaAnual={};
         res.forEach(r=>{
           if(!filaAnual[r.an])filaAnual[r.an]={};
-          filaAnual[r.an][MESES[r.mn-1]]={ing:r.ing,cob:r.cob,progOrig:r.progOrig,merma:r.merma,esFuturo:r.esFuturo,sf:r.sf,cons:r.cons};
+          filaAnual[r.an][MESES[r.mn-1]]={ing:r.ing,cob:r.cob,progOrig:r.progOrig,merma:r.merma,esFuturo:r.esFuturo,sf:r.sf,cons:r.cons,ingSug:r.ingSug,cobSinIng:r.cobSinIng};
         });
         if(res.length>0) resultados.push({art,cons,filaAnual,mermaT});
         // Guardar los parámetros EXACTOS usados para este artículo (a
@@ -8025,11 +8038,15 @@ function calcularAjustesMasiva(ctx){
       MESES.forEach((m,mi)=>{
         const d=r.filaAnual[an][m];if(!d)return;
         if(d.esFuturo&&d.progOrig>0&&d.ing===0){
-          filasCero.push({art:r.art,mes:MN[mi],mesNum:mi+1,anio:an,progOrig:d.progOrig});
+          filasCero.push({art:r.art,mes:MN[mi],mesNum:mi+1,anio:an,progOrig:d.progOrig,antes:false,cob:d.cob});
+        }else if(!d.esFuturo&&d.progOrig>0&&d.ingSug===0){
+          // Mes con programación vigente ANTES de «Mes inicio reprogramar»: se puede cancelar
+          filasCero.push({art:r.art,mes:MN[mi],mesNum:mi+1,anio:an,progOrig:d.progOrig,antes:true,cob:d.cob,cobSin:d.cobSinIng});
         }
       });
     });
   });
+  filasCero.sort((a,b)=>(a.anio*12+a.mesNum)-(b.anio*12+b.mesNum)||a.art.localeCompare(b.art));
   const artsCero=new Set(filasCero.map(f=>f.art)).size;
   // Pedido especial (oct-2026, a pedido de Felipe): ventana de los N
   // meses desde el inicio de la simulación, con la programación vigente
@@ -8118,17 +8135,21 @@ function ajustesRenderSubTab(ctx,sub){
     }
     const filas=todasFilas.filter(f=>(fil.mes==='todos'||f.mes===fil.mes)&&(fil.anio==='todos'||String(f.anio)===String(fil.anio)));
     let h=ajustesFiltroBar(ctx,'cero',todasFilas);
+    const nAntes=todasFilas.filter(f=>f.antes).length;
+    h+=`<div style="font-size:12px;color:var(--ink2);margin:0 0 .6rem">Incluye los meses <b>antes de «Mes inicio reprogramar»</b> con programación vigente (${nAntes}): ahí la simulación respeta lo programado, pero si aun sin ese ingreso el stock queda sobre la cobertura máxima, ese ingreso se puede cancelar en la ventana de modificación de CENABAST. «Cobertura sin ese ingreso» muestra cómo quedaría el mes.</div>`;
     if(!filas.length){
       h+='<div style="padding:1.2rem;color:var(--ink3);font-size:12.5px;background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2)">Ningún resultado con ese filtro.</div>';
       el.innerHTML=h;return;
     }
-    h+='<div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);overflow:hidden"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="background:var(--navy)"><th style="text-align:left;padding:.5rem .9rem;color:#fff;font-size:10.5px">Artículo</th><th style="text-align:center;padding:.5rem .8rem;color:rgba(255,255,255,.85);font-size:10.5px">Mes a bajar a 0</th><th style="text-align:right;padding:.5rem .9rem;color:rgba(255,255,255,.85);font-size:10.5px">Programación vigente</th></tr></thead><tbody>';
+    h+='<div style="background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rl2);overflow:hidden"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="background:var(--navy)"><th style="text-align:left;padding:.5rem .9rem;color:#fff;font-size:10.5px">Artículo</th><th style="text-align:center;padding:.5rem .8rem;color:rgba(255,255,255,.85);font-size:10.5px">Mes a bajar a 0</th><th style="text-align:right;padding:.5rem .9rem;color:rgba(255,255,255,.85);font-size:10.5px">Programación vigente</th><th style="text-align:left;padding:.5rem .9rem;color:rgba(255,255,255,.85);font-size:10.5px">Período</th><th style="text-align:right;padding:.5rem .9rem;color:rgba(255,255,255,.85);font-size:10.5px" title="Cobertura al cierre de ese mes si no llega ese ingreso">Cobertura sin ese ingreso</th></tr></thead><tbody>';
     filas.forEach((f,i)=>{
       const bg=i%2===0?'var(--bg)':'#fff';
       const pmBadge=_etiquetasBadgeHTML(f.art);
       h+=`<tr style="background:${bg}"><td style="padding:.45rem .9rem;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.art.replace(/"/g,'&quot;')}">${f.art}${pmBadge}</td>
         <td style="text-align:center;padding:.45rem .8rem"><span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;color:var(--blue);background:#E8F2FC">${f.mes} ${f.anio}</span></td>
-        <td style="text-align:right;padding:.45rem .9rem;font-family:DM Mono,monospace;font-weight:700;color:var(--navy)">${fmt(f.progOrig)} uds</td></tr>`;
+        <td style="text-align:right;padding:.45rem .9rem;font-family:DM Mono,monospace;font-weight:700;color:var(--navy)">${fmt(f.progOrig)} uds</td>
+        <td style="padding:.45rem .9rem;font-size:11.5px">${f.antes?'<span style="font-weight:700;color:#8A4B00;background:#FFF1DC;border-radius:20px;padding:2px 9px" title="Mes anterior a «Mes inicio reprogramar»: rige lo ya programado; cancélalo en la ventana de modificación de CENABAST">Antes de reprogramar · vigente</span>':'<span style="color:var(--ink2)">Período reprogramado</span>'}</td>
+        <td style="text-align:right;padding:.45rem .9rem;font-family:DM Mono,monospace">${(v=>v==null?'—':(v>=99?'>99':v.toFixed(1).replace('.',','))+' m')(f.antes?f.cobSin:(f.cob!=null&&f.cob<900?f.cob:null))}</td></tr>`;
     });
     h+='</tbody></table></div></div>';
     el.innerHTML=h;

@@ -58,6 +58,13 @@ async def main():
         await pg.evaluate("calcularRotacion('arsenal')")
         c=await pg.evaluate("(()=>{const R=window._rotResultados_arsenal;const L=R.map?R:R.res;const c={};L.forEach(x=>c[x.estado]=(c[x.estado]||0)+1);return c})()")
         ok(c=={'ok':24,'critico':5,'sobrestock':6,'vence-pronto':5},f'Botón → Rotación: {c}')
+        # Bajar a cero: incluye meses ANTES de «Mes inicio reprogramar» (programación vigente cancelable)
+        await pg.evaluate("switchMode('arsenal');aSwitch('masiva');document.getElementById('a-masiva-mes').value='11';document.getElementById('a-masiva-aini').value='2026';document.getElementById('a-masiva-mes-reprog').value='2';calcularMasiva('arsenal')")
+        await pg.wait_for_timeout(8000)
+        r=await pg.evaluate("""(()=>{calcularAjustesMasiva('arsenal');const F=window._ajustesCero_arsenal,R=window._masiva_res;
+          const malas=F.filter(f=>f.antes).filter(f=>{const d=R.find(x=>x.art===f.art).filaAnual[f.anio][MESES[f.mesNum-1]];return d.esFuturo||!(f.cobSin>parseFloat(document.getElementById('a-masiva-cmax').value));});
+          return{antes:F.filter(f=>f.antes).length,meses:[...new Set(F.filter(f=>f.antes).map(f=>f.mes+' '+f.anio))],malas:malas.length,despues:F.filter(f=>!f.antes&&(f.anio*12+f.mesNum)<2027*12+2).length}})()""")
+        ok(r['antes']>0 and 'Enero 2027' in r['meses'] and r['malas']==0 and r['despues']==0,f"Bajar a cero: meses antes de reprogramar (Nov–Ene) con cobertura sin el ingreso sobre el máximo ({r})")
         # ── Escenario F: Reposición SAPU ──
         await pg.evaluate("switchMode('sapu');sapuSwitch('repo');repoParam('frec','semanal');repoParam('vista','mes');repoParam('mes','2026-11')")
         await pg.wait_for_timeout(500)
