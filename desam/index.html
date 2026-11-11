@@ -1,10 +1,51 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pingüino Delta · DESAM Limache</title>
+<meta name="theme-color" content="#0E7470">
 <link rel="manifest" href="manifest.webmanifest">
+<style>
+  :root{--teal:#0E7470;--teal2:#1CAFAA;--ink:#1F2021;--ink2:#46494B;--ink3:#5C6064;--bg:#F5F8F8;--surf:#fff;--bdr:#D5E3E3}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#EEF3F3;--ink2:#C9D3D3;--ink3:#A9B4B4;--bg:#0F1A1A;--surf:#172424;--bdr:#2A3B3B;--teal:#3CC8C2}}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:radial-gradient(1200px 600px at 50% -10%,rgba(28,175,170,.18),transparent 60%),var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;padding:16px}
+  .card{width:100%;max-width:420px;background:var(--surf);border:1px solid var(--bdr);border-radius:18px;padding:2rem 1.8rem 1.6rem;text-align:center;box-shadow:0 12px 40px rgba(14,116,112,.12)}
+  .logo{width:76px;height:76px;margin:0 auto .6rem;animation:flota 2.6s ease-in-out infinite}
+  @keyframes flota{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  h1{font-size:24px;margin:.2rem 0 0;color:var(--teal);letter-spacing:-.01em}
+  .inst{font-size:13.5px;font-weight:600;color:var(--ink2);margin-top:2px;min-height:1em}
+  .barra{height:6px;border-radius:6px;background:rgba(14,116,112,.12);overflow:hidden;margin:1.3rem 0 .8rem;position:relative}
+  .barra i{position:absolute;inset:0 auto 0 0;width:38%;border-radius:6px;background:linear-gradient(90deg,var(--teal2),var(--teal));animation:corre 1.3s ease-in-out infinite}
+  @keyframes corre{0%{left:-40%}100%{left:100%}}
+  .card.listo .barra i,.card.error .barra i{animation:none;left:0;width:100%}
+  .card.error .barra i{background:#C63A3F}
+  #msg{font-size:14px;color:var(--ink);font-weight:600;min-height:1.3em}
+  #det{font-size:12.5px;color:var(--ink3);margin-top:.3rem;min-height:1.2em;line-height:1.45}
+  .tip{margin-top:1.3rem;padding-top:1rem;border-top:1px dashed var(--bdr);font-size:12px;color:var(--ink3);min-height:2.6em;transition:opacity .4s}
+  button{margin-top:1rem;padding:10px 18px;border:none;border-radius:10px;background:var(--teal);color:#fff;font:inherit;font-weight:700;cursor:pointer;display:none}
+  .card.error button{display:inline-block}
+  @media (prefers-reduced-motion:reduce){.logo,.barra i{animation:none}}
+</style>
 </head>
-<body style="font-family:system-ui,sans-serif;margin:0;padding:2rem;color:#123E66;background:#F5F8F8">
-<p id="msg">Cargando Pingüino Delta…</p>
+<body>
+<main class="card" id="card" aria-live="polite">
+  <svg class="logo" viewBox="0 0 96 96" aria-hidden="true">
+    <ellipse cx="48" cy="54" rx="30" ry="36" fill="#14302F" stroke="#2F6B68" stroke-width="2"/>
+    <ellipse cx="48" cy="60" rx="20" ry="27" fill="#fff"/>
+    <circle cx="39" cy="40" r="4.2" fill="#fff"/><circle cx="57" cy="40" r="4.2" fill="#fff"/>
+    <circle cx="40" cy="41" r="2" fill="#14302F"/><circle cx="56" cy="41" r="2" fill="#14302F"/>
+    <path d="M42 49 L48 55 L54 49 Z" fill="#F2A33A"/>
+    <ellipse cx="36" cy="89" rx="8" ry="3.5" fill="#F2A33A"/><ellipse cx="60" cy="89" rx="8" ry="3.5" fill="#F2A33A"/>
+    <path d="M22 22 L32 30 L28 34 Z" fill="#1CAFAA"/>
+  </svg>
+  <h1>Pingüino Delta</h1>
+  <div class="inst" id="inst"></div>
+  <div class="barra"><i></i></div>
+  <div id="msg">Preparando tu espacio de trabajo…</div>
+  <div id="det">Buscando la versión más reciente de Delta</div>
+  <button id="reint" onclick="location.reload()">Reintentar</button>
+  <div class="tip" id="tip"></div>
+</main>
 <script>
 /* Cargador de Pingüino Delta · versión institucional (un solo archivo).
    1) Descarga la versión publicada de Delta (se actualiza sola) y guarda una copia
@@ -22,15 +63,37 @@ const CONFIG = {
 };
 const FUENTE = 'https://carrascocisternaf-alt.github.io/pinguino-delta/';
 (function () {
-  const msg = t => { const m = document.getElementById('msg'); if (m) m.innerHTML = t; };
+  const $ = id => document.getElementById(id);
+  const estado = (m, d, cls) => { $('msg').textContent = m; $('det').textContent = d || ''; if (cls) $('card').className = 'card ' + cls; };
+  $('inst').textContent = CONFIG.nombre && !/Nombre de la/.test(CONFIG.nombre) ? CONFIG.nombre : '';
+  document.title = 'Pingüino Delta' + ($('inst').textContent ? ' · ' + $('inst').textContent : '');
+  const TIPS = ['📋 En Mi arsenal → Resumen ves cuántos meses cubre cada artículo al fin del mes.',
+    '🧾 Las órdenes de compra se marcan entre todos: ✓ OK, sin recepción o quiebre.',
+    '🔍 El buscador de Ayuda encuentra cualquier pestaña o cálculo.',
+    '🚑 En Urgencia (SAPU) está la reposición semanal y el pedido del jueves.',
+    '💾 Sin internet, Delta abre con la última copia guardada en este navegador.'];
+  let t = Math.floor(Math.random() * TIPS.length);
+  const tip = () => { $('tip').style.opacity = 0; setTimeout(() => { $('tip').textContent = TIPS[t++ % TIPS.length]; $('tip').style.opacity = 1; }, 300); };
+  tip(); const tipT = setInterval(tip, 3500);
   const db = () => new Promise((ok, ko) => { const r = indexedDB.open('delta-cargador', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
-  const leer = async () => { try { const d = await db(); return await new Promise(ok => { const q = d.transaction('kv').objectStore('kv').get('html'); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); }); } catch (e) { return null; } };
-  const guardar = async v => { try { const d = await db(); d.transaction('kv', 'readwrite').objectStore('kv').put(v, 'html'); } catch (e) {} };
+  const leer = async k => { try { const d = await db(); return await new Promise(ok => { const q = d.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); }); } catch (e) { return null; } };
+  const guardar = async (k, v) => { try { const d = await db(); d.transaction('kv', 'readwrite').objectStore('kv').put(v, k); } catch (e) {} };
   (async () => {
     let html = null;
-    try { const r = await fetch(FUENTE, { cache: 'no-cache' }); if (r.ok) { html = await r.text(); if (html.length > 100000) guardar(html); else html = null; } } catch (e) {}
-    if (!html) html = await leer();
-    if (!html) { msg('No hay internet y este navegador aún no tiene una copia de Delta. Conéctate una vez para guardarla.'); return; }
+    const lento = setTimeout(() => estado('Preparando tu espacio de trabajo…', 'La conexión está lenta; un momento más'), 5000);
+    try {
+      const ctrl = new AbortController(); const corte = setTimeout(() => ctrl.abort(), 25000);
+      const r = await fetch(FUENTE, { cache: 'no-cache', signal: ctrl.signal }); clearTimeout(corte);
+      if (r.ok) { html = await r.text(); if (html.length > 100000) { guardar('html', html); guardar('fecha', Date.now()); } else html = null; }
+    } catch (e) {}
+    clearTimeout(lento);
+    if (!html) {
+      html = await leer('html');
+      if (html) { const f = await leer('fecha'); estado('Sin conexión: abriendo la copia guardada', f ? 'Versión guardada el ' + new Date(f).toLocaleDateString('es-CL') + '. Tus datos se actualizan al volver internet.' : ''); await new Promise(z => setTimeout(z, 900)); }
+    }
+    if (!html) { clearInterval(tipT); estado('No se pudo abrir Delta', 'No hay conexión y este navegador aún no tiene una copia guardada. Conéctate a internet una vez y vuelve a intentarlo.', 'error'); return; }
+    estado('Abriendo Delta…', 'Cargando tus datos', 'listo');
+    clearInterval(tipT);
     const cfg = '<script>window.DELTA_CONFIG=' + JSON.stringify(CONFIG).replace(/</g, '\\u003c') + ';<\/script>';
     // Ingreso obligatorio: no se muestra nada de Delta hasta saber si hay sesión
     const pre = (CONFIG.tenant && CONFIG.exigirLogin !== false) ? '<style id="pre-gate">body{visibility:hidden}</style>' : '';
