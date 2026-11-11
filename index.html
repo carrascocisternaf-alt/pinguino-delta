@@ -21771,7 +21771,7 @@ function _nubePaquete(){
 }
 async function _nubeCarpeta(){
   if(NUBE.carpeta)return NUBE.carpeta;
-  if(NUBE.cfg.carpeta){const it=await _nubeItem(NUBE.cfg.carpeta);NUBE.carpeta={driveId:it.parentReference&&it.parentReference.driveId||(it.remoteItem&&it.remoteItem.parentReference.driveId),id:it.id};}
+  if(NUBE.cfg.carpeta){const it=await _nubeItem(NUBE.cfg.carpeta);const rm=it.remoteItem;NUBE.carpeta={driveId:(rm&&rm.parentReference&&rm.parentReference.driveId)||(it.parentReference&&it.parentReference.driveId),id:(rm&&rm.id)||it.id};}
   else if(NUBE.padre)NUBE.carpeta={driveId:NUBE.padre.driveId,id:NUBE.padre.id};
   return NUBE.carpeta||null;
 }
@@ -22057,7 +22057,7 @@ function nubeRender(ocupado){
     return`<span class="nb-f"><b>${etq}:</b> ${est}</span>`;};
   el.innerHTML=`<span class="nb-t">☁ <b>${_sapuEsc(NUBE.cfg.nombre||'Delta en red')}</b> ${ses?`· ${_sapuEsc(NUBE.user||'conectado')}`:'· sin sesión'}${NUBE.ultimaSync?` · sincronizado ${_fh(NUBE.ultimaSync)}`:''}${navigator.onLine===false||(NUBE.sinRed&&!_nubeOcupado)?' · <span class="nb-err">sin conexión: usando la última copia guardada</span>':''}</span>
     <span class="nb-fs">${fila('consumos','Consumos y programaciones')}${fila('sapu','Consumo diario SAPU')}${fila('inventario','Inventario botiquín')}${fila('bodega','Bodega central')}${fila('stockSapu','Stock SAPU')}${fila('comp','Stocks compartidos')}${NUBE.msg?`<span class="nb-f ${NUBE.msg.cls==='error'?'nb-err':''}">${_sapuEsc(NUBE.msg.t)}</span>`:''}</span>
-    <span class="nb-b">${ses?`<button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Sincronizando…':'🔄 Sincronizar'}</button><button onclick="nubeSalir()">Salir</button>`:`<button class="nb-main" onclick="nubeEntrar()">🔐 Entrar con cuenta ${_sapuEsc(NUBE.cfg.dominio||'institucional')}</button>`}</span>`;
+    <span class="nb-b">${ses?`<button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Sincronizando…':'🔄 Sincronizar'}</button><button onclick="NUBE.ultimoPub='';nubePublicar()" title="Sube a la carpeta compartida el inventario, bodega central, stock SAPU, mín/máx, exclusivos y equivalencias que tienes cargados en este PC">⬆ Compartir mis stocks</button><button onclick="nubeSalir()">Salir</button>`:`<button class="nb-main" onclick="nubeEntrar()">🔐 Entrar con cuenta ${_sapuEsc(NUBE.cfg.dominio||'institucional')}</button>`}</span>`;
 }
 async function nubeIniciar(){
   if(NUBE.iniciado)return;
