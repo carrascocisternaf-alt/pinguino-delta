@@ -28,8 +28,12 @@ const FUENTE = 'https://carrascocisternaf-alt.github.io/pinguino-delta/';
     if (!html) html = await leer();
     if (!html) { msg('No hay internet y este navegador aún no tiene una copia de Delta. Conéctate una vez para guardarla.'); return; }
     const cfg = '<script>window.DELTA_CONFIG=' + JSON.stringify(CONFIG).replace(/</g, '\\u003c') + ';<\/script>';
-    html = html.replace(/<head(\s[^>]*)?>/i, m => m + cfg);
+    // Ingreso obligatorio: no se muestra nada de Delta hasta saber si hay sesión
+    const pre = (CONFIG.tenant && CONFIG.exigirLogin !== false) ? '<style id="pre-gate">body{visibility:hidden}</style>' : '';
+    html = html.replace(/<head(\s[^>]*)?>/i, m => m + cfg + pre);
     document.open(); document.write(html); document.close();
+    // red de seguridad: si algo falla antes de decidir el acceso, no dejar la página en blanco
+    setTimeout(() => { const s = document.getElementById('pre-gate'); if (s) s.remove(); }, 10000);
   })();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();

@@ -94,8 +94,8 @@ async def main():
         # ── PC 1: sin sesión → botón entrar → login simulado ──
         ctx,pg,errs=await pc(b,N)
         await pg.goto('https://delta.test/'); await pg.wait_for_timeout(2500)
-        txt=await pg.inner_text('#nube-bar')
-        ok('Entrar con cuenta prueba.cl' in txt and await pg.evaluate("document.getElementById('demo-bar').style.display")=='none',f'Modo institucional activo, pide iniciar sesión y oculta datos de prueba ({txt[:80]!r})')
+        txt=await pg.inner_text('#nube-gate')
+        ok('Entrar con cuenta prueba.cl' in txt and await pg.is_visible('#nube-gate') and not await pg.is_visible('#nube-bar') and not await pg.is_visible('.mode-tabs'),f'Ingreso obligatorio: solo se ve la pantalla de ingreso ({txt[:80]!r})')
         # El login redirige a Microsoft: se intercepta y se responde como si volviera con code
         async def login_route(rt):
             q=up.parse_qs(up.urlparse(rt.request.url).query)
@@ -105,6 +105,7 @@ async def main():
         await pg.evaluate("nubeEntrar()"); await pg.wait_for_timeout(4000)
         r=await pg.evaluate("({u:location.search,tok:!!JSON.parse(localStorage.getItem('pdn_tok')||'null'),cons:Object.keys(cons_map).length,prog:Object.keys(prog).length,dias:_sdCfg().diarioDias.length,txt:document.getElementById('nube-bar').innerText})")
         ok(r['u']=='' and r['tok'],'Inicio de sesión PKCE: vuelve con código, guarda la sesión y limpia la URL')
+        ok(await pg.evaluate("!document.getElementById('nube-gate')&&!document.getElementById('pre-gate')") and await pg.is_visible('.mode-tabs'),'Tras ingresar se muestra Delta')
         ok(r['cons']>0 and r['prog']>0 and r['dias']==15,f"Lee de SharePoint el archivo único (consumos {r['cons']}, programación {r['prog']}) y el diario SAPU ({r['dias']} días)")
         ok('Q.F. Prueba' in r['txt'] and 'archivo modificado' in r['txt'],f"Barra muestra usuario y fecha de los archivos ({r['txt'][:120]!r})")
         # Sin cambios en SharePoint → no se vuelve a descargar
