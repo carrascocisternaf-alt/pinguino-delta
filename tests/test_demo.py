@@ -65,6 +65,34 @@ async def main():
           const malas=F.filter(f=>f.antes).filter(f=>{const d=R.find(x=>x.art===f.art).filaAnual[f.anio][MESES[f.mesNum-1]];return d.esFuturo||!(f.cobSin>parseFloat(document.getElementById('a-masiva-cmax').value));});
           return{antes:F.filter(f=>f.antes).length,meses:[...new Set(F.filter(f=>f.antes).map(f=>f.mes+' '+f.anio))],malas:malas.length,despues:F.filter(f=>!f.antes&&(f.anio*12+f.mesNum)<2027*12+2).length}})()""")
         ok(r['antes']>0 and 'Enero 2027' in r['meses'] and r['malas']==0 and r['despues']==0,f"Bajar a cero: meses antes de reprogramar (Nov–Ene) con cobertura sin el ingreso sobre el máximo ({r})")
+        # Resumen (situación actual sin reprogramar)
+        r=await pg.evaluate("""(()=>{localStorage.removeItem('pd_res');RES=null;aSwitch('dash');resParam('meses',2);const R=RES_ULT,c=_resCfg();
+          const x=R.filas.find(f=>f.art==='PARACETAMOL 500 MG COMPRIMIDO');
+          // verificación independiente: stock − vencido + programación − consumo × meses
+          let s=x.stock-x.vencido;x.detalle.forEach(d=>{s+=d.p-x.cons-d.ven;});
+          resParam('vista','ped');const ped=_resFiltradas();resParam('vista','sit');
+          resParam('grupo','t:SAPU');const sapu=_resFiltradas();resParam('grupo','');resParam('prog','sin');const sin=_resFiltradas().length;resParam('prog','todos');
+          resParam('q','paracetamol 500');const q=_resFiltradas().map(f=>f.art);resParam('q','');
+          const ords=_resFiltradas().map(f=>f.cob).filter(v=>v!=null&&isFinite(v));
+          return{meses:R.meses.length,ok:Math.abs(s-x.sFin)<1e-6,cob:Math.abs(x.cob-x.sFin/x.cons)<1e-9,ped:ped.length&&ped.every(f=>f.pedido===Math.max(0,Math.ceil(c.obj*f.cons-f.sFin))&&f.pedido>0),
+            sapu:sapu.length>0&&sapu.every(f=>f.tags.includes('SAPU')),sin,q,orden:ords.every((v,i)=>!i||ords[i-1]<=v),tabla:!!document.querySelector('#res-tabla table'),prom3:x.fuente}})()""")
+        ok(r['meses']==3 and r['ok'] and r['cob'] and r['ped'] and r['sapu'] and r['q']==['PARACETAMOL 500 MG COMPRIMIDO'] and r['orden'] and r['tabla'] and r['prom3']=='prom. 3 m',f"Resumen: stock fin de período, meses cubiertos, pedido especial, filtros, buscador y orden ({r})")
+        await pg.evaluate("document.querySelector('details.res-viejo').open=true;calcularDashboard('arsenal')"); await pg.wait_for_timeout(1500)
+        ok(await pg.evaluate("document.getElementById('a-dash-viejo').innerText.length>200&&!!document.getElementById('res-tabla')"),'Resumen: los indicadores anteriores siguen disponibles en el desplegable')
+        # Órdenes de compra (sin sitio compartido: en este navegador)
+        await pg.evaluate("switchMode('oc')"); await pg.wait_for_timeout(500)
+        await pg.click('#view-oc button.oc-prim >> text=+ Nueva OC')
+        await pg.fill('#oc-f-num','777-1-LE26'); await pg.fill('#view-oc .oc-fgrid input[list=oc-dl-prov]','GALENICUM HEALTH CHILE SPA')
+        await pg.fill('#view-oc .oc-f-art >> nth=0','PARACETAMOL 500 MG COMPRIMIDO'); await pg.fill('#view-oc .oc-ft tbody tr:nth-child(1) td:nth-child(2) input','2.000')
+        await pg.click('text=Guardar OC'); await pg.wait_for_timeout(500)
+        await pg.locator('#view-oc tr',has_text='PARACETAMOL').locator('button.oc-eb',has_text='OK').click(); await pg.wait_for_timeout(300)
+        await pg.click('#view-oc button.oc-prim >> text=Proceder cierre'); await pg.wait_for_timeout(300)
+        r=await pg.evaluate("(()=>{const o=Object.values(OC.ocs)[0];return{n:Object.keys(OC.ocs).length,est:o.estado,l:o.lineas.map(l=>[l.estado,l.recib,l.cant]),provs:OC_PROVS_KITE.length}})()")
+        ok(r['n']==1 and r['est']=='cerrada' and r['l']==[['ok',2000,2000]] and r['provs']>=70,f"Órdenes de compra: crear, marcar OK (recibido = pedido) y cerrar; {r['provs']} proveedores de Kite ({r})")
+        await pg.click('text=+ Nueva OC'); await pg.fill('#oc-f-num','777-1-le26'); await pg.fill('#view-oc .oc-fgrid input[list=oc-dl-prov]','X'); await pg.fill('#view-oc .oc-f-art >> nth=0','A'); await pg.fill('#view-oc .oc-ft tbody tr:nth-child(1) td:nth-child(2) input','1')
+        await pg.click('text=Guardar OC'); await pg.wait_for_timeout(300)
+        ok('Ya existe la OC' in await pg.inner_text('#oc-f-msg'),'Órdenes de compra: no permite N° de OC repetido')
+        await pg.click('#view-oc .oc-facc button >> text=Cancelar'); await pg.evaluate("switchMode('arsenal')")
         # ── Escenario F: Reposición SAPU ──
         await pg.evaluate("switchMode('sapu');sapuSwitch('repo');repoParam('frec','semanal');repoParam('vista','mes');repoParam('mes','2026-11')")
         await pg.wait_for_timeout(500)

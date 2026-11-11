@@ -35,6 +35,10 @@ Calculadora de **programación, rotación y vencimientos de medicamentos** para 
 
 **Versión institucional (Microsoft 365):** la carpeta [`institucional/`](institucional/LEEME.md) permite publicar un link propio (p. ej. en Netlify) donde cada colega entra con su cuenta Microsoft institucional; Delta lee directo de SharePoint el Excel único de consumos/programaciones y el de consumo diario SAPU, comparte los stocks cargados a mano entre todos los PC y funciona sin internet con la última copia. Sin esa configuración (como en este link abierto) no se conecta a nada.
 
+**Resumen (Mi arsenal):** situación actual sin reprogramar — stock esperado al fin del mes evaluado, meses cubiertos, alertas bajo umbral y pedido especial con la programación vigente; filtros por grupo/etiqueta, origen y con/sin programación.
+
+**Órdenes de compra:** seguimiento por línea (✓ OK, sin recepción, informa quiebre) y cierre; en el sitio compartido varias personas editan a la vez con la clave (el servidor aplica cada cambio con su hora y combina por línea).
+
 **Consumo diario sin fechas:** también acepta columnas «Consumo Día 1 (Sábado)», «Día 2 (Domingo)»… Delta deduce la fecha del Día 1 con los días de la semana (el más reciente que calce, sin pasar de hoy) y se puede corregir en pantalla; las columnas de días aún vacías no cuentan como informadas.
 
 `00_Guion_escenarios_DEMO.xlsx` indica qué debe mostrar Delta para cada artículo.
