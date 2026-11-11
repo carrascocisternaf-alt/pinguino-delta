@@ -21721,7 +21721,11 @@ const NUBE_ARCH=[
     const hojas=parseXAllSheets(buf);
     for(const h of hojas){if(_cargaUnica(h.rows,n+' ☁','arsenal'))return null;}
     return'No encontré la columna «Origen» (archivo único) en ninguna hoja.';}},
-  {k:'sapu',etq:'Consumo diario SAPU',url:c=>c.sapu,aplicar:(buf,n)=>{try{sapuDiarioDesdeBuf(buf,n+' ☁',true);return null;}catch(e){return e.message;}}}
+  {k:'sapu',etq:'Consumo diario SAPU',url:c=>c.sapu,aplicar:(buf,n)=>{try{sapuDiarioDesdeBuf(buf,n+' ☁',true);return null;}catch(e){return e.message;}}},
+  // Tomas de inventario AVIS guardadas en OneDrive (se reemplaza el archivo y Delta lo lee solo)
+  {k:'inventario',etq:'Inventario botiquín',url:c=>c.inventario,aplicar:(buf,n)=>{procesarInvRows.silencioso=true;try{const r=procesarInvRows(parseX(buf),n+' ☁');return r&&r.error?r.error:null;}finally{procesarInvRows.silencioso=false;}}},
+  {k:'bodega',etq:'Stock bodega central',url:c=>c.bodega,aplicar:(buf,n)=>{const r=repoBodegaRows(parseX(buf),n+' ☁',true);return r&&r.error?r.error:null;}},
+  {k:'stockSapu',etq:'Stock SAPU',url:c=>c.stockSapu,aplicar:(buf,n)=>{const r=repoStockSapuRows(parseX(buf),n+' ☁',true);return r&&r.error?r.error:null;}}
 ];
 async function _nubeArchivo(A,enLinea){
   const url=A.url(NUBE.cfg);if(!url)return;
@@ -21790,10 +21794,13 @@ function _nubeAplicarCompartido(d){
   if(!d||!d.datos)return;const D=d.datos;
   NUBE.aplicando=true;
   try{
-    if(D.inv&&Object.keys(D.inv).length){inv=D.inv;try{registrarArticulosDinamicos(Object.keys(inv).map(a=>({avis:a,origen:'nuevo'})));}catch(e){}
+    if(D.inv&&Object.keys(D.inv).length&&!(NUBE.cfg&&NUBE.cfg.inventario)){inv=D.inv;try{registrarArticulosDinamicos(Object.keys(inv).map(a=>({avis:a,origen:'nuevo'})));}catch(e){}
       const si=document.getElementById('st-inv');if(si)si.textContent=(D.invEstado||`✓ ${Object.keys(inv).length} artículos`)+' ☁';document.getElementById('slot-inv')?.classList.add('loaded');pdbGuardar('inv');}
     if(D.equivManual&&typeof equivManual!=='undefined'){Object.keys(D.equivManual).forEach(k=>{equivManual[k]=D.equivManual[k];});try{pdbGuardar('equivManual');}catch(e){}}
-    if(D.repo&&typeof _repoCfg==='function'){const R=_repoCfg();Object.assign(R,D.repo);if(D.apertura)_sapuCfg().apertura=D.apertura;_sapuGuardar();}
+    if(D.repo&&typeof _repoCfg==='function'){const R=_repoCfg();const rep=Object.assign({},D.repo);
+      if(NUBE.cfg&&NUBE.cfg.bodega){delete rep.bodega;delete rep.bodegaArchivo;}
+      if(NUBE.cfg&&NUBE.cfg.stockSapu){delete rep.sapuStock;delete rep.sapuStockArchivo;delete rep.sapuStockFecha;}
+      Object.assign(R,rep);if(D.apertura)_sapuCfg().apertura=D.apertura;_sapuGuardar();}
     NUBE.ultimoPub=JSON.stringify(_nubePaquete());
     try{renderLista();if(typeof sel!=='undefined'&&sel&&inv[sel])renderPanel(sel);}catch(e){}
     try{if(typeof repoRender==='function')repoRender();}catch(e){}
@@ -22049,7 +22056,7 @@ function nubeRender(ocupado){
     if(k==='comp'&&E.pendiente)est+=' <span class="nb-err">· cambios sin subir</span>';
     return`<span class="nb-f"><b>${etq}:</b> ${est}</span>`;};
   el.innerHTML=`<span class="nb-t">☁ <b>${_sapuEsc(NUBE.cfg.nombre||'Delta en red')}</b> ${ses?`· ${_sapuEsc(NUBE.user||'conectado')}`:'· sin sesión'}${NUBE.ultimaSync?` · sincronizado ${_fh(NUBE.ultimaSync)}`:''}${navigator.onLine===false||(NUBE.sinRed&&!_nubeOcupado)?' · <span class="nb-err">sin conexión: usando la última copia guardada</span>':''}</span>
-    <span class="nb-fs">${fila('consumos','Consumos y programaciones')}${fila('sapu','Consumo diario SAPU')}${fila('comp','Stocks compartidos')}${NUBE.msg?`<span class="nb-f ${NUBE.msg.cls==='error'?'nb-err':''}">${_sapuEsc(NUBE.msg.t)}</span>`:''}</span>
+    <span class="nb-fs">${fila('consumos','Consumos y programaciones')}${fila('sapu','Consumo diario SAPU')}${fila('inventario','Inventario botiquín')}${fila('bodega','Bodega central')}${fila('stockSapu','Stock SAPU')}${fila('comp','Stocks compartidos')}${NUBE.msg?`<span class="nb-f ${NUBE.msg.cls==='error'?'nb-err':''}">${_sapuEsc(NUBE.msg.t)}</span>`:''}</span>
     <span class="nb-b">${ses?`<button onclick="nubeSincronizar(true)"${ocupado||_nubeOcupado?' disabled':''}>${ocupado||_nubeOcupado?'⏳ Sincronizando…':'🔄 Sincronizar'}</button><button onclick="nubeSalir()">Salir</button>`:`<button class="nb-main" onclick="nubeEntrar()">🔐 Entrar con cuenta ${_sapuEsc(NUBE.cfg.dominio||'institucional')}</button>`}</span>`;
 }
 async function nubeIniciar(){
