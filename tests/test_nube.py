@@ -20,7 +20,7 @@ def ok(c,m): print(('✓ ' if c else '✗ ')+m); (None if c else fallas.append(m
 
 class Nube:
     """Graph simulado compartido por los dos 'PC' (contextos)."""
-    def __init__(s): s.descargas={'consumos':0,'sapu':0}; s.comp=None; s.comp_etag=0; s.puts=0; s.caido=False; s.etag={'consumos':'e1','sapu':'s1'}
+    def __init__(s): s.descargas={'consumos':0,'sapu':0}; s.comp=None; s.comp_etag=0; s.puts=0; s.caido=False; s.etag={'consumos':'e1','sapu':'s1'}; s.oc=None; s.oc_etag=0; s.conflictos=0
     async def handle(s,route):
         r=await s._handle(route); return r is not False
     async def _handle(s,route):
@@ -37,6 +37,15 @@ class Nube:
                 k='consumos' if url.endswith('CONSUMOS') else 'sapu'
                 return await route.fulfill(status=200,headers=H,content_type='application/json',body=json.dumps({'id':k,'name':k.upper()+'.xlsx','eTag':s.etag[k],'lastModifiedDateTime':'2026-11-03T12:00:00Z',
                     'lastModifiedBy':{'user':{'displayName':'Felipe'}},'parentReference':{'driveId':'D1','id':'P1'},'@microsoft.graph.downloadUrl':'https://dl.test/'+k}))
+            if p.startswith('/drives/D1/items/P1:/'+up.quote('Pinguino_Delta_OC.json')) or p.startswith('/drives/D1/items/P1:/Pinguino_Delta_OC.json'):
+                if m=='PUT':
+                    im=route.request.headers.get('if-match'); inm=route.request.headers.get('if-none-match')
+                    actual='o%d'%s.oc_etag if s.oc else None
+                    if (im and im!=actual) or (inm=='*' and s.oc): s.conflictos+=1; return await route.fulfill(status=412,headers=H,body='{}')
+                    s.oc=route.request.post_data; s.oc_etag+=1
+                    return await route.fulfill(status=200,headers=H,content_type='application/json',body=json.dumps({'eTag':'o%d'%s.oc_etag}))
+                if not s.oc: return await route.fulfill(status=404,headers=H,body='{}')
+                return await route.fulfill(status=200,headers=H,content_type='application/json',body=json.dumps({'eTag':'o%d'%s.oc_etag,'@microsoft.graph.downloadUrl':'https://dl.test/oc'}))
             if p.startswith('/drives/D1/items/P1:/'):
                 if m=='PUT':
                     s.comp=route.request.post_data; s.comp_etag+=1; s.puts+=1
@@ -47,6 +56,7 @@ class Nube:
         if u.startswith('https://dl.test/'):
             k=u.rsplit('/',1)[1]; H={'Access-Control-Allow-Origin':'*'}
             if k=='comp': return await route.fulfill(status=200,headers=H,content_type='application/json',body=s.comp)
+            if k=='oc': return await route.fulfill(status=200,headers=H,content_type='application/json',body=s.oc)
             s.descargas[k]+=1
             return await route.fulfill(status=200,headers=H,body=CONS if k=='consumos' else SAPU)
         return False
@@ -120,6 +130,18 @@ async def main():
         r=await pg2.evaluate("({cons:Object.keys(cons_map).length,ap:NUBE.estado.consumos&&NUBE.estado.consumos.aplicadoEtag,inv:Object.keys(inv).length,txt:document.getElementById('nube-bar').innerText})")
         ok(r['cons']>0 and r['ap']=='e2' and r['inv']==ninv and 'última copia' in r['txt'],f"Sin internet abre con la última copia descargada ({r['cons']} artículos, etag {r['ap']}, {r['txt'][:160]!r})")
         ok(not errs2,f'PC 2 sin errores ({errs2})')
+        # ── Órdenes de compra en OneDrive (dos personas a la vez, con If-Match) ──
+        N.caido=False
+        await pg.evaluate("switchMode('oc')"); await pg.wait_for_selector('#view-oc .oc-bar'); await pg.wait_for_timeout(800)
+        await pg.evaluate("""_ocEnviar({op:'oc',oc:{id:'x1',numero:'55-1',proveedor:'MEGALABS CHILE S.A.',fecha:'2026-11-04',obs:'',estado:'abierta',updPor:'Felipe',lineas:[{id:'l1',art:'A',cant:10,estado:'pend'},{id:'l2',art:'B',cant:20,estado:'pend'}]}})"""); await pg.wait_for_timeout(1500)
+        await pg2.reload(); await pg2.wait_for_timeout(4000)
+        await pg2.evaluate("switchMode('oc')"); await pg2.wait_for_selector('#view-oc .oc-bar'); await pg2.wait_for_timeout(1500)
+        n2=await pg2.evaluate("Object.keys(OC.ocs).length")
+        # ambos marcan a la vez líneas distintas
+        await asyncio.gather(pg.evaluate("ocLinea('x1','l1','estado','ok')"),pg2.evaluate("ocLinea('x1','l2','estado','quiebre')"))
+        await pg.wait_for_timeout(3000)
+        d=json.loads(N.oc)['ocs']['x1']['lineas']
+        ok(n2==1 and {l['id']:l['estado'] for l in d}=={'l1':'ok','l2':'quiebre'},f"OC en OneDrive: otro PC la ve y dos marcas simultáneas se conservan ({ {l['id']:l['estado'] for l in d} }, reintentos por conflicto: {N.conflictos})")
         await b.close()
 
 for modo in ('config','cargador'):

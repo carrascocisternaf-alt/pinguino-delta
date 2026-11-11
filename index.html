@@ -21142,8 +21142,36 @@ const OC={ocs:{},cargado:false,abierta:null,form:null,filtro:'abiertas',q:'',pro
 const _ocId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const _ocAhora=()=>new Date().toISOString();
 const _ocPor=()=>{try{return localStorage.getItem('pdn_por')||'';}catch(e){return'';}};
-const _ocCompartido=()=>typeof _esLotes==='function'&&_esLotes();
-const _ocPuedeEditar=()=>!_ocCompartido()||!!_lsG('pdn_clave');
+// Modo compartido: 'lotes' (servidor con clave) o 'ms' (OneDrive del DESAM con cuenta Microsoft)
+const _ocModo=()=>{if(typeof NUBE==='undefined'||!NUBE.cfg)return null;if(_esLotes())return'lotes';return NUBE.cfg.tenant?'ms':null;};
+const _ocCompartido=()=>!!_ocModo();
+const _ocSesionMS=()=>!!(NUBE.tok&&(NUBE.tok.rt||Date.now()<NUBE.tok.exp));
+const _ocPuedeEditar=()=>{const m=_ocModo();return !m||(m==='lotes'?!!_lsG('pdn_clave'):_ocSesionMS());};
+// ── OC en OneDrive (modo Microsoft): un archivo JSON en la carpeta compartida. Cada cambio
+// relee el archivo, aplica la operación y lo guarda con «If-Match» (si otra persona guardó
+// entremedio, se reintenta sobre su versión: nadie pisa a nadie).
+const NUBE_OC='Pinguino_Delta_OC.json';
+async function _ocMsLeer(){
+  const c=await _nubeCarpeta();if(!c)throw new Error('sin carpeta compartida');
+  const r=await _g(`/drives/${c.driveId}/items/${c.id}:/${encodeURIComponent(NUBE_OC)}`);
+  if(r.status===404)return{ocs:{},etag:null,c};
+  if(!r.ok){const e=new Error(r.status===403?'sin permiso en la carpeta':'HTTP '+r.status);e.status=r.status;throw e;}
+  const it=await r.json();const d=await (await fetch(it['@microsoft.graph.downloadUrl'],{cache:'no-store'})).json();
+  return{ocs:(d&&d.ocs)||{},etag:it.eTag,c};
+}
+async function _ocMsOp(op){
+  for(let i=0;i<5;i++){
+    const {ocs,etag,c}=await _ocMsLeer();
+    const oc=ocAplicarOp(ocs,op,new Date().toISOString());
+    if(!oc){const e=new Error('OC inexistente');e.status=404;throw e;}
+    const h={'Content-Type':'application/json'};if(etag)h['If-Match']=etag;else h['If-None-Match']='*';
+    const r=await _g(`/drives/${c.driveId}/items/${c.id}:/${encodeURIComponent(NUBE_OC)}:/content`,{method:'PUT',headers:h,body:JSON.stringify({app:'Pinguino Delta OC',v:1,ocs})});
+    if(r.status===412||r.status===409){await new Promise(z=>setTimeout(z,300+Math.random()*700));continue;}
+    if(!r.ok){const e=new Error(r.status===403?'tu cuenta solo puede leer la carpeta compartida':'HTTP '+r.status);e.status=r.status===403?401:r.status;throw e;}
+    return{ok:true,oc};
+  }
+  throw new Error('otra persona está guardando: reintenta');
+}
 const _ocEsc=s=>_sapuEsc(s==null?'':String(s));
 const _ocFecha=t=>{if(!t)return'';const d=new Date(t);return isNaN(d)?String(t):d.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});};
 const OC_EST={pend:['Pendiente','#E6EAEA','#46494B'],ok:['✓ OK','#1E8A4C','#fff'],sin:['Sin recepción','#F2A33A','#2B1A00'],quiebre:['Informa quiebre','#C63A3F','#fff']};
@@ -21171,12 +21199,12 @@ async function _ocCargarLocal(){if(OC.cargado)return;OC.cargado=true;try{const v
 function _ocGuardarLocal(){try{pdbSet('ocs',OC.ocs);pdbSet('ocs_cola',OC.cola||[]);}catch(e){}}
 async function ocSync(){
   if(!_ocCompartido())return;
-  try{await _ocVaciarCola();const j=await _lxJSON((NUBE.cfg.api||'/api/delta')+'?k=oc');OC.ocs=j.ocs||{};
+  try{await _ocVaciarCola();const j=_ocModo()==='ms'?await _ocMsLeer():await _lxJSON((NUBE.cfg.api||'/api/delta')+'?k=oc');OC.ocs=j.ocs||{};
     (OC.cola||[]).forEach(op=>ocAplicarOp(OC.ocs,op,_ocAhora())); // lo que aún no se pudo subir se sigue viendo
     OC.sync=Date.now();OC.error=(OC.cola||[]).length?`${OC.cola.length} cambio(s) sin subir: se reintenta`:null;_ocGuardarLocal();}
   catch(e){OC.error='sin conexión: se muestra la última copia';}
 }
-async function _ocPost(op){return _lxJSON(NUBE.cfg.api||'/api/delta',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+_lsG('pdn_clave')},body:JSON.stringify(Object.assign({k:'oc'},op))});}
+async function _ocPost(op){if(_ocModo()==='ms')return _ocMsOp(op);return _lxJSON(NUBE.cfg.api||'/api/delta',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+_lsG('pdn_clave')},body:JSON.stringify(Object.assign({k:'oc'},op))});}
 async function _ocVaciarCola(){
   while(OC.cola&&OC.cola.length){const op=OC.cola[0];
     try{const j=await _ocPost(op);if(j.oc)OC.ocs[j.oc.id]=j.oc;OC.cola.shift();}
@@ -21325,7 +21353,7 @@ function ocRender(){
   const estadoSync=comp?(OC.error?`<span style="color:var(--red)">⚠ ${_ocEsc(OC.error)}</span>`:`☁ Compartido con los colegas${OC.sync?' · actualizado '+_ocFecha(OC.sync):''}`):'💾 Guardado en este navegador (en el link compartido se ve entre todos)';
   el.innerHTML=`
   <div class="oc-top">
-    <div><h2>🧾 Órdenes de compra</h2><div class="oc-sub" style="font-size:12.5px">${estadoSync}${comp&&!_ocPuedeEditar()?' · <b>Solo lectura</b>: para editar, guarda la clave en la barra azul (🔑).':''}</div></div>
+    <div><h2>🧾 Órdenes de compra</h2><div class="oc-sub" style="font-size:12.5px">${estadoSync}${comp&&!_ocPuedeEditar()?(_ocModo()==='ms'?' · <b>Solo lectura</b>: para editar, entra con tu cuenta institucional (barra azul).':' · <b>Solo lectura</b>: para editar, guarda la clave en la barra azul (🔑).'):''}</div></div>
     <label class="oc-yo">Tu nombre<input type="text" value="${_ocEsc(_ocPor())}" placeholder="p. ej. Q.F. Felipe / Bodega" onchange="ocGuardarNombre(this.value)"></label>
   </div>
   <div class="kpis oc-kpis">
@@ -21789,6 +21817,7 @@ async function nubeSincronizar(manual){
   try{
     if(enLinea&&!NUBE.user){try{const r=await _g('/me?$select=displayName,mail');if(r.ok){const j=await r.json();NUBE.user=j.displayName||j.mail;_lsS('pdn_user',NUBE.user);}}catch(e){}}
     for(const A of NUBE_ARCH)await _nubeArchivo(A,enLinea);
+    try{if(enLinea&&typeof ocSync==='function'&&OC.cargado){await ocSync();if(document.getElementById('view-oc')?.style.display==='block')ocRender();}}catch(e){}
     if(enLinea){await _nubeLeerCompartido();if(NUBE.estado.comp&&NUBE.estado.comp.pendiente)await nubePublicar();}
     else{const cc=await _nubeGet('comp');const E=NUBE.estado.comp=NUBE.estado.comp||{};if(cc&&!E.aplicadoEtag){E.meta=cc.meta;_nubeAplicarCompartido(cc.d);E.aplicadoEtag=cc.meta.etag;E.desdeCache=true;}}
     const algunoOK=NUBE_ARCH.some(A=>NUBE.estado[A.k]&&NUBE.estado[A.k].enLinea);NUBE.sinRed=enLinea?!algunoOK:navigator.onLine===false;
