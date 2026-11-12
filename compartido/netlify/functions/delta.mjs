@@ -117,6 +117,11 @@ export default async (req) => {
     }
     if (body.k === "oc") {
       if (text.length > MAX_OC) return json({ error: "OC demasiado grande." }, 413);
+      const idOk = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(v);
+      const oid = body.op === "oc" ? body.oc && body.oc.id : body.id;
+      const lineasOk = body.op === "oc" ? Array.isArray(body.oc && body.oc.lineas) && body.oc.lineas.every((l) => l && idOk(l.id))
+        : body.op === "linea" ? !!(body.linea && idOk(body.linea.id)) : true;
+      if (!["oc", "linea", "cab"].includes(body.op) || !idOk(oid) || !lineasOk) return json({ error: "OC inválida." }, 400);
       const todo = (await store.get("ocs", { type: "json" })) || { ocs: {} };
       const oc = ocAplicarOp(todo.ocs, body, ahora);
       if (!oc) return json({ error: "OC inválida o inexistente." }, body.op === "oc" ? 400 : 404);

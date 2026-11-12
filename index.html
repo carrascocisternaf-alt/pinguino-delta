@@ -13321,7 +13321,7 @@ function importarRespaldoCompleto(evt){
         pdbGuardar(k);
       });
       if(data.vistaGastoIVA){vistaGastoIVA=data.vistaGastoIVA;pdbSet('vistaGastoIVA',vistaGastoIVA);}
-      if(data.ocs&&typeof OC!=='undefined'&&!(typeof _esLotes==='function'&&_esLotes())){Object.keys(data.ocs).forEach(id=>{OC.ocs[id]=data.ocs[id];});pdbSet('ocs',OC.ocs);}
+      if(data.ocs&&typeof OC!=='undefined'&&!(typeof _esLotes==='function'&&_esLotes())){Object.assign(OC.ocs,_ocSanearTodo(data.ocs));pdbSet('ocs',OC.ocs);}
       const reconciliar=[];
       [...Object.keys(inv),...Object.keys(cons_map),...Object.keys(prog)].forEach(a=>{
         if(!ARTS_FIJOS_SET.has(a))reconciliar.push({avis:a,origen:'nuevo'});
@@ -21021,15 +21021,24 @@ function resCalcular(){
     const ori=(y)=>{const o=pd&&(pd.origenPorAño&&pd.origenPorAño[y]||pd.origen);return o?String(o).trim():'';};
     let s=stock,lleg=0,quiebre=null,cobMin=Infinity;const detalle=[];
     // vencimientos dentro del período (lotes que vencen antes del fin del mes)
-    const vencPorMes={};if(cfg.venc)lots.forEach(l=>{const v=_repoFinVenc(l.venc);if(v.getFullYear()<9999){const k=v.getFullYear()*12+v.getMonth()+1;vencPorMes[k]=(vencPorMes[k]||0)+(+l.stock||0);}});
-    let vencido=0;const kIni=y0*12+m0;
-    Object.keys(vencPorMes).forEach(k=>{if(+k<kIni){vencido+=vencPorMes[k];}});
-    s-=vencido; // ya vencido al día de hoy
+    // Simulación por lote (FEFO): cada mes llega lo programado (lote sin vencimiento conocido),
+    // se consume primero lo que vence antes y, al cierre del mes, se descuenta como merma solo
+    // lo que queda de los lotes que vencen ese mes (no el lote completo).
+    const kIni=y0*12+m0;
+    let L=lots.map(l=>{const v=_repoFinVenc(l.venc);return{q:+l.stock||0,k:v.getFullYear()<9999?v.getFullYear()*12+v.getMonth()+1:Infinity};}).filter(x=>x.q>0);
+    let vencido=0;
+    if(cfg.venc){L.forEach(x=>{if(x.k<kIni){vencido+=x.q;x.q=0;}});L=L.filter(x=>x.q>0);}
+    let falta=0;
     meses.forEach(({y,m})=>{
-      const p=progMes(y,m);lleg+=p;const ven=vencPorMes[y*12+m]||0;
-      s=s+p-cb.c-ven;
+      const k=y*12+m,p=progMes(y,m);lleg+=p;if(p>0)L.push({q:p,k:Infinity});
+      L.sort((a,b)=>a.k-b.k);let c=cb.c;
+      for(const x of L){if(c<=0)break;const t=Math.min(x.q,c);x.q-=t;c-=t;}
+      falta+=c; // consumo que no alcanzó a cubrirse (quiebre)
+      let ven=0;if(cfg.venc)L.forEach(x=>{if(x.k===k&&x.q>0){ven+=x.q;x.q=0;}});
+      L=L.filter(x=>x.q>0);
+      s=L.reduce((a,x)=>a+x.q,0)-falta;
       if(cb.c>0)cobMin=Math.min(cobMin,s/cb.c);
-      if(quiebre===null&&s<0&&cb.c>0)quiebre=MC[m-1]+' '+String(y).slice(2);
+      if(quiebre===null&&falta>0&&cb.c>0)quiebre=MC[m-1]+' '+String(y).slice(2);
       detalle.push({y,m,p,ven,s});
     });
     // «Con programación» = tiene unidades programadas desde el mes en curso en adelante
@@ -21205,12 +21214,26 @@ function ocAplicarOp(ocs,op,ahora){
     ocs[n.id]=Object.assign({},o,{numero:n.numero,proveedor:n.proveedor,fecha:n.fecha,obs:n.obs,updPor:n.updPor,upd:ahora,lineas});return ocs[n.id];}
   return null;
 }
-function ocCombinar(a,b){return b||a;} // compatibilidad con respaldos: la versión importada reemplaza
-async function _ocCargarLocal(){if(OC.cargado)return;OC.cargado=true;try{const v=await pdbGet('ocs');if(v&&typeof v==='object')OC.ocs=v;}catch(e){}try{const c=await pdbGet('ocs_cola');if(Array.isArray(c))OC.cola=c;}catch(e){}}
+function ocCombinar(a,b){return b||a;}
+// Datos de OC que llegan de otros PC (servidor/OneDrive/respaldo) se normalizan antes de mostrarse:
+// ids solo [A-Za-z0-9_-], números como número, fecha AAAA-MM-DD y estados conocidos (evita inyección en la página).
+const _ocIdOk=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(v);
+const _ocTxt=(v,n)=>v==null?'':String(v).slice(0,n);
+const _ocNum=v=>{if(v===null||v===undefined||v==='')return null;const n=+v;return isFinite(n)?n:null;};
+function _ocSanear(o){
+  if(!o||typeof o!=='object'||!_ocIdOk(o.id))return null;
+  const L=(Array.isArray(o.lineas)?o.lineas:[]).filter(l=>l&&_ocIdOk(l.id)).map(l=>({id:l.id,art:_ocTxt(l.art,200),cant:_ocNum(l.cant)||0,recib:_ocNum(l.recib),
+    estado:['pend','ok','sin','quiebre'].includes(l.estado)?l.estado:'pend',obs:_ocTxt(l.obs,300),por:_ocTxt(l.por,80),ts:_ocTxt(l.ts,40),borrada:!!l.borrada}));
+  const ci=o.cierre&&typeof o.cierre==='object'?{ts:_ocTxt(o.cierre.ts,40),por:_ocTxt(o.cierre.por,80),pendientes:_ocNum(o.cierre.pendientes)||0}:null;
+  return{id:o.id,numero:_ocTxt(o.numero,60),proveedor:_ocTxt(o.proveedor,160),fecha:/^\d{4}-\d{2}-\d{2}$/.test(o.fecha||'')?o.fecha:'',obs:_ocTxt(o.obs,300),
+    estado:o.estado==='cerrada'?'cerrada':'abierta',cierre:ci,borrada:!!o.borrada,creado:_ocTxt(o.creado,40),creadoPor:_ocTxt(o.creadoPor,80),upd:_ocTxt(o.upd,40),updPor:_ocTxt(o.updPor,80),lineas:L};
+}
+function _ocSanearTodo(m){const r={};Object.values(m||{}).forEach(o=>{const x=_ocSanear(o);if(x)r[x.id]=x;});return r;} // compatibilidad con respaldos: la versión importada reemplaza
+async function _ocCargarLocal(){if(OC.cargado)return;OC.cargado=true;try{const v=await pdbGet('ocs');if(v&&typeof v==='object')OC.ocs=_ocSanearTodo(v);}catch(e){}try{const c=await pdbGet('ocs_cola');if(Array.isArray(c))OC.cola=c;}catch(e){}}
 function _ocGuardarLocal(){try{pdbSet('ocs',OC.ocs);pdbSet('ocs_cola',OC.cola||[]);}catch(e){}}
 async function ocSync(){
   if(!_ocCompartido())return;
-  try{await _ocVaciarCola();const j=_ocModo()==='ms'?await _ocMsLeer():await _lxJSON((NUBE.cfg.api||'/api/delta')+'?k=oc');OC.ocs=j.ocs||{};
+  try{await _ocVaciarCola();const j=_ocModo()==='ms'?await _ocMsLeer():await _lxJSON((NUBE.cfg.api||'/api/delta')+'?k=oc');OC.ocs=_ocSanearTodo(j.ocs);
     (OC.cola||[]).forEach(op=>ocAplicarOp(OC.ocs,op,_ocAhora())); // lo que aún no se pudo subir se sigue viendo
     OC.sync=Date.now();OC.error=(OC.cola||[]).length?`${OC.cola.length} cambio(s) sin subir: se reintenta`:null;_ocGuardarLocal();}
   catch(e){OC.error='sin conexión: se muestra la última copia';}
@@ -21218,7 +21241,7 @@ async function ocSync(){
 async function _ocPost(op){if(_ocModo()==='ms')return _ocMsOp(op);return _lxJSON(NUBE.cfg.api||'/api/delta',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+_lsG('pdn_clave')},body:JSON.stringify(Object.assign({k:'oc'},op))});}
 async function _ocVaciarCola(){
   while(OC.cola&&OC.cola.length){const op=OC.cola[0];
-    try{const j=await _ocPost(op);if(j.oc)OC.ocs[j.oc.id]=j.oc;OC.cola.shift();}
+    try{const j=await _ocPost(op);const x=_ocSanear(j.oc);if(x)OC.ocs[x.id]=x;OC.cola.shift();}
     catch(e){if(e.status===401||e.status===400||e.status===404){OC.cola.shift();OC.error=e.status===401?'clave incorrecta: un cambio no se guardó en el servidor':'un cambio fue rechazado: '+e.message;continue;}throw e;}}
   _ocGuardarLocal();
 }
@@ -21308,7 +21331,7 @@ function _ocTarjeta(o){
   return`<div class="oc-card${o.estado==='cerrada'?' cerrada':''}" data-oc="${_ocEsc(o.id)}">
     <div class="oc-head" onclick="ocToggle('${o.id}')">
       <div class="oc-num">OC ${_ocEsc(o.numero)}</div>
-      <div class="oc-prov">${_ocEsc(o.proveedor)}${o.fecha?` · ${o.fecha.split('-').reverse().join('/')}`:''}</div>
+      <div class="oc-prov">${_ocEsc(o.proveedor)}${o.fecha?` · ${_ocEsc(o.fecha.split('-').reverse().join('/'))}`:''}</div>
       <div class="oc-prog" title="${r.ok} de ${r.n} líneas recepcionadas OK"><div style="width:${pct}%"></div></div>
       <div class="oc-cnt">${r.ok}/${r.n} OK${r.sin?` · ${r.sin} sin recepción`:''}${r.quiebre?` · <b style="color:#A12A2E">${r.quiebre} quiebre</b>`:''}</div>
       <span class="oc-chip" style="background:${e[1]};color:${e[2]}">${e[0]}</span>
@@ -21318,7 +21341,7 @@ function _ocTarjeta(o){
       ${o.obs?`<div class="oc-obs">📝 ${_ocEsc(o.obs)}</div>`:''}
       <div class="oc-tw"><table class="oc-t"><thead><tr><th>Artículo</th><th class="n">Pedido</th><th class="n">Recibido</th><th>Estado</th><th>Observación</th><th>Último cambio</th></tr></thead><tbody>${
         r.L.map(l=>`<tr class="oc-l-${l.estado}"><td class="oc-art">${_ocEsc(l.art)}</td><td class="n">${(+l.cant).toLocaleString('es-CL')}</td>
-          <td class="n"><input class="oc-rec" type="text" inputmode="numeric" value="${l.recib==null?'':l.recib}" ${ed?'':'disabled'} onchange="ocLinea('${o.id}','${l.id}','recib',this.value)">${l.recib!=null&&+l.recib<+l.cant&&l.estado==='ok'?'<div class="oc-sub" style="color:#B4530A">parcial</div>':''}</td>
+          <td class="n"><input class="oc-rec" type="text" inputmode="numeric" value="${l.recib==null?'':_ocEsc(l.recib)}" ${ed?'':'disabled'} onchange="ocLinea('${o.id}','${l.id}','recib',this.value)">${l.recib!=null&&+l.recib<+l.cant&&l.estado==='ok'?'<div class="oc-sub" style="color:#B4530A">parcial</div>':''}</td>
           <td class="oc-ebs">${bt(l,'ok')}${bt(l,'sin')}${bt(l,'quiebre')}</td>
           <td><input class="oc-lobs" type="text" value="${_ocEsc(l.obs||'')}" placeholder="—" ${ed?'':'disabled'} onchange="ocLinea('${o.id}','${l.id}','obs',this.value)"></td>
           <td class="oc-sub">${l.por?_ocEsc(l.por)+' · ':''}${_ocFecha(l.ts)}</td></tr>`).join('')}</tbody></table></div>

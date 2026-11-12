@@ -180,6 +180,13 @@ async def main():
         o=list(S.ocs.values())[0]
         ok(o['estado']=='cerrada' and o['cierre']['por']=='Bodega' and o['cierre']['pendientes']==1,f"OC cerrada con registro de quién ({o['estado']}, {o.get('cierre')})")
         ok(not errs3,f'PC de la bodeguera sin errores ({errs3})')
+        # Seguridad: datos de OC manipulados en el servidor no se ejecutan en la página
+        S.ocs["x');window.__pwn=1;('"]={'id':"x');window.__pwn=1;('",'numero':'<img src=x onerror="window.__pwn=2">','proveedor':'P','lineas':[]}
+        S.ocs['ok1']={'id':'ok1','numero':'<b>9</b>','proveedor':'<img src=x onerror="window.__pwn=3">','fecha':'"><img src=x onerror="window.__pwn=4">','estado':'abierta','lineas':[{'id':'l"9','art':'x'},{'id':'l1','art':'<svg onload="window.__pwn=5">','cant':'1','recib':'"><img src=x onerror="window.__pwn=6">','estado':'ok'}]}
+        await pg3.evaluate("ocActualizar()"); await pg3.wait_for_timeout(800)
+        await pg3.evaluate("OC.filtro='todas';OC.abierta='ok1';ocRender()"); await pg3.wait_for_timeout(500)
+        r=await pg3.evaluate("({pwn:window.__pwn||0,ids:Object.keys(OC.ocs),lin:OC.ocs.ok1&&OC.ocs.ok1.lineas.map(l=>l.id),img:document.querySelectorAll('#view-oc img,#view-oc svg[onload]').length})")
+        ok(r['pwn']==0 and "x');window.__pwn=1;('" not in r['ids'] and r['lin']==['l1'] and r['img']==0,f'Seguridad OC: ids y textos manipulados se descartan o escapan ({r})')
         await b.close()
     print('\nRESULTADO:', 'TODO OK' if not fallas else f'{len(fallas)} FALLA(S)')
     if fallas: raise SystemExit(1)
