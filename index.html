@@ -21771,7 +21771,8 @@ function _nubePaquete(){
 }
 async function _nubeCarpeta(){
   if(NUBE.carpeta)return NUBE.carpeta;
-  if(NUBE.cfg.carpeta){const it=await _nubeItem(NUBE.cfg.carpeta);const rm=it.remoteItem;NUBE.carpeta={driveId:(rm&&rm.parentReference&&rm.parentReference.driveId)||(it.parentReference&&it.parentReference.driveId),id:(rm&&rm.id)||it.id};}
+  if(NUBE.cfg.carpeta){const it=await _nubeItem(NUBE.cfg.carpeta);const rm=it.remoteItem;NUBE.carpeta={driveId:(rm&&rm.parentReference&&rm.parentReference.driveId)||(it.parentReference&&it.parentReference.driveId),id:(rm&&rm.id)||it.id,nombre:it.name||(rm&&rm.name)||''};
+    if(!NUBE.carpeta.driveId){NUBE.carpeta=null;throw new Error('no se pudo ubicar la carpeta compartida');}}
   else if(NUBE.padre)NUBE.carpeta={driveId:NUBE.padre.driveId,id:NUBE.padre.id};
   return NUBE.carpeta||null;
 }
@@ -21780,8 +21781,12 @@ async function _nubeLeerCompartido(){
   try{
     const c=await _nubeCarpeta();if(!c){E.error='sin carpeta';return;}
     const r=await _g(`/drives/${c.driveId}/items/${c.id}:/${encodeURIComponent(NUBE_COMP)}`);
-    if(r.status===404){E.vacio=true;E.error=null;return;}
+    if(r.status===404){E.vacio=true;E.error=null;
+      // Carpeta nueva y vacía: si este PC tiene stocks cargados, los sube (p. ej. al cambiar de carpeta)
+      if(Object.keys(inv||{}).length||Object.keys((_repoCfg&&_repoCfg().bodega)||{}).length){NUBE.ultimoPub='';await nubePublicar();}
+      return;}
     if(!r.ok)throw new Error(r.status===403?'sin permiso en la carpeta':'HTTP '+r.status);
+    E.vacio=false;
     const it=await r.json();E.meta={etag:it.eTag,mod:it.lastModifiedDateTime,por:it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName};
     if(E.aplicadoEtag===it.eTag){E.error=null;return;}
     const d=await (await fetch(it['@microsoft.graph.downloadUrl'])).json();
@@ -22052,8 +22057,9 @@ function nubeRender(ocupado){
   el.style.display='flex';
   const ses=!!(NUBE.tok&&(NUBE.tok.rt||Date.now()<NUBE.tok.exp));
   const fila=(k,etq)=>{const E=NUBE.estado[k]||{};const m=E.meta;if(!NUBE.cfg[k==='comp'?'_':k]&&k!=='comp')return'';
-    let est=E.formato?`<span class="nb-err">⚠ ${_sapuEsc(E.formato)}</span>`:E.error&&!m?`<span class="nb-err">⚠ ${_sapuEsc(E.error)}</span>`:m?`✓ ${k==='comp'?'actualizado':'archivo modificado'} ${_fh(m.mod)}${m.por?' por '+_sapuEsc(m.por):''}${E.error?` <span class="nb-err" title="${_sapuEsc(E.error)}">· sin conexión, última copia</span>`:''}`:(k==='comp'&&E.vacio?(NUBE.cfg.carpeta?'aún no hay stocks compartidos: se crearán al cargar uno':'<span class="nb-err">no encontrados: si otra persona ya los cargó, falta compartir contigo la carpeta de stocks</span>'):'pendiente');
-    if(k==='comp'&&E.pendiente)est+=' <span class="nb-err">· cambios sin subir</span>';
+    let est=E.formato?`<span class="nb-err">⚠ ${_sapuEsc(E.formato)}</span>`:E.error&&!m?`<span class="nb-err">⚠ ${_sapuEsc(E.error)}</span>`:m?`✓ ${k==='comp'?'actualizado':'archivo modificado'} ${_fh(m.mod)}${m.por?' por '+_sapuEsc(m.por):''}${E.error?` <span class="nb-err">· ${/fetch|network|conex/i.test(E.error)?'sin conexión, se muestra la última copia':'⚠ '+_sapuEsc(E.error)+' (se muestra la última copia)'}</span>`:''}`:(k==='comp'&&E.vacio?(NUBE.cfg.carpeta?'aún no hay stocks compartidos: se crearán al cargar uno':'<span class="nb-err">no encontrados: si otra persona ya los cargó, falta compartir contigo la carpeta de stocks</span>'):'pendiente');
+    if(k==='comp'&&E.pendiente)est+=` <span class="nb-err">· no se pudo subir${E.error?': '+_sapuEsc(E.error):''}</span>`;
+    if(k==='comp'&&NUBE.carpeta&&NUBE.carpeta.nombre)est+=` <span style="opacity:.8">· carpeta «${_sapuEsc(NUBE.carpeta.nombre)}»</span>`;
     return`<span class="nb-f"><b>${etq}:</b> ${est}</span>`;};
   el.innerHTML=`<span class="nb-t">☁ <b>${_sapuEsc(NUBE.cfg.nombre||'Delta en red')}</b> ${ses?`· ${_sapuEsc(NUBE.user||'conectado')}`:'· sin sesión'}${NUBE.ultimaSync?` · sincronizado ${_fh(NUBE.ultimaSync)}`:''}${navigator.onLine===false||(NUBE.sinRed&&!_nubeOcupado)?' · <span class="nb-err">sin conexión: usando la última copia guardada</span>':''}</span>
     <span class="nb-fs">${fila('consumos','Consumos y programaciones')}${fila('sapu','Consumo diario SAPU')}${fila('inventario','Inventario botiquín')}${fila('bodega','Bodega central')}${fila('stockSapu','Stock SAPU')}${fila('comp','Stocks compartidos')}${NUBE.msg?`<span class="nb-f ${NUBE.msg.cls==='error'?'nb-err':''}">${_sapuEsc(NUBE.msg.t)}</span>`:''}</span>
